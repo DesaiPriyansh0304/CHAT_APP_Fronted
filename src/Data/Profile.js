@@ -1,0 +1,47 @@
+export const recentChats = [
+  {
+    name: "Patrick Hendricks",
+    img: "https://randomuser.me/api/portraits/men/1.jpg",
+    message: "hey! there I'm available",
+    time: "02:50 PM",
+    online: true,
+  },
+  {
+    name: "Mark Messer",
+    img: "https://randomuser.me/api/portraits/men/5.jpg",
+    message: "Images",
+    time: "10:30 AM",
+    unread: 2,
+    online: false,
+  },
+  {
+    name: "General",
+    img: null,
+    message: "This theme is Awesome!",
+    time: "2:06 min",
+    online: false,
+  },
+  {
+    name: "Doris Brown",
+    img: "https://randomuser.me/api/portraits/women/2.jpg",
+    message: "typing •••",
+    time: "10:05 AM",
+    online: true,
+    isTyping: true,
+  },
+  {
+    name: "Designer",
+    img: null,
+    message: "Next meeting tomorrow 10.00AM",
+    time: "2:10 min",
+    unread: 1,
+    online: false,
+  },
+  {
+    name: "Steve Walker",
+    img: "https://randomuser.me/api/portraits/men/4.jpg",
+    message: "Admin-A-zip",
+    time: "01:16 PM",
+    online: false,
+  },
+];

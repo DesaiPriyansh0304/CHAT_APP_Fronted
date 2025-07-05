@@ -1,0 +1,128 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { io } from "socket.io-client";
+import { setOnlineUsers } from "./OnlineuserSlice";
+import { newMessageReceived } from "./ChatSlice";
+
+//  Must match your server base URL — no /api!
+const URL = import.meta.env.VITE_REACT_APP;
+let socketInstance = null;
+
+const socketSlice = createSlice({
+  name: "socket",
+  initialState: {
+    socket: null,
+    isConnected: false,
+  },
+  reducers: {
+    setSocket: (state, action) => {
+      state.socket = action.payload;
+    },
+    setConnectionStatus: (state, action) => {
+      state.isConnected = action.payload;
+    },
+    clearSocket: (state) => {
+      state.socket = null;
+      state.isConnected = false;
+    },
+  },
+});
+
+export const { setSocket, setConnectionStatus, clearSocket } =
+  socketSlice.actions;
+
+export const connectSocket = (user) => (dispatch) => {
+  if (!user || socketInstance?.connected) {
+    console.log("⚠️ Socket already connected or user missing/SoketSlice", {
+      hasUser: !!user,
+      socketConnected: socketInstance?.connected,
+    });
+    return;
+  }
+
+  console.log("🌐 Connecting socket to:/SoketSlice", URL);
+  console.log("👤 Connecting with userId:/SoketSlice", user._id || user.userId);
+
+  socketInstance = io(URL, {
+    query: {
+      userId: user._id || user.userId,
+    },
+    transports: ["websocket"],
+  });
+
+  socketInstance.on("connect", () => {
+    console.log("🟢Socket connected:/SoketSlice", socketInstance.id);
+    dispatch(setSocket(socketInstance));
+    dispatch(setConnectionStatus(true));
+  });
+
+  socketInstance.on("connect_error", (err) => {
+    console.error("⚫Socket connection error:/SoketSlice", err.message);
+    dispatch(setConnectionStatus(false));
+  });
+
+  socketInstance.on("disconnect", () => {
+    console.log("🔴Socket disconnected/SoketSlice");
+    dispatch(setConnectionStatus(false));
+  });
+
+  // socketInstance.on("getOnlineUsers", (userIds) => {
+  //   console.log(" Online users received:", userIds);
+  //   dispatch(setOnlineUsers(userIds));
+  // });
+
+  socketInstance.on("groupMessage", (message) => {
+    console.log("👥 Group message received:/SoketSlice", message);
+
+    dispatch(
+      newMessageReceived({
+        ...message,
+        text: message.text || "",
+        image: message.image || "",
+        file: message.file || "",
+        type: message.type || "text",
+      })
+    );
+  });
+
+  socketInstance.on("privateMessage", (message) => {
+    console.log("📩 Private message received:/SoketSlice", message);
+    // dispatch(newMessageReceived(message));
+    const currentUserId = user._id || user.userId;
+    const content = Array.isArray(message.content)
+      ? message.content[0]
+      : message.content;
+
+    if (message.receiverId === currentUserId) {
+      dispatch(
+        newMessageReceived({
+          ...message,
+          content: message.content || [],
+          text: message.text || "", // normalize fields
+          // image: message.image || "",
+          // file: message.file || "",
+          image: message.type === "image" ? content : "",
+          file: message.type === "file" ? content : "",
+          type: message.type || "text",
+        })
+      );
+    }
+  });
+
+  // handle reconnection
+  socketInstance.io.on("reconnect", () => {
+    console.log("🔁 Reconnected to socket server!/SoketSlice");
+  });
+};
+
+//disconnnected SOCKET.IO
+export const disconnectSocket = () => (dispatch) => {
+  if (socketInstance) {
+    console.log("🔌Disconnecting socket.../SoketSlice");
+    socketInstance.disconnect();
+    socketInstance = null;
+    dispatch(clearSocket());
+    dispatch(setOnlineUsers([]));
+  }
+};
+
+export default socketSlice.reducer;

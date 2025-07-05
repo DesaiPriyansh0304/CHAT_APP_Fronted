@@ -1,0 +1,475 @@
+  // state.user = action.payload.user;
+      // state.user = action.payload.email;
+        state.token = action.payload.token;
+      state.isAuthenticated = true;
+      localStorage.setItem("Authtoken", action.payload.token);
+     
+
+       localStorage.setItem("AuthUser", JSON.stringify(action.payload.user));
+
+       rigthsidebar.jsx
+       // import React, { useEffect, useRef, useState } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
+// import axios from 'axios';
+// import { connectSocket, disconnectSocket } from '../feature/Slice/SocketSlice';
+// import { setMessages, addOwnMessage } from '../feature/Slice/ChatSlice';
+// import Header from './Rigthsidebar/Header';
+// import Chatbody from './Rigthsidebar/Chatbody';
+// import Inputside from './Rigthsidebar/Inputside';
+
+// const Rightsidebar = ({ selectUser }) => {
+//   const dispatch = useDispatch();
+//   const user = useSelector((state) => state.auth.user);
+//   const { messages } = useSelector((state) => state.chat);
+//   const { socket, isConnected } = useSelector((state) => state.socket);
+
+//   const [message, setMessage] = useState('');
+//   const [typing, setTyping] = useState(false);
+//   const [isTyping, setIsTyping] = useState(false);
+//   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+//   const [loadingHistory, setLoadingHistory] = useState(false);
+//   console.log('✌️setLoadingHistory --->', setLoadingHistory);
+//   const [file, setFile] = useState(null);
+//   const [image, setImage] = useState(null);
+//   const [emoji, setEmoji] = useState('');
+//   const [fileName, setFileName] = useState('');
+
+//   const scrollEnd = useRef();
+//   const URL = import.meta.env.VITE_REACT_APP;
+
+//   useEffect(() => {
+//     if (emoji) setMessage((prev) => prev + emoji);
+//   }, [emoji]);
+
+//   useEffect(() => {
+//     if (!user || !user.userId) return;
+
+//     const timeout = setTimeout(() => {
+//       const patchedUser = { ...user, _id: user.userId };
+//       dispatch(connectSocket(patchedUser));
+//     }, 200);
+
+//     return () => {
+//       clearTimeout(timeout);
+//       dispatch(disconnectSocket());
+//     };
+//   }, [user, dispatch]);
+
+//   useEffect(() => {
+//     if (!socket) return;
+
+//     socket.on("typing", ({ senderId, isTyping }) => {
+//       if (senderId === selectUser?._id) {
+//         setIsTyping(isTyping);
+//       }
+//     });
+
+//     return () => {
+//       socket.off("typing");
+//     };
+//   }, [socket, selectUser]);
+
+//   useEffect(() => {
+//     scrollEnd.current?.scrollIntoView({ behavior: 'smooth' });
+//   }, [messages]);
+
+//   useEffect(() => {
+//     const fetchChatHistory = async (lastMessageId) => {
+//       if (!user || !selectUser) return;
+
+//       try {
+//         const { data } = await axios.get(`${URL}/api/msg/chat-history`, {
+//           params: {
+//             userId1: user._id,
+//             userId2: selectUser._id,
+//             lastMessageId,
+//           },
+//         });
+
+//         if (data.chatHistory.length) {
+//           dispatch(setMessages([...data.chatHistory, ...messages]));
+//         }
+
+//         dispatch(setMessages(data.chatHistory));
+//       } catch (error) {
+//         console.error("Failed to fetch chat history:", error);
+//       }
+//     };
+
+//     fetchChatHistory();
+//   }, [user, selectUser, dispatch, URL, messages]);
+
+//   const handleTyping = (e) => {
+//     setMessage(e.target.value);
+//     if (!typing) {
+//       setTyping(true);
+//       socket?.emit('typing', {
+//         receiverId: selectUser._id,
+//         isTyping: true,
+//       });
+
+//       setTimeout(() => {
+//         setTyping(false);
+//         socket?.emit('typing', {
+//           receiverId: selectUser._id,
+//           isTyping: false,
+//         });
+//       }, 2000);
+//     }
+//   };
+
+//   const handleSendMessage = async (e) => {
+//     e.preventDefault();
+
+//     if ((!message.trim() && !image && !file) || !selectUser) return;
+
+//     let messageType = "text";
+//     if (image) messageType = "image";
+//     else if (file) messageType = "file";
+
+//     const payload = {
+//       senderId: user._id || user.userId,
+//       receiverId: selectUser._id,
+//       createdAt: new Date().toISOString(),
+//       textMessage: message.trim() || null,
+//       base64Image: image || null,
+//       base64File: file || null,
+//       messageType,
+//       type: messageType,
+//       fileName: file ? fileName : undefined, // 👈 original file name
+//     };
+
+//     const messageObject = {
+//       ...payload,
+//       text: payload.textMessage,
+//       image: payload.base64Image,
+//       file: payload.base64File,
+//     };
+
+//     dispatch(addOwnMessage(messageObject));
+//     socket?.emit("privateMessage", payload);
+
+//     setMessage("");
+//     setFile(null);
+//     setImage(null);
+//     setFileName('');
+//   };
+
+//   if (!selectUser) {
+//     return (
+//       <div className="flex flex-col items-center justify-center h-full text-blue-700 px-4 text-center">
+//         <img alt="No chat selected" className="w-32 h-32 mb-4 opacity-80" src="https://via.placeholder.com/128?text=No+Chat" />
+//         <h2 className="text-lg font-semibold mb-2">No chat selected</h2>
+//         <p className="text-sm text-gray-600">Please select a conversation to start chatting.</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden">
+//       {/* Header - fixed height */}
+//       <div className="flex-shrink-0">
+//         <Header selectUser={selectUser} isTyping={isTyping} user={user} />
+//         {!isConnected && (
+//           <div className="text-red-600 text-sm text-center p-2 bg-yellow-100">
+//             🔌 Reconnecting to socket...
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Chat body - scrollable */}
+//       <div className="flex-1 overflow-y-auto">
+//         <Chatbody
+//           selectUser={selectUser}
+//           messages={messages}
+//           user={user}
+//           scrollEnd={scrollEnd}
+//           loadingHistory={loadingHistory}
+//         />
+//       </div>
+
+//       {/* Input - fixed height */}
+//       <div className="flex-shrink-0">
+//         <Inputside
+//           message={message}
+//           setMessage={setMessage}
+//           handleTyping={handleTyping}
+//           handleSendMessage={handleSendMessage}
+//           showEmojiPicker={showEmojiPicker}
+//           setShowEmojiPicker={setShowEmojiPicker}
+//           selectUser={selectUser}
+//           setFile={setFile}
+//           setImage={setImage}
+//           setEmoji={setEmoji}
+//           setFileName={setFileName}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Rightsidebar;
+
+
+
+//icon page ui fixed
+//chatdoy data proper set in message
+//chat body set in history deta show
+
+chatbody.jsximport React, { useRef, useEffect } from "react";
+import { format } from "timeago.js";
+import { FaFileAlt } from "react-icons/fa";
+
+const Chatbody = ({
+    messages,
+    user,
+    scrollEnd,
+    loadingHistory,
+    fetchOlderMessages,
+    selectUser,
+    selectGroup,
+}) => {
+    const containerRef = useRef(null);
+    console.log('✌️selectGroup --->', selectGroup);
+    console.log('✌️selectUser --->', selectUser);
+
+    const handleScroll = () => {
+        const container = containerRef.current;
+        if (!container || loadingHistory) return;
+
+        if (container.scrollTop === 0) {
+            if (typeof fetchOlderMessages === "function") {
+                fetchOlderMessages();
+            }
+        }
+    };
+
+    useEffect(() => {
+        scrollEnd.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, scrollEnd]);
+
+    return (
+        <div
+            ref={containerRef}
+            onScroll={handleScroll}
+            className="h-full overflow-y-auto p-4 space-y-2 bg-gray-50"
+        >
+            {loadingHistory && (
+                <div className="text-center text-gray-500 text-sm py-2">
+                    Loading more messages...
+                </div>
+            )}
+
+            {messages.map((msg, idx) => {
+                const isSender =
+                    msg.senderId === user._id || msg.senderId === user.userId;
+
+                const alignment = isSender
+                    ? "items-end text-right"
+                    : "items-start text-left";
+                const bubbleColor = isSender
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-black";
+
+                const messageText = msg.text || msg.content || "";
+                const messageType = msg.type || "text";
+                const messageContent =
+                    msg.content || msg.image || msg.file || "";
+                const fileName = msg.fileName || "Download File";
+
+                const isImage =
+                    messageType === "image" &&
+                    messageContent.startsWith("http");
+                const isImageBase64 =
+                    messageType === "image" &&
+                    messageContent.startsWith("data:image/");
+                const isFile =
+                    messageType === "file" &&
+                    messageContent.startsWith("http");
+                const isFileBase64 =
+                    messageType === "file" &&
+                    messageContent.startsWith("data:");
+
+                const hasText = messageText.trim() !== "";
+
+                return (
+                    <div key={idx} className={`flex flex-col ${alignment}`}>
+                        <div className={`inline-block max-w-xs px-4 py-2 rounded-xl ${bubbleColor}`}>
+                            {hasText && (
+                                <p className="whitespace-pre-wrap">{messageText}</p>
+                            )}
+
+                            {(isImage || isImageBase64) && (
+                                <img
+                                    src={messageContent}
+                                    alt="sent-img"
+                                    className="mt-2 max-h-48 rounded-lg border"
+                                />
+                            )}
+
+                            {(isFile || isFileBase64) && (
+                                <a
+                                    href={messageContent}
+                                    download={fileName}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-2 flex items-center gap-1 text-sm underline"
+                                >
+                                    <FaFileAlt /> {fileName}
+                                </a>
+                            )}
+                        </div>
+                        <span className="text-xs text-gray-400 mt-1">
+                            {msg.senderName || (isSender ? "You" : "Friend")} •{" "}
+                            {format(msg.createdAt)}
+                        </span>
+                    </div>
+                );
+            })}
+
+            <div ref={scrollEnd}></div>
+        </div>
+    );
+};
+
+export default Chatbody;
+
+
+// const SenderMessage = ({
+//     msg,
+//     messageDate,
+//     messageText,
+//     messageContent,
+//     hasText,
+//     isImage,
+//     isImageBase64,
+//     isFile,
+//     isFileBase64,
+//     fileName,
+//     setPreviewMedia,
+//     setIsImagePreview,
+// }) => (
+//     <div className="flex flex-col items-end text-right">
+//         <div className="text-xs text-center text-gray-400 my-2">
+//             {messageDate} • You
+//         </div>
+
+//         <div className="inline-block max-w-xs px-4 py-2 rounded-xl bg-blue-500 text-white">
+//             {hasText && (
+//                 <p className="whitespace-pre-wrap break-words">{messageText}</p>
+//             )}
+
+//             {(isImage || isImageBase64) && (
+//                 <img
+//                     src={messageContent}
+//                     alt="sent-img"
+//                     className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+//                     onClick={() => {
+//                         setPreviewMedia(messageContent);
+//                         setIsImagePreview(true);
+//                     }}
+//                 />
+//             )}
+
+//             {(isFile || isFileBase64) && (
+//                 <button
+//                     onClick={() => {
+//                         setPreviewMedia(messageContent);
+//                         setIsImagePreview(false);
+//                     }}
+//                     className="mt-2 flex items-center gap-1 text-sm underline"
+//                 >
+//                     <FaFileAlt /> {fileName}
+//                 </button>
+//             )}
+//         </div>
+
+//         <span className="text-xs text-gray-400 mt-1">
+//             {format(msg.createdAt)}
+//         </span>
+//     </div>
+// );
+
+// const ReceiverMessage = ({
+//     msg,
+//     messageDate,
+//     messageText,
+//     messageContent,
+//     hasText,
+//     isImage,
+//     isImageBase64,
+//     isFile,
+//     isFileBase64,
+//     fileName,
+//     setPreviewMedia,
+//     setIsImagePreview,
+// }) => (
+//     <div className="flex flex-col items-start text-left">
+//         <div className="text-xs text-center text-gray-400 my-2">
+//             {messageDate} • {msg.senderEmail || "Friend"}
+//         </div>
+
+//         <div className="inline-block max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-black">
+//             {hasText && (
+//                 <p className="whitespace-pre-wrap break-words">{messageText}</p>
+//             )}
+
+//             {(isImage || isImageBase64) && (
+//                 <img
+//                     src={messageContent}
+//                     alt="received-img"
+//                     className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+//                     onClick={() => {
+//                         setPreviewMedia(messageContent);
+//                         setIsImagePreview(true);
+//                     }}
+//                 />
+//             )}
+
+//             {(isFile || isFileBase64) && (
+//                 <button
+//                     onClick={() => {
+//                         setPreviewMedia(messageContent);
+//                         setIsImagePreview(false);
+//                     }}
+//                     className="mt-2 flex items-center gap-1 text-sm underline"
+//                 >
+//                     <FaFileAlt /> {fileName}
+//                 </button>
+//             )}
+//         </div>
+
+//         <span className="text-xs text-gray-400 mt-1">
+//             {format(msg.createdAt)}
+//         </span>
+//     </div>
+// );
+
+
+{/* <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        /> */}
+        {/* <Route path="/bio" element={<PrivateRoute><AvtarPage /></PrivateRoute>} /> */}
+
+         {/* <Route
+          path="/contact/:token"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        /> */}
+        {/*icon router*/}
+        {/* <Route
+          path="/:tab"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        /> */}
