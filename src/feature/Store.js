@@ -12,6 +12,8 @@ import onlineUsersReducer from "../feature/Slice/OnlineuserSlice";
 import chatHistoryReducer from "../feature/Slice/ChatHistory";
 import userGroupsReducer from "../feature/Slice/UserGroup";
 import loginuserReducer from "../feature/Slice/LoginUserSlice";
+import favoriteReducer from "../feature/Slice/favoriteSlice";
+import invitedUsersReducer from "../feature/Slice/InvitedUsersSlice";
 
 const store = configureStore({
   reducer: {
@@ -29,6 +31,9 @@ const store = configureStore({
     chatHistory: chatHistoryReducer,
     userGroups: userGroupsReducer,
     loginuser: loginuserReducer,
+
+    favorite: favoriteReducer,
+    invitedUsers: invitedUsersReducer,
     //Group
   },
 });

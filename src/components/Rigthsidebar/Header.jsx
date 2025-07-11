@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     MdOutlineDeleteOutline,
     MdOutlineVolumeOff,
@@ -11,12 +11,20 @@ import {
     IoSearchOutline,
 } from 'react-icons/io5';
 import { BsThreeDots } from 'react-icons/bs';
+import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup'
 
 function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
 
     // console.log('✌️selectUser --->', selectUser);
     // console.log('✌️selectGroup --->', selectGroup);
     const [showMoreOptions, setShowMoreOptions] = useState(false);
+    const [showCallModal, setShowCallModal] = useState(false); //Aduiocall
+    const [showVideoModal, setShowVideoModal] = useState(false); // Video call modal
+    const [callData, setCallData] = useState(null);
+    const [showSearchBox, setShowSearchBox] = useState(false);
+    // console.log('✌️showVideoModal --->', showVideoModal);
+    // console.log('✌️showCallModal --->', showCallModal);
+
 
     const topItems = [
         { id: 1, icon: <IoSearchOutline />, title: 'Search' },
@@ -30,6 +38,22 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
         { id: 2, icon: <MdOutlineVolumeOff />, title: 'Mute' },
         { id: 3, icon: <MdOutlineDeleteOutline />, title: 'Delete' },
     ];
+
+    const dotmenuRef = useRef();
+
+    useEffect(() => {
+        const handleClickAnywhere = (event) => {
+            if (showMoreOptions && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+                setShowMoreOptions(false);
+
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickAnywhere);
+        return () => {
+            document.removeEventListener('mousedown', handleClickAnywhere);
+        };
+    }, [showMoreOptions]);
 
     const isUserSelected = selectUser && Object.keys(selectUser).length > 0;
     const isGroupSelected = selectGroup && Object.keys(selectGroup).length > 0;
@@ -56,9 +80,27 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-7 text-gray-500 text-xl">
+                <div className="flex items-center gap-7 text-gray-500 text-xl ">
                     {topItems.map(({ id, icon, title }) => (
-                        <button key={id} title={title} className="hover:text-blue-600" type="button">
+                        <button
+                            key={id}
+                            title={title}
+                            className="hover:text-blue-600 cursor-pointer"
+                            type="button"
+                            onClick={() => {
+                                if (title === 'Call') {
+                                    setCallData(isUserSelected ? selectUser : selectGroup);
+                                    setShowCallModal(true);
+                                } else if (title === 'Video Call') {
+                                    setShowVideoModal(true);
+                                    setCallData(isUserSelected ? selectUser : selectGroup);
+                                } else if (title === 'Search') {
+                                    setShowSearchBox(true)
+                                } else if (title === 'Profile') {
+                                    onProfileClick();
+                                }
+                            }}
+                        >
                             {icon}
                         </button>
                     ))}
@@ -72,7 +114,8 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
                             <BsThreeDots />
                         </button>
                         {showMoreOptions && (
-                            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 text-sm text-gray-700">
+                            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 text-sm text-gray-700"
+                                ref={dotmenuRef}>
                                 {dotUpsideItems.map(({ id, icon, title }) => (
                                     <button
                                         key={id}
@@ -88,6 +131,37 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
                         )}
                     </div>
                 </div>
+
+                {/* Audio Call Modal */}
+                {showCallModal && (
+                    <AudioCallModal
+                        user={callData}
+                        onCancel={() => setShowCallModal(false)}
+                        onCall={() => {
+                            setShowCallModal(false);
+                            // console.log('Calling:', callData);
+
+                        }}
+                    />
+                )}
+                {/* Video Call Modal */}
+                {showVideoModal && (
+                    <VideoCallModal
+                        user={callData}
+                        onCancel={() => setShowVideoModal(false)}
+                        onCall={() => {
+                            setShowVideoModal(false);
+                            // console.log('Video calling:', callData);
+                        }}
+                    />
+                )}
+                {/* serchbox Modal */}
+                {showSearchBox && (
+                    <SearchBox onClose={() => setShowSearchBox(false)}
+                        onSearch={(value) => {
+                            console.log('🔍 Search Payload:', value);
+                        }} />
+                )}
             </div>
         );
     }
@@ -115,7 +189,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
 
                 <div className="flex items-center gap-7 text-gray-500 text-xl">
                     {topItems.map(({ id, icon, title }) => (
-                        <button key={id} title={title} className="hover:text-blue-600" type="button">
+                        <button key={id} title={title} className="hover:text-blue-600 " type="button">
                             {icon}
                         </button>
                     ))}

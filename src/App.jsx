@@ -4,7 +4,6 @@ import './App.css';
 import Home from './Pages/Home';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
-import AvtarPage from './Pages/AvtarPage';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from "./Pages/PrivetRouter";
 import PublicRoute from "./Pages/PublicRouter";
@@ -24,7 +23,6 @@ function App() {
         {/* Private routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Home />} />
-          <Route path="/bio" element={<AvtarPage />} />
           <Route path="/contact/:token" element={<Home />} />
           <Route path="/:tab" element={<Home />} />
         </Route>

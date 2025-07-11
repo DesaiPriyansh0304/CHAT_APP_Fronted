@@ -32,8 +32,10 @@ const buildPrivateMessagePayload = ({
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
   fileName: file.length ? fileName : null,
-  messageType: image ? 'image' : file ? 'file' : 'text',
-  type: image ? 'image' : file ? 'file' : 'text',
+  // messageType: image ? 'image' : file ? 'file' : 'text',
+  // type: image ? 'image' : file ? 'file' : 'text',
+  messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
+  type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
   // fileName: file ? fileName : undefined,
 });
 
@@ -55,8 +57,10 @@ const buildGroupMessagePayload = ({
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
   fileNames: file.length ? fileName : null,
-  messageType: image ? 'image' : file ? 'file' : 'text',
-  type: image ? 'image' : file ? 'file' : 'text',
+  // messageType: image ? 'image' : file ? 'file' : 'text',
+  // type: image ? 'image' : file ? 'file' : 'text',
+  messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
+  type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
   // fileName: file ? fileName : undefined,
 });
 
@@ -271,7 +275,8 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if ((!message.trim() && !image && !file) || (!selectUser && !selectGroup)) return;
+    const isEmptyMessage = !message.trim() && image.length === 0 && file.length === 0;
+    if (isEmptyMessage || (!selectUser && !selectGroup)) return;
 
     const payload = selectGroup
       ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
@@ -372,6 +377,9 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
             setImage={setImage}
             setEmoji={setEmoji}
             setFileName={setFileName}
+            file={file}
+            image={image}
+            fileName={fileName}
           />
         </div>
       </div>

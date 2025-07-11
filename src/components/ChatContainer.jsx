@@ -4,6 +4,8 @@ import ProfilePage from '../Pages/ProfilePage';
 import Group from './Iconpage/Group';
 import Contacts from './Iconpage/Contacts';
 import Setting from './Iconpage/Setting';
+import AvtarPage from '../Pages/AvtarPage'
+import AllUser from './Iconpage/AllUser';
 // import Language from './Iconpage/Language';
 
 
@@ -47,6 +49,18 @@ function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, sel
         return (
           <div>
             <Setting />
+          </div>
+        );
+      case 'avtarpage':
+        return (
+          <div>
+            <AvtarPage />
+          </div>
+        );
+      case 'alluser':
+        return (
+          <div>
+            <AllUser />
           </div>
         );
       default:

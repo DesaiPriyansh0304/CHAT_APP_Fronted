@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MdEdit } from "react-icons/md";
-import { AiFillEdit } from "react-icons/ai";
-import { TbMessageDots } from "react-icons/tb";
-import { IoCallSharp, IoVideocam } from "react-icons/io5";
-import { TiHome } from "react-icons/ti";
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { updateProfile } from '../feature/Slice/Updateprofile';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 function AvtarPage() {
-    const user = useSelector(state => state.auth.user);
+    const user = useSelector(state => state.loginuser.userData);
     const profileStatus = useSelector(state => state.updateProfile.status);
     const dispatch = useDispatch();
 
@@ -25,31 +22,29 @@ function AvtarPage() {
         profile_avatar: null
     });
 
+    const [initialFormData, setInitialFormData] = useState(null);
     const [error, setError] = useState({});
-    const [clickEffect, setClickEffect] = useState(null);
     const [preview, setPreview] = useState(null);
     const [formChanged, setFormChanged] = useState(false);
-
+    const [editMode, setEditMode] = useState(false);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (user) {
-            setAvtarFrom(prev => ({
-                ...prev,
+            const formatted = {
                 email: user.email || '',
                 firstname: user.firstname || '',
                 lastname: user.lastname || '',
                 mobile: user.mobile || '',
-                gender: user.gender
-                    ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1).toLowerCase()
-                    : '',
+                gender: user.gender || '',
                 dob: user.dob ? moment(user.dob).format('YYYY-MM-DD') : '',
                 bio: user.bio || '',
                 profile_avatar: user.profile_avatar || null
-            }));
-
-            if (user.profile_avatar) {
-                setPreview(user.profile_avatar);
+            };
+            setAvtarFrom(formatted);
+            setInitialFormData(formatted);
+            if (formatted.profile_avatar) {
+                setPreview(formatted.profile_avatar);
             }
         }
     }, [user]);
@@ -57,28 +52,21 @@ function AvtarPage() {
     useEffect(() => {
         if (profileStatus === 'succeeded') {
             toast.success("Profile updated successfully!");
+            setEditMode(false);
         }
     }, [profileStatus]);
 
-    const bghandleClick = (index) => {
-        setClickEffect(index);
-    };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setAvtarFrom((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-        setFormChanged(true);
+        const newForm = { ...avatrFrom, [name]: value };
+        setAvtarFrom(newForm);
+        setFormChanged(JSON.stringify(newForm) !== JSON.stringify(initialFormData));
         if (error[name]) {
             setError({ ...error, [name]: '' });
         }
     };
 
-    const handleImageClick = () => {
-        fileInputRef.current.click();
-    };
+    const handleImageClick = () => fileInputRef.current.click();
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -94,165 +82,154 @@ function AvtarPage() {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
+            reader.onerror = error => reject(error);
         });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            let avatarBase64 = null;
-
-            if (avatrFrom.profile_avatar && typeof avatrFrom.profile_avatar !== 'string') {
-                avatarBase64 = await toBase64(avatrFrom.profile_avatar);
-            } else if (typeof avatrFrom.profile_avatar === 'string') {
-                avatarBase64 = avatrFrom.profile_avatar;
+            let avatarBase64 = avatrFrom.profile_avatar;
+            if (avatarBase64 && typeof avatarBase64 !== 'string') {
+                avatarBase64 = await toBase64(avatarBase64);
             }
-
-            await dispatch(updateProfile({
-                profile_avatar: avatarBase64,
-                firstname: avatrFrom.firstname,
-                lastname: avatrFrom.lastname,
-                bio: avatrFrom.bio,
-                mobile: avatrFrom.mobile,
-                dob: avatrFrom.dob,
-                gender: avatrFrom.gender
-            }));
-
+            await dispatch(updateProfile({ ...avatrFrom, profile_avatar: avatarBase64 }));
             setFormChanged(false);
+            setInitialFormData({ ...avatrFrom, profile_avatar: avatarBase64 });
         } catch (error) {
             console.error("Update Error:", error);
             toast.error("Something went wrong.");
         }
     };
 
-    const TopIcon = [
-        { id: 0, icon: <TiHome />, title: "Home" },
-        { id: 1, icon: <TbMessageDots />, title: "Message" },
-        { id: 2, icon: <AiFillEdit />, title: "Edit" },
-        { id: 3, icon: <MdEdit />, title: "Mail" },
-        { id: 4, icon: <IoCallSharp />, title: "Call" },
-        { id: 5, icon: <IoVideocam />, title: "Videocall" },
-    ];
+    const handleCancel = () => {
+        setAvtarFrom(initialFormData);
+        setPreview(initialFormData?.profile_avatar || null);
+        setFormChanged(false);
+        setEditMode(false);
+    };
 
     return (
-        <div className='flex w-full h-screen items-center justify-center'>
-            <div className='flex flex-row h-[90%] w-[90%] max-w-[1200px]'>
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4">
+            <div className="relative w-full max-w-3xl bg-gray-950 text-white rounded-2xl shadow-2xl p-8">
 
-                {/* Icon Sidebar */}
-                <div className='flex-[1] border shadow-md flex items-center justify-center bg-white'>
-                    <ul className="flex flex-col gap-8 p-4">
-                        {TopIcon.map(({ id, icon, title }) => (
-                            <li key={id} className="relative group">
+                {/* Edit Button */}
+                {!editMode && (
+                    <button
+                        onClick={() => setEditMode(true)}
+                        className="absolute top-4 left-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md"
+                    >
+                        Edit Profile
+                    </button>
+                )}
+
+                <div className="flex flex-col items-center">
+                    {/* Avatar */}
+                    <div className="relative mb-6">
+                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-green-500 shadow-lg">
+                            {preview ? (
+                                <img src={preview} alt="avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                            )}
+                        </div>
+                        {editMode && (
+                            <>
                                 <button
-                                    className={`p-2 ${clickEffect === id
-                                        ? 'bg-blue-100 text-blue-600 border border-blue-400 rounded-md'
-                                        : 'text-black'} hover:text-blue-500 transition-transform duration-300 transform hover:scale-90 text-2xl`}
-                                    onClick={() => bghandleClick(id)}
+                                    onClick={handleImageClick}
+                                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md"
                                 >
-                                    {icon}
+                                    <MdEdit className="text-xl text-green-700" />
                                 </button>
-                                <div className="absolute top-12 left-1/2 -translate-x-1/2 z-10 invisible group-hover:visible
-                                 opacity-0 group-hover:opacity-100 inline-block px-3 py-2 text-sm font-medium
-                                  text-black bg-gray-100 rounded-lg shadow-md transition-opacity duration-300">
-                                    {title}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0
-                                      border-l-[6px] border-r-[6px] border-t-[6px]
-                                     border-l-transparent border-r-transparent border-t-gray-100" />
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Profile and Form Section */}
-                <div className='flex-[3] bg-gray-200 border border-black shadow-md flex flex-col items-center relative'>
-                    {/* Avatar Preview */}
-                    <div className='mt-5 relative w-40 h-40'>
-                        <div className='w-40 h-40 rounded-full border-4 border-white bg-gray-300' />
-                        {preview && (
-                            <img
-                                src={preview}
-                                alt="Avatar"
-                                className='w-40 h-40 rounded-full border-4 border-white object-cover absolute top-0 left-0'
-                            />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </>
                         )}
-                        <span
-                            onClick={handleImageClick}
-                            className='absolute bottom-0 right-0 bg-gray-500 text-white rounded-full p-2 border-2 border-white shadow-md cursor-pointer text-2xl'
-                        >
-                            <MdEdit />
-                        </span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            ref={fileInputRef}
-                            onChange={handleImageChange}
-                            style={{ display: 'none' }}
-                        />
                     </div>
 
                     {/* Form */}
-                    <form
-                        onSubmit={handleSubmit}
-                        className="gap-4 w-full max-w-3xl p-6 grid grid-cols-2 gap-x-6 gap-y-4"
-                    >
+                    <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                            { label: "First Name", name: "firstname", type: "text" },
-                            { label: "Last Name", name: "lastname", type: "text" },
-                            { label: "Email", name: "email", type: "text" },
-                            { label: "Mobile", name: "mobile", type: "text" },
-                            { label: "Date of Birth", name: "dob", type: "date" },
-                            { label: "BIO", name: "bio", type: "text" },
-                            {
-                                label: "Gender", name: "gender", type: "select",
-                                options: ["Male", "Female", "Other"]
-                            }
-                        ].map(({ label, name, type, options }) => (
-                            <div key={name} className="flex flex-col">
-                                <label htmlFor={name} className="mb-1 font-medium text-gray-700">{label}</label>
-                                {type === "select" ? (
-                                    <select
-                                        id={name}
-                                        name={name}
-                                        value={avatrFrom[name]}
-                                        onChange={handleChange}
-                                        className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    >
-                                        <option value="" disabled>{`Select ${label}`}</option>
-                                        {options.map(opt => (
-                                            <option key={opt} value={opt}>{opt}</option>
-                                        ))}
-                                    </select>
-                                ) : (
-                                    <input
-                                        type={type}
-                                        name={name}
-                                        id={name}
-                                        value={avatrFrom[name]}
-                                        onChange={handleChange}
-                                        className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                )}
-                                {error[name] && <span className="text-red-500 text-sm">{error[name]}</span>}
+                            { label: "First Name", name: "firstname" },
+                            { label: "Last Name", name: "lastname" },
+                            { label: "Email", name: "email", type: "email", alwaysDisabled: true },
+                            { label: "Mobile", name: "mobile" },
+                            { label: "Date of Birth", name: "dob", type: "date" }
+                        ].map((field, idx) => (
+                            <div key={idx}>
+                                <label>{field.label}</label>
+                                <input
+                                    type={field.type || "text"}
+                                    name={field.name}
+                                    value={avatrFrom[field.name]}
+                                    onChange={handleChange}
+                                    disabled={field.alwaysDisabled || !editMode}
+                                    className="w-full p-2 rounded-md bg-black border border-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
                             </div>
                         ))}
 
-                        {formChanged && (
-                            <div className="col-span-2 flex justify-end">
-                                <button
+                        {/* Gender */}
+                        <div>
+                            <label>Gender</label>
+                            <select
+                                name="gender"
+                                value={avatrFrom.gender}
+                                onChange={handleChange}
+                                disabled={!editMode}
+                                className="w-full p-2 rounded-md bg-black border border-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <option value="">Select Gender</option>
+                                {["male", "female", "other"].map((g) => (
+                                    <option key={g} value={g}>{g.charAt(0).toUpperCase() + g.slice(1)}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Bio */}
+                        <div className="md:col-span-2">
+                            <label>Bio</label>
+                            <textarea
+                                name="bio"
+                                value={avatrFrom.bio}
+                                onChange={handleChange}
+                                rows={3}
+                                disabled={!editMode}
+                                className="w-full p-2 rounded-md bg-black border border-green-500 text-white resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            ></textarea>
+                        </div>
+
+                        {/* Buttons */}
+                        {editMode && (
+                            <div className="md:col-span-2 flex justify-between mt-4">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={handleCancel}
+                                    type="button"
+                                    className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-md"
+                                >
+                                    Cancel
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: formChanged ? 1.05 : 1 }}
+                                    whileTap={{ scale: formChanged ? 0.95 : 1 }}
                                     type="submit"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md"
+                                    disabled={!formChanged}
+                                    className={`px-6 py-2 rounded-md font-medium shadow 
+                                        ${formChanged
+                                            ? "bg-green-600 hover:bg-green-700 text-white"
+                                            : "bg-gray-600 text-gray-300 cursor-not-allowed"}`}
                                 >
                                     Update Profile
-                                </button>
+                                </motion.button>
                             </div>
                         )}
                     </form>
-                </div>
-
-                {/* Optional Section */}
-                <div className='flex-[5] bg-gray-400 border border-black shadow-md flex items-center justify-center'>
-                    <p>Priyansh</p>
                 </div>
             </div>
         </div>

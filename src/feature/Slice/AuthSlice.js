@@ -19,6 +19,7 @@ const authSlice = createSlice({
       };
 
       state.user = userData;
+
       state.token = token;
       state.isAuthenticated = true;
 

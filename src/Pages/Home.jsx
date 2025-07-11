@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import Slidbar from '../components/Slidbar';
 import Rightsidebar from '../components/Rigthsidebar';
 import ChatContainer from '../components/ChatContainer';
+import AvtarPage from './AvtarPage';
+import AllUser from '../components/Iconpage/AllUser';
 
 function Home() {
   const { tab, token } = useParams();
@@ -29,46 +31,69 @@ function Home() {
   return (
     <>
       <div className='w-full h-screen bg-white'>
-        <div className=' h-full relative grid grid-cols-[6%_25%_69%]'>
 
-          {/* Sidebar */}
-          <div className='h-screen'>
-            <Slidbar
-              selectUser={selectedUser}
-              SetSelectUser={handleUserSelect}
-              // setActivePage={setActivePage}
-              selectGroup={selectGroup}
-              setSelectGroup={handleGroupSelect}
-            />
+        {currentTab === 'alluser' ? (
+          <div className='h-full grid grid-cols-[6%_94%]'>
+            <div className='h-screen'>
+              <Slidbar
+                selectUser={selectedUser}
+                SetSelectUser={handleUserSelect}
+                selectGroup={selectGroup}
+                setSelectGroup={handleGroupSelect}
+              />
+            </div>
+            <div className='h-screen'>
+              <AllUser />
+            </div>
           </div>
-
-          {/* Chat Container */}
-          <div className='h-screen overflow-hidden'>
-            <ChatContainer
-              selectUser={selectedUser}
-              SetSelectUser={handleUserSelect}
-              // activePage={activePage}
-              // activePage={tab} // Route thi active page
-              activePage={currentTab}
-              setUserChat={setUserChat}
-              selectGroup={selectGroup}
-              setSelectGroup={handleGroupSelect}
-            />
+        ) : currentTab === 'avtarpage' ? (
+          <div className='h-full grid grid-cols-[6%_94%]'>
+            <div className='h-screen'>
+              <Slidbar
+                selectUser={selectedUser}
+                SetSelectUser={handleUserSelect}
+                selectGroup={selectGroup}
+                setSelectGroup={handleGroupSelect}
+              />
+            </div>
+            <div className='h-screen'>
+              <AvtarPage />
+            </div>
           </div>
+        ) : (
+          // Default Layout (Sidebar + ChatContainer + Rightsidebar)
+          <div className='h-full grid grid-cols-[6%_25%_69%]'>
+            <div className='h-screen'>
+              <Slidbar
+                selectUser={selectedUser}
+                SetSelectUser={handleUserSelect}
+                selectGroup={selectGroup}
+                setSelectGroup={handleGroupSelect}
+              />
+            </div>
 
-          {/* Right Sidebar */}
-          <div className='h-screen'>
-            <Rightsidebar
-              selectUser={selectedUser}
-              SetSelectUser={handleUserSelect}
-              // activePage={activePage}
-              userchat={userchat}
-              selectGroup={selectGroup}
-              setSelectGroup={handleGroupSelect}
-            />
+            <div className='h-screen overflow-hidden'>
+              <ChatContainer
+                selectUser={selectedUser}
+                SetSelectUser={handleUserSelect}
+                activePage={currentTab}
+                setUserChat={setUserChat}
+                selectGroup={selectGroup}
+                setSelectGroup={handleGroupSelect}
+              />
+            </div>
+
+            <div className='h-screen'>
+              <Rightsidebar
+                selectUser={selectedUser}
+                SetSelectUser={handleUserSelect}
+                userchat={userchat}
+                selectGroup={selectGroup}
+                setSelectGroup={handleGroupSelect}
+              />
+            </div>
           </div>
-
-        </div>
+        )}
       </div>
     </>
   );

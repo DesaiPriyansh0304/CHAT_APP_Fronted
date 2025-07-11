@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { RiUserAddLine } from "react-icons/ri";
 import { FaSearch } from "react-icons/fa";
 import ContactAdd from "../../Contacts/ContactAdd";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { EllipsisVerticalIcon } from "lucide-react";
-//dot icon
 import { IoShareSocialOutline } from "react-icons/io5";
 import { MdBlockFlipped } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { fetchInvitedUsers } from "../../feature/Slice/InvitedUsersSlice";
 
 // Utility: Group users by first character
 const groupContactsByLetter = (contacts) => {
@@ -30,17 +30,17 @@ const groupContactsByLetter = (contacts) => {
 
 function Contacts() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const { userData: user } = useSelector((state) => state.loginuser);
-  const [confirmedUsers, setConfirmedUsers] = useState([]);
   const { token } = useParams();
+  const dispatch = useDispatch();
 
-  //dot menu
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false); //dotmenu
+  // dot menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const dotmenuRef = useRef();
 
   const toggleMenu = (id) => {
-    // setIsMenuOpen(!isMenuOpen);
-    setIsMenuOpen(prev => (prev === id ? null : id));
+    setIsMenuOpen((prev) => (prev && activeMenuId === id ? false : true));
+    setActiveMenuId(id);
   };
 
   const dotMenu = [
@@ -49,25 +49,25 @@ function Contacts() {
     { id: 2, title: "Remove", icon: <RiDeleteBin6Line /> },
   ];
 
-  const dotmenuRef = useRef();
-
   useEffect(() => {
     const handleClickAnywhere = (event) => {
-      if (isMenuOpen && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+      if (
+        isMenuOpen &&
+        dotmenuRef.current &&
+        !dotmenuRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
-
+        setActiveMenuId(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickAnywhere);
+    document.addEventListener("mousedown", handleClickAnywhere);
     return () => {
-      document.removeEventListener('mousedown', handleClickAnywhere);
+      document.removeEventListener("mousedown", handleClickAnywhere);
     };
   }, [isMenuOpen]);
 
-
-
-  // Token verification (optional - for invite)
+  // Token verify if URL contains token
   useEffect(() => {
     const verifyToken = async () => {
       try {
@@ -96,51 +96,53 @@ function Contacts() {
     if (token) verifyToken();
   }, [token]);
 
-  // Load confirmed invited users with optional name
+  // Fetch invited users from Redux
   useEffect(() => {
-    const fetchConfirmedUsers = async () => {
-      const confirmed =
-        user?.invitedUsers?.filter((i) => i.invited_is_Confirmed) || [];
+    dispatch(fetchInvitedUsers());
+  }, [dispatch]);
 
-      const result = await Promise.all(
-        confirmed.map(async (inv) => {
-          if (inv.user) {
-            try {
-              const res = await fetch(
-                `${import.meta.env.VITE_REACT_APP}/api/auth/get-user/${inv.user}`
-              );
-              const data = await res.json();
-              if (
-                res.ok &&
-                data.user.firstname &&
-                data.user.lastname
-              ) {
-                return {
-                  id: inv._id,
-                  name: `${data.user.firstname} ${data.user.lastname}`,
-                  email: inv.email,
-                };
-              }
-            } catch (error) {
-              console.error("Fetch user error:", error);
-            }
-          }
+  const invitedUserState = useSelector((state) => state.invitedUsers);
+  console.log('✌️invitedUserState --->', invitedUserState);
 
-          // fallback: email only
-          return {
-            id: inv._id,
-            name: null,
-            email: inv.email,
-          };
-        })
-      );
 
-      setConfirmedUsers(result);
-    };
+  let confirmedUsers = [];
+  const invitedUsersArray = invitedUserState.users.invitedUsers || [];
+  const invitedByArray = invitedUserState.users.invitedBy || [];
 
-    fetchConfirmedUsers();
-  }, [user]);
+  // Show invited users if they exist
+  if (Array.isArray(invitedUsersArray) && invitedUsersArray.length > 0) {
+    const invited = invitedUsersArray
+      .filter((inv) => {
+        const firstname = inv.user?.firstname || "";
+        const lastname = inv.user?.lastname || "";
+        return inv.invited_is_Confirmed && (firstname || lastname);
+      })
+      .map((inv) => {
+        const firstname = inv.user?.firstname || "";
+        const lastname = inv.user?.lastname || "";
+        const fullName = `${firstname} ${lastname}`.trim();
 
+        return {
+          id: inv._id,
+          name: fullName,
+          avatar: inv.user?.profile_avatar || "",
+        };
+      });
+
+    confirmedUsers = [...confirmedUsers, ...invited];
+  }
+
+  // Show invitedBy if it exists
+  if (Array.isArray(invitedByArray) && invitedByArray.length > 0) {
+    invitedByArray.forEach((inviter) => {
+      const fullName = `${inviter.firstname} ${inviter.lastname}`.trim();
+      confirmedUsers.push({
+        id: inviter._id,
+        name: fullName,
+        avatar: inviter.profile_avatar || "",
+      });
+    });
+  }
   const groupedContacts = groupContactsByLetter(confirmedUsers);
 
   return (
@@ -172,7 +174,7 @@ function Contacts() {
           .sort()
           .map((letter) => (
             <div key={letter}>
-              <div className="text-purple-600 font-semibold text-sm  mt-8">
+              <div className="text-purple-600 font-semibold text-sm mt-8">
                 {letter}
               </div>
               {groupedContacts[letter].map((inv, idx) => (
@@ -184,23 +186,25 @@ function Contacts() {
                     {inv.name || inv.email}
                   </div>
                   <div className="relative text-gray-500 text-xl cursor-pointer">
-                    {/* <button onClick={toggleMenu}> */}
                     <button onClick={() => toggleMenu(inv.id)}>
                       <EllipsisVerticalIcon size={16} />
                     </button>
 
-                    {isMenuOpen === inv.id && (
+                    {isMenuOpen && activeMenuId === inv.id && (
                       <div
                         ref={dotmenuRef}
                         className="absolute right-0 mt-2 w-30 bg-white border border-blue-300 rounded-xs shadow-md z-10"
                       >
-                        <ul className="">
+                        <ul>
                           {dotMenu.map(({ title, id, icon }) => (
-                            <li key={id} className="flex flex-col hover:bg-gray-100">
-                              <div
-                                className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 justify-between  "
-                              >
-                                <div className="text-gray-700 text-md">{title}</div>
+                            <li
+                              key={id}
+                              className="flex flex-col hover:bg-gray-100"
+                            >
+                              <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 justify-between">
+                                <div className="text-gray-700 text-md">
+                                  {title}
+                                </div>
                                 <div className="text-blue-500">{icon}</div>
                               </div>
                             </li>
@@ -209,7 +213,6 @@ function Contacts() {
                       </div>
                     )}
                   </div>
-
                 </div>
               ))}
             </div>
