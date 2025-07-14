@@ -9,8 +9,12 @@ export const checkAuth = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      // console.log("token --->/getuserSilce", token);
 
+      if (!token) {
+        return rejectWithValue(
+          "❌No token found. Please login again./GetuserSlice"
+        );
+      }
       if (!token) {
         dispatch(logout());
         return rejectWithValue("Token not found");
@@ -22,6 +26,7 @@ export const checkAuth = createAsyncThunk(
         },
       });
 
+      // console.log("✅response --->/GetuserSlice", response);
       const userData = response?.data?.decoded;
       // console.log("userData --->getuserSilce", userData);
 

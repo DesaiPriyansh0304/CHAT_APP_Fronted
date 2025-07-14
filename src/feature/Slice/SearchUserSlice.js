@@ -1,21 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
-// Async thunk to fetch invited user data
+// ✅ Thunk with search query support
 export const fetchInvitedUsers = createAsyncThunk(
   "invitedUsers/fetchInvitedUsers",
   async (searchQuery = "", { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      if (!token) {
-        return rejectWithValue(
-          "❌No token found. Please login again./invitedUserSlice"
-        );
-      }
+
       const response = await fetch(
         `${
           import.meta.env.VITE_REACT_APP
-        }/api/auth/get-inviteduser?search=${searchQuery}`,
+        }/api/auth/get-inviteduser?search=${encodeURIComponent(searchQuery)}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -26,7 +22,6 @@ export const fetchInvitedUsers = createAsyncThunk(
 
       const data = await response.json();
 
-      console.log("✅response --->/invitedUserSlice", response);
       if (!response.ok) {
         return rejectWithValue(data.message || "Failed to fetch invited users");
       }
@@ -36,7 +31,7 @@ export const fetchInvitedUsers = createAsyncThunk(
         invitedBy: data.invitedBy || [],
       };
     } catch (error) {
-      console.error("error --->/invitedUserSlice", error);
+      console.error("fetchInvitedUsers error:", error);
       return rejectWithValue("Network error");
     }
   }
@@ -50,7 +45,9 @@ const invitedUsersSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    // You can add filtering/resetting reducers here if needed
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchInvitedUsers.pending, (state) => {

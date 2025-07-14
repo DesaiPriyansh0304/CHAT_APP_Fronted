@@ -10,19 +10,22 @@ export const fetchChatHistory = createAsyncThunk(
     try {
       const params = groupId ? { groupId, page } : { userId1, userId2, page };
 
-      // console.log("Params =>", params);
       const { data } = await axios.get(`${URL}/api/msg/chat-history`, {
         params,
       });
-      console.log("Fetched chatHistory:", data.chatHistory);
+      // console.log("✅data --->/Chathistory", data);
+
       return {
         messages: data.chatHistory,
         currentPage: data.currentPage,
         totalPages: data.totalPages,
         totalMessages: data.totalMessages,
+        sender: data.sender || null,
+        receiver: data.receiver || null,
+        groupUsers: data.groupUsers || [],
       };
     } catch (error) {
-      console.error("❌ Chat history fetch error:", error);
+      console.error("❌Chat history fetch error:", error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -37,6 +40,9 @@ const chatHistorySlice = createSlice({
     currentPage: 1,
     totalPages: 1,
     totalMessages: 0,
+    sender: null,
+    receiver: null,
+    groupUsers: [],
   },
   reducers: {
     setMessages: (state, action) => {
@@ -51,6 +57,12 @@ const chatHistorySlice = createSlice({
       state.totalPages = 1;
       state.totalMessages = 0;
       state.error = null;
+      state.sender = null;
+      state.receiver = null;
+      state.groupUsers = [];
+    },
+    addMessagesToTop: (state, action) => {
+      state.messages = [...action.payload, ...state.messages];
     },
   },
   extraReducers: (builder) => {
@@ -59,13 +71,17 @@ const chatHistorySlice = createSlice({
         state.loadingHistory = true;
       })
       .addCase(fetchChatHistory.fulfilled, (state, action) => {
-        const { messages, currentPage, totalPages, totalMessages } =
-          action.payload;
-        // console.log("messages --->", messages);
-        // console.log("Fulfilled reducer payload:", action.payload);
+        const {
+          messages,
+          currentPage,
+          totalPages,
+          totalMessages,
+          sender,
+          receiver,
+          groupUsers,
+        } = action.payload;
 
         const flattenedMessages = messages.map((msg) => {
-          // console.log("✌️msg --->", msg);
           const senderId =
             typeof msg.senderId === "object" ? msg.senderId._id : msg.senderId;
           const receiverId =
@@ -77,12 +93,10 @@ const chatHistorySlice = createSlice({
           const receiverEmail =
             typeof msg.receiverId === "object" ? msg.receiverId.email : "";
 
-          // console.log("✌️senderId --->", senderId);
-          // console.log("✌️receiverId --->", receiverId);
           return {
             ...msg,
-            senderId, // string
-            receiverId, // string
+            senderId,
+            receiverId,
             senderEmail,
             receiverEmail,
             text: msg.text || "",
@@ -90,8 +104,6 @@ const chatHistorySlice = createSlice({
             type: msg.type || "text",
           };
         });
-        // console.log("✌️flattenedMessages --->", flattenedMessages);
-        // console.log(" Flattened Messages:", flattenedMessages);
 
         if (currentPage > 1) {
           state.messages = [...flattenedMessages, ...state.messages];
@@ -99,11 +111,12 @@ const chatHistorySlice = createSlice({
           state.messages = flattenedMessages;
         }
 
-        // console.log(" Final state.messages in reducer:", state.messages);
-
         state.currentPage = currentPage;
         state.totalPages = totalPages;
         state.totalMessages = totalMessages;
+        state.sender = sender || null;
+        state.receiver = receiver || null;
+        state.groupUsers = groupUsers || [];
         state.loadingHistory = false;
       })
       .addCase(fetchChatHistory.rejected, (state, action) => {

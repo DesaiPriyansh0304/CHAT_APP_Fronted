@@ -3,7 +3,6 @@ import { io } from "socket.io-client";
 import { setOnlineUsers } from "./OnlineuserSlice";
 import { newMessageReceived } from "./ChatSlice";
 
-//  Must match your server base URL — no /api!
 const URL = import.meta.env.VITE_REACT_APP;
 let socketInstance = null;
 
@@ -31,16 +30,20 @@ export const { setSocket, setConnectionStatus, clearSocket } =
   socketSlice.actions;
 
 export const connectSocket = (user) => (dispatch) => {
+  //socket connection and  connected or user missing
   if (!user || socketInstance?.connected) {
-    console.log("⚠️ Socket already connected or user missing/SoketSlice", {
+    console.log("⚠️ Socket already connected or user missing/SocketSlice", {
       hasUser: !!user,
       socketConnected: socketInstance?.connected,
     });
     return;
   }
 
-  console.log("🌐 Connecting socket to:/SoketSlice", URL);
-  console.log("👤 Connecting with userId:/SoketSlice", user._id || user.userId);
+  console.log("🌐 Connecting socket to:/SocketSlice", URL);
+  console.log(
+    "👤 Connecting with userId:/SocketSlice",
+    user._id || user.userId
+  );
 
   socketInstance = io(URL, {
     query: {
@@ -50,13 +53,13 @@ export const connectSocket = (user) => (dispatch) => {
   });
 
   socketInstance.on("connect", () => {
-    console.log("🟢Socket connected:/SoketSlice", socketInstance.id);
+    console.log("🟢Socket connected:/SocketSlice", socketInstance.id);
     dispatch(setSocket(socketInstance));
     dispatch(setConnectionStatus(true));
   });
 
   socketInstance.on("connect_error", (err) => {
-    console.error("⚫Socket connection error:/SoketSlice", err.message);
+    console.error("⚫Socket connection error:/SocketSlice", err.message);
     dispatch(setConnectionStatus(false));
   });
 
@@ -65,14 +68,17 @@ export const connectSocket = (user) => (dispatch) => {
     dispatch(setConnectionStatus(false));
   });
 
-  // socketInstance.on("getOnlineUsers", (userIds) => {
-  //   console.log(" Online users received:", userIds);
-  //   dispatch(setOnlineUsers(userIds));
-  // });
+  socketInstance.on("getOnlineUsers", (userIds) => {
+    console.log(
+      "🔵 Online users received/SocketSlice/ (count):",
+      userIds.length
+    );
+    console.log(" Online users received:", userIds);
+    dispatch(setOnlineUsers(userIds));
+  });
 
   socketInstance.on("groupMessage", (message) => {
-    console.log("👥 Group message received:/SoketSlice", message);
-
+    console.log("👥 Group message received:/SocketSlice", message);
     dispatch(
       newMessageReceived({
         ...message,
@@ -85,7 +91,7 @@ export const connectSocket = (user) => (dispatch) => {
   });
 
   socketInstance.on("privateMessage", (message) => {
-    console.log("📩 Private message received:/SoketSlice", message);
+    console.log("📩 Private message received:/SocketSlice", message);
     // dispatch(newMessageReceived(message));
     const currentUserId = user._id || user.userId;
     const content = Array.isArray(message.content)
@@ -97,9 +103,7 @@ export const connectSocket = (user) => (dispatch) => {
         newMessageReceived({
           ...message,
           content: message.content || [],
-          text: message.text || "", // normalize fields
-          // image: message.image || "",
-          // file: message.file || "",
+          text: message.text || "",
           image: message.type === "image" ? content : "",
           file: message.type === "file" ? content : "",
           type: message.type || "text",
@@ -110,14 +114,14 @@ export const connectSocket = (user) => (dispatch) => {
 
   // handle reconnection
   socketInstance.io.on("reconnect", () => {
-    console.log("🔁 Reconnected to socket server!/SoketSlice");
+    console.log("🔁 Reconnected to socket server!/SocketSlice");
   });
 };
 
 //disconnnected SOCKET.IO
 export const disconnectSocket = () => (dispatch) => {
   if (socketInstance) {
-    console.log("🔌Disconnecting socket.../SoketSlice");
+    console.log("🔌Disconnecting socket.../SocketSlice");
     socketInstance.disconnect();
     socketInstance = null;
     dispatch(clearSocket());

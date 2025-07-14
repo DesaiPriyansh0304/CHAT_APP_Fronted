@@ -7,10 +7,11 @@ export const createGroup = createAsyncThunk(
   "group/create",
   async (groupData, { rejectWithValue }) => {
     const token = localStorage.getItem("Authtoken");
-    console.log("✌️token --->", token);
 
     if (!token) {
-      return rejectWithValue("No token found. Please login again.");
+      return rejectWithValue(
+        "❌No token found. Please login again./CreateGroup"
+      );
     }
 
     try {
@@ -21,7 +22,7 @@ export const createGroup = createAsyncThunk(
         },
       });
 
-      console.log("✌️res --->", res);
+      // console.log("✅res --->/CreateGroup", res);
       return res.data.group;
     } catch (err) {
       return rejectWithValue(

@@ -43,6 +43,7 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.7",
     "timeago.js": "^4.0.2",
+    "use-debounce": "^10.0.5",
     "yup": "^1.6.1"
   },
   "devDependencies": {

@@ -6,9 +6,14 @@ const URL = import.meta.env.VITE_REACT_APP;
 
 export const getUserMessage = createAsyncThunk(
   "getUserMessage/fetch",
-  async (_, { getState, rejectWithValue }) => {
-    const token = getState().auth.token;
-    // console.log("token update profile --->/getUserMessage", token);
+  async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem("Authtoken");
+
+    if (!token) {
+      return rejectWithValue(
+        "❌No token found. Please login again./CreateGroup"
+      );
+    }
 
     try {
       const response = await axios.get(`${URL}/api/msg/user`, {
@@ -21,7 +26,7 @@ export const getUserMessage = createAsyncThunk(
           unseenMessages: response.data.unseenMessages,
         };
       }
-      // console.log("response /msg/user--->", response);
+      // console.log("✅response /msg/user--->getUserMessage.js", response);
       return rejectWithValue("Failed to fetch user messages");
     } catch (error) {
       toast.error("Update Profile Error");

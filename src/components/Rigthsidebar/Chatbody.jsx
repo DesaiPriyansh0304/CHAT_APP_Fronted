@@ -1,5 +1,4 @@
 import React, { useRef, useEffect, useState } from "react";
-// import { FaFileAlt } from "react-icons/fa";
 import { SenderMessage, ReceiverMessage } from "../Rigthsidebar/Messageui"
 
 
@@ -9,34 +8,48 @@ const Chatbody = ({
     scrollEnd,
     loadingHistory,
     fetchOlderMessages,
+    sender,
+    receiver,
+    groupUsers,
+    currentPage,
+    totalPages,
 }) => {
+    console.log("🔢 Chatbody pagination:", { currentPage, totalPages });
+    // console.log("receiver", receiver)
+    // console.log('✌️user --->', sender);
+    // console.log('✌️messages --->', messages);
     const containerRef = useRef(null);
     const [previewMedia, setPreviewMedia] = useState(null);
     const [isImagePreview, setIsImagePreview] = useState(true);
+
 
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
-        const handleScroll = () => {
-            if (container.scrollTop < 100 && !loadingHistory) {
-                const prevScrollHeight = container.scrollHeight;
-                fetchOlderMessages?.();
+        const handleScroll = async () => {
+            if (container.scrollTop < 100 && !loadingHistory && currentPage < totalPages) {
+                const previousScrollHeight = container.scrollHeight;
 
-                setTimeout(() => {
+                await fetchOlderMessages(); // Make sure it's awaited if possible
+
+                // Use requestAnimationFrame to wait until render is complete
+                requestAnimationFrame(() => {
                     const newScrollHeight = container.scrollHeight;
-                    container.scrollTop = newScrollHeight - prevScrollHeight;
-                }, 200);
+                    container.scrollTop = newScrollHeight - previousScrollHeight;
+                });
             }
         };
 
-        container.addEventListener("scroll", handleScroll);
-        return () => container.removeEventListener("scroll", handleScroll);
-    }, [loadingHistory, fetchOlderMessages]);
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, [loadingHistory, fetchOlderMessages, currentPage, totalPages]);
+
 
     useEffect(() => {
-        scrollEnd.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, scrollEnd]);
+        console.log("🔢 currentPage:", currentPage, "totalPages:", totalPages);
+    }, [currentPage, totalPages]);
+
 
     let lastSenderId = null;
     let lastDate = null;
@@ -82,8 +95,9 @@ const Chatbody = ({
                 const isFileBase64 = messageType === "file" && typeof messageContent === 'string' && messageContent.startsWith("data:");
                 // const hasText = messageText.trim() !== "";
                 const hasText = typeof messageText === "string" && messageText.trim() !== "";
-                console.log('✌️hasText --->', hasText);
-
+                const hasValidContent = contentArray.some((item) => typeof item === "string" && item.trim() !== "");
+                // console.log('✌️hasText --->', hasText);
+                if (!hasText && !hasValidContent) return null;
                 const messageDate = new Date(msg.createdAt).toDateString();
                 const showGroupHeader = senderId !== lastSenderId || messageDate !== lastDate;
 
@@ -108,6 +122,8 @@ const Chatbody = ({
                                 fileName={fileName}
                                 setPreviewMedia={setPreviewMedia}
                                 setIsImagePreview={setIsImagePreview}
+                                sender={sender}
+                                groupUsers={groupUsers}
                             />
                         ) : (
                             <ReceiverMessage
@@ -123,6 +139,9 @@ const Chatbody = ({
                                 fileName={fileName}
                                 setPreviewMedia={setPreviewMedia}
                                 setIsImagePreview={setIsImagePreview}
+                                receiver={receiver}
+                                groupUsers={groupUsers}
+                                hasValidContent={hasValidContent}
                             />
                         )}
                     </div>

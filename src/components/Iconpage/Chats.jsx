@@ -1,42 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInvitedUsers } from '../../feature/Slice/InvitedUsersSlice';
 import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from "framer-motion";
+import { useDebounce } from 'use-debounce';
+import { selectOnlineUsers } from '../../feature/Slice/OnlineuserSlice'; // ✅ import online users
 
 function Chats({ selectUser, SetSelectUser }) {
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 400);
+
   const { unseenMessages, status, error } = useSelector((state) => state.getUserMessage);
-  const { users } = useSelector((state) => state.invitedUsers);
+  const { invitedUsers = [], invitedBy = [] } = useSelector((state) => state.invitedUsers);
+  const onlineUserIds = useSelector(selectOnlineUsers); // ✅ get online user IDs
 
-  // ✅ Extracting arrays safely
-  const invitedUsersArray = Array.isArray(users?.invitedUsers) ? users.invitedUsers : [];
-  const invitedByArray = Array.isArray(users?.invitedBy) ? users.invitedBy : [];
+  // ✅ Convert onlineUserIds to Set for fast lookup
+  const onlineUserIdsSet = new Set(onlineUserIds);
 
-  // ✅ Filtered and Combined Chat Users
-  const combinedChatUsers = [
-    ...invitedUsersArray
-      .filter(
-        (inv) =>
-          inv.invited_is_Confirmed === true &&
-          inv.user &&
-          (inv.user.firstname || inv.user.lastname)
-      )
-      .map((inv) => ({ ...inv.user, invited_is_Confirmed: inv.invited_is_Confirmed })),
-    ...invitedByArray.filter((user) => user.firstname || user.lastname)
-  ];
+  // ✅ Prepare confirmed invited users
+  const confirmedInvitedUsers = invitedUsers
+    .filter((inv) => inv.invited_is_Confirmed && inv.user)
+    .map((inv) => ({ ...inv.user, invited_is_Confirmed: true }));
+
+  // ✅ Combine users and assign `.online` flag
+  const combinedChatUsers = [...confirmedInvitedUsers, ...invitedBy].map((user) => ({
+    ...user,
+    online: onlineUserIdsSet.has(user._id), // 🟢 set online true/false
+  }));
 
   useEffect(() => {
-    dispatch(fetchInvitedUsers());
-  }, [dispatch]);
-
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    console.log('Search query:', query);
-    // Add search filter here if needed
-  };
+    dispatch(fetchInvitedUsers(debouncedSearch));
+  }, [dispatch, debouncedSearch]);
 
   const scrollLeft = () => scrollRef.current && (scrollRef.current.scrollLeft -= 100);
   const scrollRight = () => scrollRef.current && (scrollRef.current.scrollLeft += 100);
@@ -53,7 +50,8 @@ function Chats({ selectUser, SetSelectUser }) {
           type="text"
           placeholder="Search messages or users"
           className="w-full pl-10 pr-4 py-2 rounded-md bg-[#E4E9F7] text-gray-700 placeholder-gray-500 focus:outline-none"
-          onChange={handleSearch}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
         <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
       </div>
@@ -86,7 +84,7 @@ function Chats({ selectUser, SetSelectUser }) {
               <div className="flex flex-col items-center w-20">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 text-blue-800 font-semibold flex items-center justify-center">
                   {chatUser.online && (
-                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                    <span className="absolute bottom-0 right-0 max-w-3 max-h-3 bg-green-500 border-2 border-white rounded-full" />
                   )}
                   {chatUser.profile_avatar ? (
                     <img src={chatUser.profile_avatar} alt={chatUser.firstname} className="w-full h-full object-cover" />

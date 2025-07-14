@@ -14,74 +14,47 @@ import Chatbody from './Rigthsidebar/Chatbody';
 import Inputside from './Rigthsidebar/Inputside';
 import RightProfilePanel from './Rigthsidebar/chatprofiledata';
 
-//  Payload PrivateChat
 const buildPrivateMessagePayload = ({
-  user,
-  selectUser,
-  message,
-  image = [],
-  file = [],
-  fileName = [],
+  user, selectUser, message, image = [], file = [], fileName = [],
 }) => ({
   senderId: user._id || user.userId,
   receiverId: selectUser._id,
   createdAt: new Date().toISOString(),
   textMessage: message.trim() || null,
-  // base64Image: image || null,
-  // base64File: file || null,
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
   fileName: file.length ? fileName : null,
-  // messageType: image ? 'image' : file ? 'file' : 'text',
-  // type: image ? 'image' : file ? 'file' : 'text',
   messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
   type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
-  // fileName: file ? fileName : undefined,
 });
 
-//payload Gropdata
 const buildGroupMessagePayload = ({
-  user,
-  selectGroup,
-  message,
-  image = [],
-  file = [],
-  fileName = [],
+  user, selectGroup, message, image = [], file = [], fileName = [],
 }) => ({
   senderId: user._id || user.userId,
   groupId: selectGroup._id,
   createdAt: new Date().toISOString(),
   textMessage: message.trim() || null,
-  // base64Image: image || null,
-  // base64File: file || null,
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
   fileNames: file.length ? fileName : null,
-  // messageType: image ? 'image' : file ? 'file' : 'text',
-  // type: image ? 'image' : file ? 'file' : 'text',
   messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
   type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
-  // fileName: file ? fileName : undefined,
 });
 
-
 const Rightsidebar = ({ selectUser, selectGroup }) => {
-  // console.log('✌️selectGroup --->', selectGroup);
-  // console.log('✌️selectUser --->', selectUser);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const {
-    messages,
-    loadingHistory,
-    currentPage,
-    totalPages,
+    messages, loadingHistory, currentPage, totalPages, sender, receiver,
   } = useSelector((state) => state.chatHistory);
-  // console.log(" Redux state.chat at selector:", state.chatHistory); 
-
+  // console.log("🧠 Redux chatHistory:", {
+  //   currentPage,
+  //   totalPages,
+  // });
   const { socket, isConnected } = useSelector((state) => state.socket);
 
   const [message, setMessage] = useState('');
-  // console.log('✌️message --->123', message);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -90,13 +63,11 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   const [emoji, setEmoji] = useState('');
   const [fileName, setFileName] = useState();
   const [showProfilePanel, setShowProfilePanel] = useState(false);
-  // console.log('✌️showProfilePanel --->', showProfilePanel);
   const scrollEnd = useRef();
 
   useEffect(() => {
     if (!selectUser && !selectGroup) return;
     dispatch(setMessages([]));
-
     const payload = selectGroup
       ? { groupId: selectGroup._id, page: 1 }
       : {
@@ -104,15 +75,18 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
         userId2: selectUser._id,
         page: 1,
       };
-
-    //API Call log here
-    console.log("📤 [Initial Load] Fetching chat history =>", payload);
-
     dispatch(fetchChatHistory(payload));
   }, [selectUser, selectGroup, user, dispatch]);
 
+  // ✅ Log sender, receiver, and group ID
+  useEffect(() => {
+    // if (sender) console.log("🟢 Sender:", sender);
+    // if (receiver) console.log("🔵 Receiver:", receiver);
+    // if (selectGroup?._id) console.log("👥 Group ID:", selectGroup._id);
+  }, [sender, receiver, selectGroup]);
 
-  const handleFetchOlderMessages = () => {
+  //page in history data
+  const handleFetchOlderMessages = async () => {
     if (loadingHistory || currentPage >= totalPages) return;
 
     const payload = selectGroup
@@ -123,11 +97,9 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
         page: currentPage + 1,
       };
 
-    // API Call log here
-    console.log("📤 [Scroll Load] Fetching chat history =>", payload);
-
-    dispatch(fetchChatHistory(payload));
+    await dispatch(fetchChatHistory(payload)); // Ensure it’s awaited
   };
+
 
   useEffect(() => {
     if (emoji) setMessage((prev) => prev + emoji);
@@ -145,7 +117,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     };
   }, [user, dispatch]);
 
-  // Typing indicator
   useEffect(() => {
     if (!socket) return;
     socket.on('typing', ({ senderId, isTyping }) => {
@@ -156,89 +127,46 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     return () => socket.off('typing');
   }, [socket, selectUser]);
 
-  // Join group room
   useEffect(() => {
     if (socket && selectGroup?._id) {
       socket.emit('joinGroup', { groupId: selectGroup._id });
     }
   }, [socket, selectGroup]);
 
-  // Handle incoming messages
   useEffect(() => {
     if (!socket) return;
     const currentUserId = String(user._id || user.userId);
 
     const handleGroupMessage = (data) => {
       const senderId =
-        typeof data.senderId === 'object'
-          ? String(data.senderId._id)
-          : String(data.senderId);
-
+        typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
       if (senderId === currentUserId) return;
-
-      console.log(' Received Group Message:', data);
-
-      // dispatch(
-      //   addOwnMessage({
-      //     ...data,
-      //     text: data.text || '',
-      //     content: data.content || data.text || data.image || data.file || '',
-      //     type: data.type || 'text',
-      //     image: data.image || '',
-      //     file: data.file || '',
-      //   })
-      // );
-
       const contentArray = Array.isArray(data.content) ? data.content : [data.content];
-      const firstContent = contentArray[0] || "";
-
-      dispatch(
-        addOwnMessage({
-          ...data,
-          text: data.text || firstContent || '',
-          content: contentArray,
-          type: data.type || 'text',
-          image: data.type === 'image' ? firstContent : '',
-          file: data.type === 'file' ? firstContent : '',
-        })
-      );
+      const firstContent = contentArray[0] || '';
+      dispatch(addOwnMessage({
+        ...data,
+        text: data.text || firstContent || '',
+        content: contentArray,
+        type: data.type || 'text',
+        image: data.type === 'image' ? firstContent : '',
+        file: data.type === 'file' ? firstContent : '',
+      }));
     };
 
     const handlePrivateMessage = (data) => {
       const senderId =
-        typeof data.senderId === 'object'
-          ? String(data.senderId._id)
-          : String(data.senderId);
-
+        typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
       if (senderId === currentUserId) return;
-
-      console.log('📥 Received Private Message:', data);
       const contentArray = Array.isArray(data.content) ? data.content : [data.content];
-      const firstContent = contentArray[0] || "";
-
-      // dispatch(
-      //   addOwnMessage({
-      //     ...data,
-      //     text: data.content || data.text || '',
-      //     content: data.content || data.text || data.image || data.file || '',
-      //     type: data.type || 'text',
-      //     image: data.image || '',
-      //     file: data.file || '',
-      //   })
-      // );
-
-
-      dispatch(
-        addOwnMessage({
-          ...data,
-          text: data.text || firstContent || '',
-          content: contentArray,
-          type: data.type || 'text',
-          image: data.type === 'image' ? firstContent : '',
-          file: data.type === 'file' ? firstContent : '',
-        })
-      );
-
+      const firstContent = contentArray[0] || '';
+      dispatch(addOwnMessage({
+        ...data,
+        text: data.text || firstContent || '',
+        content: contentArray,
+        type: data.type || 'text',
+        image: data.type === 'image' ? firstContent : '',
+        file: data.type === 'file' ? firstContent : '',
+      }));
     };
 
     socket.on('groupMessage', handleGroupMessage);
@@ -262,7 +190,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
         receiverId: selectUser?._id,
         isTyping: true,
       });
-
       setTimeout(() => {
         setTyping(false);
         socket?.emit('typing', {
@@ -273,7 +200,40 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     }
   };
 
-  const handleSendMessage = async (e) => {
+  // const handleSendMessage = (e) => {
+  //   e.preventDefault();
+  //   const isEmptyMessage = !message.trim() && image.length === 0 && file.length === 0;
+  //   if (isEmptyMessage || (!selectUser && !selectGroup)) return;
+
+  //   const payload = selectGroup
+  //     ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
+  //     : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
+
+  //   const contentArray =
+  //     image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
+
+  //   const messageObject = {
+  //     ...payload,
+  //     text: payload.textMessage,
+  //     images: payload.base64Image,
+  //     files: payload.base64File,
+  //     content: contentArray,
+  //     type: payload.type,
+  //   };
+
+  //   if (!selectGroup) {
+  //     dispatch(addOwnMessage(messageObject));
+  //   }
+
+  //   socket?.emit(selectGroup ? 'groupMessage' : 'privateMessage', payload);
+
+  //   setMessage('');
+  //   setFile([]);
+  //   setImage([]);
+  //   setFileName([]);
+  // };
+
+  const handleSendMessage = (e) => {
     e.preventDefault();
     const isEmptyMessage = !message.trim() && image.length === 0 && file.length === 0;
     if (isEmptyMessage || (!selectUser && !selectGroup)) return;
@@ -283,16 +243,9 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
 
     const contentArray =
-      image?.length > 0 ? image :
-        file?.length > 0 ? file :
-          [message.trim()];
+      image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
 
     const messageObject = {
-      // ...payload,
-      // text: payload.textMessage,
-      // image: payload.base64Image,
-      // file: payload.base64File,
-      // content: payload.base64Image || payload.base64File || payload.textMessage,
       ...payload,
       text: payload.textMessage,
       images: payload.base64Image,
@@ -301,11 +254,8 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       type: payload.type,
     };
 
-    console.log('📤 Sent Message:', messageObject);
-
-    if (!selectGroup) {
-      dispatch(addOwnMessage(messageObject));
-    }
+    // Show message immediately for sender
+    dispatch(addOwnMessage(messageObject));
 
     socket?.emit(selectGroup ? 'groupMessage' : 'privateMessage', payload);
 
@@ -314,6 +264,20 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     setImage([]);
     setFileName([]);
   };
+
+
+  const { groupUsers } = useSelector((state) => state.chatHistory);
+
+  useEffect(() => {
+    console.log("🧑‍🤝‍🧑 Group Members:");
+    groupUsers.forEach(({ user, role }) => {
+      // console.log('✌️user --->', user);
+      if (user) {
+        console.log(`${user.firstname} ${user.lastname} - Role: ${role}`);
+      }
+    });
+  }, [groupUsers]);
+
 
   if (!selectUser && !selectGroup) {
     return (
@@ -334,8 +298,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   return (
     <div className="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden">
       <div className={`flex flex-col h-full ${showProfilePanel ? 'w-[48vw]' : ''}`}>
-
-        <div className='flex-shrink-0'>
+        <div className="flex-shrink-0">
           <Header
             selectUser={selectUser}
             selectGroup={selectGroup}
@@ -350,7 +313,11 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           )}
         </div>
 
+
         <div className="flex-1 overflow-y-auto">
+          {loadingHistory && (
+            <div className="text-center text-sm text-gray-400 my-2">Loading more messages...</div>
+          )}
           <Chatbody
             selectUser={selectUser}
             selectGroup={selectGroup}
@@ -359,9 +326,13 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
             scrollEnd={scrollEnd}
             loadingHistory={loadingHistory}
             fetchOlderMessages={handleFetchOlderMessages}
+            sender={sender}
+            receiver={receiver}
+            groupUsers={groupUsers}
+            currentPage={currentPage}
+            totalPages={totalPages}
           />
         </div>
-
 
         <div className="flex-shrink-0 bottom-fixed">
           <Inputside
@@ -384,16 +355,14 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
         </div>
       </div>
 
-      {
-        showProfilePanel && (
-          <RightProfilePanel
-            userData={selectUser || selectGroup}
-            isGroup={!!selectGroup}
-            onClose={() => setShowProfilePanel(false)}
-          />
-        )
-      }
-    </div >
+      {showProfilePanel && (
+        <RightProfilePanel
+          userData={selectUser || selectGroup}
+          isGroup={!!selectGroup}
+          onClose={() => setShowProfilePanel(false)}
+        />
+      )}
+    </div>
   );
 };
 

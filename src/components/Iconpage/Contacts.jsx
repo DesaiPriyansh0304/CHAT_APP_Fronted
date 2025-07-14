@@ -10,21 +10,18 @@ import { IoShareSocialOutline } from "react-icons/io5";
 import { MdBlockFlipped } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { fetchInvitedUsers } from "../../feature/Slice/InvitedUsersSlice";
+import { useDebounce } from "use-debounce";
 
 // Utility: Group users by first character
 const groupContactsByLetter = (contacts) => {
   const grouped = {};
-
   contacts.forEach((contact) => {
     const key = contact.name
       ? contact.name.charAt(0).toUpperCase()
-      : contact.email.charAt(0).toUpperCase();
-    if (!grouped[key]) {
-      grouped[key] = [];
-    }
+      : contact.email?.charAt(0).toUpperCase();
+    if (!grouped[key]) grouped[key] = [];
     grouped[key].push(contact);
   });
-
   return grouped;
 };
 
@@ -33,7 +30,9 @@ function Contacts() {
   const { token } = useParams();
   const dispatch = useDispatch();
 
-  // dot menu
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 400);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
   const dotmenuRef = useRef();
@@ -60,89 +59,61 @@ function Contacts() {
         setActiveMenuId(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickAnywhere);
     return () => {
       document.removeEventListener("mousedown", handleClickAnywhere);
     };
   }, [isMenuOpen]);
 
-  // Token verify if URL contains token
   useEffect(() => {
-    const verifyToken = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_REACT_APP}/api/auth/invitedUsers-verify`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
-          }
-        );
-
-        const data = await response.json();
-        if (response.ok) {
-          toast.success("🎉 Invitation confirmed!");
-        } else {
-          toast.error("❌ " + data.message);
+    if (token) {
+      const verifyToken = async () => {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_REACT_APP}/api/auth/invitedUsers-verify`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token }),
+            }
+          );
+          const data = await response.json();
+          if (response.ok) toast.success("🎉 Invitation confirmed!");
+          else toast.error("❌ " + data.message);
+        } catch (err) {
+          console.error("Token verify error:", err);
         }
-      } catch (err) {
-        console.error("Token verify error:", err);
-      }
-    };
-
-    if (token) verifyToken();
+      };
+      verifyToken();
+    }
   }, [token]);
 
-  // Fetch invited users from Redux
   useEffect(() => {
-    dispatch(fetchInvitedUsers());
-  }, [dispatch]);
+    dispatch(fetchInvitedUsers(debouncedSearch));
+  }, [dispatch, debouncedSearch]);
 
   const invitedUserState = useSelector((state) => state.invitedUsers);
-  console.log('✌️invitedUserState --->', invitedUserState);
+  const invitedUsersArray = invitedUserState.invitedUsers || [];
+  const invitedByArray = invitedUserState.invitedBy || [];
 
+  // 👇 Use same filtering logic as LiveChatUser
+  const confirmedInvitedUsers = invitedUsersArray
+    .filter((item) => item.invited_is_Confirmed && item.user !== null)
+    .map((item) => item.user);
 
-  let confirmedUsers = [];
-  const invitedUsersArray = invitedUserState.users.invitedUsers || [];
-  const invitedByArray = invitedUserState.users.invitedBy || [];
+  const allLiveUsers = [...confirmedInvitedUsers, ...invitedByArray];
 
-  // Show invited users if they exist
-  if (Array.isArray(invitedUsersArray) && invitedUsersArray.length > 0) {
-    const invited = invitedUsersArray
-      .filter((inv) => {
-        const firstname = inv.user?.firstname || "";
-        const lastname = inv.user?.lastname || "";
-        return inv.invited_is_Confirmed && (firstname || lastname);
-      })
-      .map((inv) => {
-        const firstname = inv.user?.firstname || "";
-        const lastname = inv.user?.lastname || "";
-        const fullName = `${firstname} ${lastname}`.trim();
+  // Format for contact display
+  const confirmedUsers = allLiveUsers.map((user) => {
+    const name = `${user.firstname || ""} ${user.lastname || ""}`.trim();
+    return {
+      id: user._id,
+      name,
+      email: user.email,
+      avatar: user.profile_avatar || "",
+    };
+  });
 
-        return {
-          id: inv._id,
-          name: fullName,
-          avatar: inv.user?.profile_avatar || "",
-        };
-      });
-
-    confirmedUsers = [...confirmedUsers, ...invited];
-  }
-
-  // Show invitedBy if it exists
-  if (Array.isArray(invitedByArray) && invitedByArray.length > 0) {
-    invitedByArray.forEach((inviter) => {
-      const fullName = `${inviter.firstname} ${inviter.lastname}`.trim();
-      confirmedUsers.push({
-        id: inviter._id,
-        name: fullName,
-        avatar: inviter.profile_avatar || "",
-      });
-    });
-  }
   const groupedContacts = groupContactsByLetter(confirmedUsers);
 
   return (
@@ -164,6 +135,8 @@ function Contacts() {
         <input
           type="text"
           placeholder="Search users.."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 rounded-md bg-[#e4e9f7] text-gray-700 placeholder-gray-500 focus:outline-none"
         />
       </div>

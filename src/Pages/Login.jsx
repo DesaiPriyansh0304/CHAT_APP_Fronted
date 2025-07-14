@@ -6,16 +6,17 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { addUser } from '../feature/Slice/AuthSlice';
 import * as Yup from 'yup';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 function Login() {
   const [userLogin, setUserLogin] = useState({ email: '', password: '' });
   const [error, setError] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Yup schema for validation
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .matches(/\S+@\S+\.\S+/, 'Email format is invalid')
@@ -43,19 +44,13 @@ function Login() {
       const { success, data, token, userId } = response.data;
 
       if (success && token) {
-        const userData = {
-          ...data,
-          _id: userId, // explicitly attach userId as _id
-        };
-
+        const userData = { ...data, _id: userId };
         dispatch(addUser({ user: userData, token, userId }));
-
         toast.success('Login Successful');
         navigate('/');
       } else {
         throw new Error('Invalid login response');
       }
-
     } catch (err) {
       if (err.name === 'ValidationError') {
         const validationErrors = {};
@@ -66,10 +61,7 @@ function Login() {
       } else {
         console.error("Login error:", err);
         setError({
-          form:
-            err.response?.data?.message ||
-            err.message ||
-            'Login failed. Please try again later.',
+          form: err.response?.data?.message || err.message || 'Login failed. Please try again later.',
         });
         toast.error('Login unsuccessful');
       }
@@ -77,7 +69,6 @@ function Login() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex h-screen bg-[#213448] grid-cols-[60%_40%] overflow-hidden">
@@ -124,18 +115,24 @@ function Login() {
             </div>
 
             {/* Password */}
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <label htmlFor="password" className="block mb-1">Password</label>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 id="password"
                 placeholder="Enter your password"
-                className="w-full p-3 rounded bg-white text-black"
+                className="w-full p-3 rounded bg-white text-black pr-10"
                 value={userLogin.password}
                 onChange={handleChange}
                 disabled={isLoading}
               />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-[38px] right-4 cursor-pointer text-green-600"
+              >
+                {showPassword ? <FiEye /> : <FiEyeOff />}
+              </span>
               {error.password && <p className="mt-1 text-sm text-red-500">{error.password}</p>}
             </div>
 

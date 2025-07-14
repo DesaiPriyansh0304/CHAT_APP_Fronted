@@ -8,6 +8,13 @@ export const addFavorite = createAsyncThunk(
   async ({ messageId, chatType, content, type }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
+
+      if (!token) {
+        return rejectWithValue(
+          "❌No token found. Please login again./favorite"
+        );
+      }
+
       const res = await axios.post(
         `${URL}/api/auth/favorite`,
         { messageId, chatType, content, type },
@@ -17,8 +24,7 @@ export const addFavorite = createAsyncThunk(
           },
         }
       );
-      console.log("✌️res --->", res);
-      console.log("✌️res.data --->", res.data);
+      // console.log("✅res --->/favorite", res);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response.data);

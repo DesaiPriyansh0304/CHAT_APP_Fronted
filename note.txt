@@ -513,3 +513,20 @@ export default Chatbody;
         70000
 
         2,89,000
+
+
+        user:null   verify
+        "invited_is_Confirmed": true, unverify
+         user:null
+        "invited_is_Confirmed": false,
+
+         user:true
+        "invited_is_Confirmed": flase,    
+
+        inset-0 bg-gradient-to-b from-[#67B7D1] to-white
+
+
+        compltet in 
+
+        Avtar page
+        all user page

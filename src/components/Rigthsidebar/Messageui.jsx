@@ -12,7 +12,9 @@ import toast from 'react-hot-toast';
 
 export const SenderMessage = ({
     msg,
+    // sender,
     // messageDate,
+    // groupUsers,
     messageText,
     messageContent,
     hasText,
@@ -26,6 +28,8 @@ export const SenderMessage = ({
 }) => {
     const { userData: user } = useSelector((state) => state.loginuser);
     // console.log('✌️msg --->', msg);
+
+
     return (
         //main div
         <div className="flex flex-col self-end">
@@ -157,12 +161,18 @@ export const SenderMessage = ({
     )
 };
 
+
+const isLikelyURL = (text) => /^https?:\/\//.test(text);
+
+
 export const ReceiverMessage = ({
     msg,
-    // messageDate,
+    groupUsers,
+    receiver,
     messageText,
-    messageContent,
+    // messageContent,
     hasText,
+    hasValidContent,
     isImage,
     isImageBase64,
     isFile,
@@ -171,158 +181,142 @@ export const ReceiverMessage = ({
     setPreviewMedia,
     setIsImagePreview,
 }) => {
+    let senderName = '';
+    const senderId = typeof msg.senderId === 'object' ? msg.senderId._id : msg.senderId;
 
-    const [receiverData, setReceiverData] = useState(null);
-    // console.log('✌️receiverData --->', receiverData);
-
-    useEffect(() => {
-        const fetchReceiverData = async () => {
-            try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_REACT_APP}/api/auth/get-user/${msg.senderId}`
-                );
-                const data = await response.json();
-                console.log('✌️data --->', data);
-                setReceiverData(data.user);
-            } catch (error) {
-                console.error("❌ Failed to fetch receiver data", error);
-            }
-        };
-
-        if (msg.senderId) {
-            fetchReceiverData();
+    if (groupUsers?.length) {
+        const foundUser = groupUsers.find((u) => {
+            const uid = u?.user?._id || u?.user?.userId;
+            return uid === senderId;
+        });
+        if (foundUser?.user) {
+            senderName = `${foundUser.user.firstname} ${foundUser.user.lastname}`;
         }
-    }, [msg.senderId]);
+    }
 
-    // console.log('✌️msg --->', msg);
+    if (!senderName && receiver) {
+        senderName = `${receiver.firstname} ${receiver.lastname}`;
+    }
+
     return (
-        //main div
         <div className="flex flex-col self-start text-left">
-            {/*image and chatdata*/}
             <div className="flex flex-row gap-1">
-                {/* {messageDate} • {msg.senderEmail || "Friend"} */}
 
-                {/*sender image*/}
+                {/* Sender avatar */}
                 <div className="w-11 h-11 rounded-full overflow-hidden self-end">
-                    {receiverData?.profile_avatar ? (
-                        <img
-                            src={receiverData?.profile_avatar}
-                            alt={receiverData?.profile_avatar}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <span className=''>
-                            {receiverData?.firstname?.[0]?.toUpperCase()}
-                            {receiverData?.lastname?.[0]?.toUpperCase()}
-                        </span>
-                    )}
+                    {(() => {
+                        let avatar = '';
+                        let fname = '';
+                        let lname = '';
 
+                        if (groupUsers?.length) {
+                            const foundUser = groupUsers.find((u) => {
+                                const uid = u?.user?._id || u?.user?.userId;
+                                return uid === senderId;
+                            });
+
+                            if (foundUser?.user) {
+                                avatar = foundUser.user.profile_avatar;
+                                fname = foundUser.user.firstname;
+                                lname = foundUser.user.lastname;
+                            }
+                        }
+
+                        if (!avatar && receiver) {
+                            avatar = receiver.profile_avatar;
+                            fname = receiver.firstname;
+                            lname = receiver.lastname;
+                        }
+
+                        return avatar ? (
+                            <img
+                                src={avatar}
+                                alt="profile"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
+                                {fname?.[0]?.toUpperCase()}{lname?.[0]?.toUpperCase()}
+                            </div>
+                        );
+                    })()}
                 </div>
-                <div className="inline-block ">
 
+                <div className="inline-block">
                     <div>
                         <ul>
                             <li>
-                                {/*chat message and time zone*/}
-                                <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
-                                    {/*Chat Message*/}
-                                    <div className="">
-                                        {hasText && (
-                                            <p className="whitespace-pre-wrap break-words">{messageText}</p>
+                                {(hasText || hasValidContent) && (
+                                    <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
+
+                                        {/* Chat Text (filtered) */}
+                                        {hasText && !isLikelyURL(messageText) && (
+                                            <p className="whitespace-pre-wrap break-words">
+                                                {messageText}
+                                            </p>
                                         )}
 
-                                        {/* {(isImage || isImageBase64) && (
-                                            <img
-                                                src={messageContent}
-                                                alt="received-img"
-                                                className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                                                onClick={() => {
-                                                    setPreviewMedia(messageContent);
-                                                    setIsImagePreview(true);
-                                                }}
-                                            />
-                                        )} */}
-                                        {(isImage || isImageBase64) && Array.isArray(msg.content) && msg.content.map((url, i) => (
-                                            <img
-                                                key={i}
-                                                src={url}
-                                                alt={`sent-img-${i}`}
-                                                className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                                                onClick={() => {
-                                                    setPreviewMedia(url);
-                                                    setIsImagePreview(true);
-                                                }}
-                                            />
-                                        ))}
+                                        {/* Image Preview */}
+                                        {(hasValidContent && (isImage || isImageBase64)) &&
+                                            Array.isArray(msg.content) &&
+                                            msg.content.map((url, i) => (
+                                                <img
+                                                    key={i}
+                                                    src={url}
+                                                    alt={`sent-img-${i}`}
+                                                    className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+                                                    onClick={() => {
+                                                        setPreviewMedia(url);
+                                                        setIsImagePreview(true);
+                                                    }}
+                                                />
+                                            ))}
 
-                                        {/* {(isFile || isFileBase64) && (
-                                            <button
-                                                onClick={() => {
-                                                    setPreviewMedia(messageContent);
-                                                    setIsImagePreview(false);
-                                                }}
-                                                className="mt-2 flex items-center gap-1 text-sm underline"
-                                            >
-                                                <FaFileAlt /> {fileName}
-                                            </button>
-                                        )} */}
-                                        {(isFile || isFileBase64) && Array.isArray(msg.content) && msg.content.map((url, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => {
-                                                    setPreviewMedia(url);
-                                                    setIsImagePreview(false);
-                                                }}
-                                                className="mt-2 flex items-center gap-1 text-sm underline"
-                                            >
-                                                <FaFileAlt /> {Array.isArray(msg.fileName) ? msg.fileName[i] : fileName || `File ${i + 1}`}
-                                            </button>
-                                        ))}
-                                    </div>
+                                        {/* File Preview */}
+                                        {(hasValidContent && (isFile || isFileBase64)) &&
+                                            Array.isArray(msg.content) &&
+                                            msg.content.map((url, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setPreviewMedia(url);
+                                                        setIsImagePreview(false);
+                                                    }}
+                                                    className="mt-2 flex items-center gap-1 text-sm underline"
+                                                >
+                                                    <FaFileAlt /> {Array.isArray(msg.fileName) ? msg.fileName[i] : fileName || `File ${i + 1}`}
+                                                </button>
+                                            ))}
 
-                                    {/*time zone*/}
-                                    <div className=" flex flex-row gap-1.5 items-center mt-1.5 justify-end">
-                                        <div className="text-xs text-black">
-                                            <IoTimeOutline />
-                                        </div>
-                                        <div className="text-black text-xs">
-                                            {new Date(msg.createdAt).toLocaleTimeString([], {
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                                hour12: true,
-                                            })}
+                                        {/* Timestamp */}
+                                        <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
+                                            <div className="text-xs text-black">
+                                                <IoTimeOutline />
+                                            </div>
+                                            <div className="text-black text-xs">
+                                                {new Date(msg.createdAt).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    hour12: true,
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
+                                )}
 
-
-
-                                </div>
-
-                                {/*reciver Full Name*/}
+                                {/* Sender name */}
                                 <div className="text-xs text-gray-500 mt-1.5 text-left">
-                                    {receiverData?.firstname} {receiverData?.lastname}
+                                    {senderName || 'User'}
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="justify-start text-gray-500">
-                    {/* <RxDotsVertical /> */}
-                    <DotMenu
-                        messageText={messageText}
-                        messageContent={messageContent}
-                        hasText={hasText}
-                        isImage={isImage || isImageBase64}
-                        isFile={isFile || isFileBase64}
-                        position="left" onOptionClick={(option) => console.log("Receiver Option:", option)} />
-                </div>
+
             </div>
-            {/* <span className="text-xs text-gray-400 mt-1">
-                {format(msg.createdAt)}
-            </span> */}
         </div>
-    )
+    );
 };
 
 

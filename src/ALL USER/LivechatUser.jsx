@@ -1,22 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInvitedUsers } from '../feature/Slice/InvitedUsersSlice';
 import { motion } from 'framer-motion';
+import { useDebounce } from 'use-debounce';
 
 const LiveChatUser = () => {
     const dispatch = useDispatch();
+    const [search, setSearch] = useState('');
+    const [debouncedSearch] = useDebounce(search, 400);
+
+    const { invitedUsers = [], invitedBy = [], loading } = useSelector(
+        (state) => state.invitedUsers
+    );
 
     useEffect(() => {
-        dispatch(fetchInvitedUsers());
-    }, [dispatch]);
-
-    const invitedUsersState = useSelector((state) => state.invitedUsers);
-    const invitedUsers = Array.isArray(invitedUsersState?.users?.invitedUsers)
-        ? invitedUsersState.users.invitedUsers
-        : [];
-    const invitedBy = Array.isArray(invitedUsersState?.users?.invitedBy)
-        ? invitedUsersState.users.invitedBy
-        : [];
+        dispatch(fetchInvitedUsers(debouncedSearch));
+    }, [dispatch, debouncedSearch]);
 
     const confirmedInvitedUsers = invitedUsers
         .filter(item => item.invited_is_Confirmed && item.user !== null)
@@ -69,6 +68,14 @@ const LiveChatUser = () => {
                 Combined list of users you invited and users who invited you.
             </p>
 
+            <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="mb-6 px-4 py-2 border border-purple-300 rounded-md w-full max-w-md outline-none focus:ring-2 focus:ring-purple-400"
+            />
+
             <div className="overflow-x-auto rounded-lg shadow">
                 <table className="min-w-full border border-purple-300 rounded-lg overflow-hidden">
                     <thead className="text-white" style={{ background: 'linear-gradient(to right, #B985F4, #6C56D2)' }}>
@@ -84,7 +91,11 @@ const LiveChatUser = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {allLiveUsers.length > 0 ? (
+                        {loading ? (
+                            <tr>
+                                <td colSpan="8" className="text-center py-4 text-purple-500">Loading...</td>
+                            </tr>
+                        ) : allLiveUsers.length > 0 ? (
                             allLiveUsers.map((user, i) => renderUserRow(user, user._id, i))
                         ) : (
                             <tr>
