@@ -62,8 +62,8 @@ function Home() {
           </div>
         ) : (
           // Default Layout (Sidebar + ChatContainer + Rightsidebar)
-          <div className='h-full grid grid-cols-[6%_25%_69%]'>
-            <div className='h-screen'>
+          <div className='h-full grid grid-cols-[6%_25%_69%] '>
+            <div className='h-screen overflow-hidden'>
               <Slidbar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}

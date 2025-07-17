@@ -4,7 +4,7 @@ import { fetchInvitedUsers } from '../../feature/Slice/InvitedUsersSlice';
 import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from "framer-motion";
 import { useDebounce } from 'use-debounce';
-import { selectOnlineUsers } from '../../feature/Slice/OnlineuserSlice'; // ✅ import online users
+import { selectOnlineUsers } from '../../feature/Slice/OnlineuserSlice';
 
 function Chats({ selectUser, SetSelectUser }) {
   const dispatch = useDispatch();
@@ -15,20 +15,21 @@ function Chats({ selectUser, SetSelectUser }) {
 
   const { unseenMessages, status, error } = useSelector((state) => state.getUserMessage);
   const { invitedUsers = [], invitedBy = [] } = useSelector((state) => state.invitedUsers);
-  const onlineUserIds = useSelector(selectOnlineUsers); // ✅ get online user IDs
+  const onlineUserIds = useSelector(selectOnlineUsers); // get online user ID
+  console.log('✌️onlineUserIds --->', onlineUserIds);
 
-  // ✅ Convert onlineUserIds to Set for fast lookup
+  // Convert onlineUserIds to Set for fast lookup
   const onlineUserIdsSet = new Set(onlineUserIds);
 
-  // ✅ Prepare confirmed invited users
+  // Prepare confirmed invited users
   const confirmedInvitedUsers = invitedUsers
     .filter((inv) => inv.invited_is_Confirmed && inv.user)
     .map((inv) => ({ ...inv.user, invited_is_Confirmed: true }));
 
-  // ✅ Combine users and assign `.online` flag
+  //  Combine users and assign `.online` flag
   const combinedChatUsers = [...confirmedInvitedUsers, ...invitedBy].map((user) => ({
     ...user,
-    online: onlineUserIdsSet.has(user._id), // 🟢 set online true/false
+    online: onlineUserIdsSet.has(user._id), // set online true/false
   }));
 
   useEffect(() => {
@@ -42,7 +43,7 @@ function Chats({ selectUser, SetSelectUser }) {
   return (
     <div className='p-2 h-screen w-full'>
       {/* Header */}
-      <div className='p-5 text-2xl font-semibold'>Chats</div>
+      <div className='p-5 text-2xl font-semibold dark:text-[var(--text-color3)]'>Chats</div>
 
       {/* Search Box */}
       <div className="mx-3 mb-6 relative">
@@ -74,7 +75,7 @@ function Chats({ selectUser, SetSelectUser }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {combinedChatUsers.map((chatUser) => (
+          {combinedChatUsers.filter((chatUser) => chatUser.online).map((chatUser) => (
             <motion.div
               key={chatUser._id}
               className="text-center w-16"
@@ -91,8 +92,11 @@ function Chats({ selectUser, SetSelectUser }) {
                   ) : (
                     <span>{chatUser.firstname?.[0]?.toUpperCase()}{chatUser.lastname?.[0]?.toUpperCase()}</span>
                   )}
+
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+
                 </div>
-                <p className="font-bold text-sm mt-1 truncate">{chatUser.firstname}</p>
+                <p className="font-bold text-sm dark:text-[var(--text-color)] mt-1 truncate">{chatUser.firstname}</p>
               </div>
             </motion.div>
           ))}
@@ -110,7 +114,7 @@ function Chats({ selectUser, SetSelectUser }) {
 
       {/* Recent Chat Users List */}
       <div>
-        <p className="text-lg font-semibold mb-4">Recent</p>
+        <p className="text-lg font-semibold dark:text-[var(--text-color3)] mb-4">Recent</p>
         {status === 'loading' ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : error ? (
@@ -123,8 +127,10 @@ function Chats({ selectUser, SetSelectUser }) {
                 <div
                   key={chatUser._id}
                   onClick={() => SetSelectUser(chatUser)}
-                  className={`flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
-                    ${chatUser.isTyping ? 'bg-[#d9e8ff] hover:bg-[#e3ecff]' : 'hover:bg-[#e3ecff]'}
+                  className={` group  flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
+                   ${chatUser.isTyping
+                      ? 'bg-[#d9e8ff] hover:bg-[#e3ecff]  dark:hover:bg-[#e3ecff] '
+                      : 'hover:bg-[#e3ecff] dark:hover:bg-[#e3ecff]'}
                     ${selectUser?._id === chatUser._id ? 'bg-gray-200' : ''}`}
                 >
                   {/* Avatar */}
@@ -132,7 +138,7 @@ function Chats({ selectUser, SetSelectUser }) {
                     {chatUser.profile_avatar ? (
                       <img src={chatUser.profile_avatar} alt={getFullName(chatUser)} className="w-10 h-10 rounded-full object-cover" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-400 text-white flex items-center justify-center text-lg font-semibold">
+                      <div className="w-10 h-10 rounded-full text-white bg-gray-400 flex items-center justify-center text-lg font-semibold">
                         {chatUser.firstname?.[0]?.toUpperCase()}
                       </div>
                     )}
@@ -141,10 +147,16 @@ function Chats({ selectUser, SetSelectUser }) {
                     )}
                   </div>
 
-                  {/* Message Preview */}
+                  {/* Message bio */}
                   <div className="flex-1">
-                    <p className="text-sm font-semibold truncate">{getFullName(chatUser)}</p>
-                    <p className={`text-sm ${chatUser.isTyping ? 'text-blue-600 italic' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-sm font-semibold truncate ${selectUser?._id === chatUser._id
+                        ? 'text-black hover:text-black'
+                        : 'dark:text-[var(--text-color3)]  group-hover:text-black'
+                        }  `}
+                    >{getFullName(chatUser)}</p>
+
+                    <p className={`text-sm ${chatUser.isTyping ? 'text-blue-600 italic' : 'text-gray-500'} dark:text-[var(--text-color)]`}>
                       {chatUser.bio
                         ? (() => {
                           const words = chatUser.bio.trim().split(/\s+/);
@@ -169,7 +181,7 @@ function Chats({ selectUser, SetSelectUser }) {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

@@ -117,12 +117,12 @@ function Contacts() {
   const groupedContacts = groupContactsByLetter(confirmedUsers);
 
   return (
-    <div className="h-screen w-full p-4 bg-[#f9fbfd] relative">
+    <div className="h-screen w-full p-4  relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-xl font-semibold text-gray-800">Contacts</h4>
+        <h4 className="text-xl font-semibold text-gray-800 dark:text-[var(--text-color3)]">Contacts</h4>
         <button
-          className="text-gray-600 hover:text-gray-800 text-xl mr-4 cursor-pointer"
+          className="text-gray-600 hover:text-gray-800 dark:text-[var(--text-color1)] text-xl mr-4 cursor-pointer"
           onClick={() => setShowAddModal(true)}
         >
           <RiUserAddLine />
@@ -147,7 +147,7 @@ function Contacts() {
           .sort()
           .map((letter) => (
             <div key={letter}>
-              <div className="text-purple-600 font-semibold text-sm mt-8">
+              <div className="text-purple-600 dark:text-[var(--text-color)] font-semibold text-sm mt-8">
                 {letter}
               </div>
               {groupedContacts[letter].map((inv, idx) => (
@@ -155,10 +155,10 @@ function Contacts() {
                   key={idx}
                   className="flex justify-between items-center px-4 py-2 rounded cursor-pointer"
                 >
-                  <div className="text-gray-800 font-medium">
+                  <div className="text-gray-800 dark:text-[var(--text-color3)] font-medium">
                     {inv.name || inv.email}
                   </div>
-                  <div className="relative text-gray-500 text-xl cursor-pointer">
+                  <div className="relative text-gray-500 text-xl dark:text-[var(--text-color1)] cursor-pointer">
                     <button onClick={() => toggleMenu(inv.id)}>
                       <EllipsisVerticalIcon size={16} />
                     </button>

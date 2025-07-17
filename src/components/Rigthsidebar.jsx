@@ -8,6 +8,7 @@ import {
   addOwnMessage,
   setMessages,
   fetchChatHistory,
+  setSearchQuery,
 } from '../feature/Slice/ChatHistory';
 import Header from './Rigthsidebar/Header';
 import Chatbody from './Rigthsidebar/Chatbody';
@@ -99,6 +100,10 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
 
     await dispatch(fetchChatHistory(payload)); // Ensure it’s awaited
   };
+
+  useEffect(() => {
+    dispatch(setSearchQuery("")); // clear search on new chat
+  }, [selectUser, selectGroup]);
 
 
   useEffect(() => {
@@ -273,7 +278,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     groupUsers.forEach(({ user, role }) => {
       // console.log('✌️user --->', user);
       if (user) {
-        console.log(`${user.firstname} ${user.lastname} - Role: ${role}`);
+        console.log(`${user.firstname} ${user.lastname} ${user._id} - Role: ${role}`);
       }
     });
   }, [groupUsers]);
@@ -321,7 +326,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           <Chatbody
             selectUser={selectUser}
             selectGroup={selectGroup}
-            messages={messages}
+            // messages={messages}
             user={user}
             scrollEnd={scrollEnd}
             loadingHistory={loadingHistory}

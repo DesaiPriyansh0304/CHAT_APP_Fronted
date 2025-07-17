@@ -129,7 +129,7 @@ const InvitedUser = ({ onChat }) => {
                                 return (
                                     <motion.tr
                                         key={invite._id}
-                                        className="border-t hover:bg-gradient-to-r from-gray-100 to-gray-200 transition"
+                                        className="border-t hover:bg-gradient-to-r from-gray-100 to-gray-300 dark:hover:bg-gradient-to-r dark:hover:from-[#ffcccc] dark:hover:to-[#f87171] dark:hover:text-black transition"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.05 }}

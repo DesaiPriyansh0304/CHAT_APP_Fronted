@@ -58,7 +58,7 @@ function Inputside({
         <>
             {/* 👇 Preview ABOVE input box */}
             {(image.length > 0 || file.length > 0) && (
-                <div className="w-full p-3 border-b border-gray-300 bg-white">
+                <div className="w-full p-3 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2e2e2e] transition-colors duration-300">
                     {image.length > 0 && (
                         <div className="flex flex-wrap gap-4 mb-2 justify-start">
                             {image.map((img, index) => (
@@ -79,7 +79,7 @@ function Inputside({
                     )}
 
                     {file.length > 0 && (
-                        <div className="text-sm text-gray-700">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
                             {fileName.map((name, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     📄 <span>{name}</span>
@@ -99,29 +99,26 @@ function Inputside({
                 </div>
             )}
 
-
-            <div className="p-4 border-t border-gray-200 bg-[#f3f3f6] relative">
-
-                {/* 👇 Input field and actions stay AS IS */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-[#f3f3f6] dark:bg-[#1e1e1e] relative transition-colors duration-300">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-3">
                     <input
                         type="text"
                         placeholder="Enter message..."
                         value={message}
                         onChange={onInputChange}
-                        className="flex-1 rounded-md py-2 px-4 border border-gray-300 focus:outline-none focus:border-blue-600"
+                        className="flex-1 rounded-md py-2 px-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2a2a2a] text-black dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
                         autoComplete="off"
                     />
 
                     {/* Image Upload */}
                     <input type="file" accept="image/*" multiple onChange={handleImageUpload} hidden id="upload-image" />
-                    <label htmlFor="upload-image" className="text-2xl text-gray-600 cursor-pointer">
+                    <label htmlFor="upload-image" className="text-2xl text-gray-600 dark:text-gray-300 cursor-pointer">
                         <MdImage />
                     </label>
 
                     {/* File Upload */}
                     <input type="file" onChange={handleFileUpload} multiple hidden id="upload-file" />
-                    <label htmlFor="upload-file" className="text-2xl text-gray-600 cursor-pointer">
+                    <label htmlFor="upload-file" className="text-2xl text-gray-600 dark:text-gray-300 cursor-pointer">
                         <MdAttachFile />
                     </label>
 
@@ -129,7 +126,7 @@ function Inputside({
                     <button
                         type="button"
                         onClick={() => setShowEmojiPicker((prev) => !prev)}
-                        className="text-2xl text-gray-600 hover:text-gray-800"
+                        className="text-2xl text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
                         title="Emoji"
                     >
                         <MdOutlineEmojiEmotions />
@@ -138,7 +135,7 @@ function Inputside({
                     {/* Send Button */}
                     <button
                         type="submit"
-                        className="flex items-center justify-center bg-[#7269EF] text-white rounded-md p-2 hover:bg-[#564cd1]"
+                        className="flex items-center justify-center bg-[#7269EF] text-white rounded-md p-2 hover:bg-[#564cd1] disabled:opacity-50"
                         title="Send Message"
                         disabled={!message.trim() && image.length === 0 && file.length === 0}
                     >
@@ -146,9 +143,8 @@ function Inputside({
                     </button>
                 </form>
 
-
                 {showEmojiPicker && (
-                    <div className="absolute bottom-16 right-4 z-50">
+                    <div className="absolute bottom-16 right-4 z-50 bg-white dark:bg-[#2a2a2a] dark:text-white p-2 rounded-md shadow-md">
                         <EmojiPicker onEmojiClick={(e) => setEmoji(e.emoji)} />
                     </div>
                 )}

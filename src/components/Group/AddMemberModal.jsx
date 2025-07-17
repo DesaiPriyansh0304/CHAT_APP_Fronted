@@ -1,137 +1,125 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { fetchInvitedUsers } from "../../feature/Slice/InvitedUsersSlice";
 import { FaTimes } from "react-icons/fa";
+import axios from "axios";
 
-const AddMemberModal = ({ onClose, groupId, onMembersAdded }) => {
-    const [users, setUsers] = useState([]);
-    const [selectedIds, setSelectedIds] = useState([]);
+const AddMemberModal = ({ groupId, onClose, onMembersAdded, existingMemberIds }) => {
     const dispatch = useDispatch();
-    const invitedUserState = useSelector((state) => state.invitedUsers);
-    const URL = import.meta.env.VITE_REACT_APP;
+    const { invitedUsers, invitedBy } = useSelector((state) => state.invitedUsers);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [selectedUsers, setSelectedUsers] = useState([]);
 
     useEffect(() => {
         dispatch(fetchInvitedUsers());
     }, [dispatch]);
 
     useEffect(() => {
-        if (invitedUserState.users && Array.isArray(invitedUserState.users)) {
-            const validUsers = invitedUserState.users
-                .filter((item) => item.user !== null)
-                .map((item) => item.user);
-            setUsers(validUsers);
-        }
-    }, [invitedUserState.users]);
+        // Flatten and filter out users already in group
+        const allUsers = [];
 
-    const toggleSelect = (userId) => {
-        setSelectedIds((prev) =>
+        invitedUsers?.forEach((inv) => {
+            if (inv.user && !existingMemberIds.includes(inv.user._id)) {
+                allUsers.push(inv.user);
+            }
+        });
+
+        invitedBy?.forEach((user) => {
+            if (user && !existingMemberIds.includes(user._id)) {
+                allUsers.push(user);
+            }
+        });
+
+        setFilteredUsers(allUsers);
+    }, [invitedUsers, invitedBy, existingMemberIds]);
+
+    const toggleSelectUser = (userId) => {
+        setSelectedUsers((prev) =>
             prev.includes(userId)
                 ? prev.filter((id) => id !== userId)
                 : [...prev, userId]
         );
     };
+    const URL = import.meta.env.VITE_REACT_APP;
 
     const handleAddMembers = async () => {
         try {
             const token = localStorage.getItem("Authtoken");
-            const res = await axios.post(
+
+            const response = await axios.post(
                 `${URL}/api/msg/addmember`,
                 {
                     groupId,
-                    newMemberIds: selectedIds,
+                    newMemberIds: selectedUsers,
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     },
                 }
             );
-            onMembersAdded(res.data.group);
-            onClose();
-        } catch (err) {
-            console.error("❌ Failed to add members:", err.message);
+
+            if (response.data.message === "Members added") {
+                onMembersAdded();
+                onClose();
+            }
+        } catch (error) {
+            console.error("Error adding members:", error);
         }
     };
 
-    const handleBackgroundClick = (e) => {
-        if (e.target.id === 'modal-background') {
-            onClose();
-        }
-    };
+
 
     return (
-        <div
-            id="modal-background"
-            onClick={handleBackgroundClick}
-            className="fixed inset-0  bg-opacity-40 flex items-center justify-center z-50"
-        >
-            <div className="bg-gradient-to-br from-white via-blue-50 to-purple-100 shadow-xl rounded-2xl w-[430px] p-6 grid gap-4 relative">
-                {/* ❌ Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-600 hover:text-red-600"
-                >
-                    <FaTimes size={20} />
-                </button>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-md w-full max-w-md p-4">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">Add Members</h2>
+                    <FaTimes
+                        className="cursor-pointer text-gray-500 hover:text-gray-800"
+                        onClick={onClose}
+                    />
+                </div>
 
-                {/* 🔤 Title */}
-                <h2 className="text-xl font-semibold text-blue-700">Add Members to Group</h2>
-
-                {/* 📋 User List */}
-                <div className="max-h-64 overflow-y-auto grid gap-2 pr-1">
-                    {users.map((user) => {
-                        const isSelected = selectedIds.includes(user._id);
-                        return (
-                            <div
+                {filteredUsers.length === 0 ? (
+                    <p className="text-gray-600">No available contacts to add.</p>
+                ) : (
+                    <ul className="space-y-2 max-h-64 overflow-y-auto">
+                        {filteredUsers.map((user) => (
+                            <li
                                 key={user._id}
-                                className={`grid grid-cols-[auto_1fr] items-center gap-3 p-2 rounded-md border cursor-pointer transition ${isSelected
-                                    ? 'bg-blue-100 border-blue-400'
-                                    : 'hover:bg-gray-100'
-                                    }`}
-                                onClick={() => toggleSelect(user._id)}
+                                className="flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-gray-100"
+                                onClick={() => toggleSelectUser(user._id)}
                             >
+                                <div className="flex items-center space-x-3">
+                                    <img
+                                        src={user.profile_avatar}
+                                        alt="avatar"
+                                        className="w-8 h-8 rounded-full"
+                                    />
+                                    <div>
+                                        <p className="font-medium">{user.firstname} {user.lastname}</p>
+                                        <p className="text-sm text-gray-500">{user.email}</p>
+                                    </div>
+                                </div>
                                 <input
                                     type="checkbox"
-                                    checked={isSelected}
+                                    checked={selectedUsers.includes(user._id)}
                                     readOnly
-                                    className="accent-blue-600 w-4 h-4 cursor-pointer"
                                 />
-                                <div className="text-sm text-gray-800">
-                                    <div className="font-medium">
-                                        {user.firstname} {user.lastname}
-                                    </div>
-                                    <div className="text-gray-500 text-xs">{user.email}</div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
 
-                {/* 🔢 Selected Count */}
-                <div className="text-sm text-gray-600 text-right">
-                    Selected Users: <strong>{selectedIds.length}</strong>
-                </div>
-
-                {/* 🔘 Buttons */}
-                <div className="grid grid-cols-2 gap-3">
-                    <button
-                        onClick={onClose}
-                        className="border border-gray-400 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleAddMembers}
-                        disabled={selectedIds.length === 0}
-                        className={`py-2 rounded-md text-white font-medium ${selectedIds.length === 0
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                            }`}
-                    >
-                        Add Members
-                    </button>
-                </div>
+                <button
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                    onClick={handleAddMembers}
+                    disabled={selectedUsers.length === 0}
+                >
+                    Add Selected
+                </button>
             </div>
         </div>
     );

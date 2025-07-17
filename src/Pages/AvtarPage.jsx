@@ -109,40 +109,38 @@ function AvtarPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center px-4 py-10 bg-gradient-to-br from-[#67B7D1] via-white to-[#EA9282]">
+        <div className="min-h-screen w-full flex items-center justify-center px-4 py-10 bg-gradient-to-br from-[#67B7D1] via-white to-[#EA9282] dark:from-gray-800 dark:via-gray-900 dark:to-black">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="relative w-full max-w-3xl bg-white text-gray-800 rounded-2xl shadow-lg overflow-hidden"
+                className="relative w-full max-w-3xl bg-white text-gray-800 dark:bg-[#1e1e1e] dark:text-white rounded-2xl shadow-lg overflow-hidden"
             >
-
                 {!editMode && (
                     <button
                         onClick={() => setEditMode(true)}
-                        className="absolute top-4 left-4 bg-[#67B7D1] hover:bg-[#58a5c3] text-white px-4 py-2 rounded-md shadow-md"
+                        className="absolute top-4 left-4 bg-[#67B7D1] hover:bg-[#58a5c3] text-white px-4 py-2 rounded-md shadow-md dark:bg-[#3b9fc1] dark:hover:bg-[#2f91b2]"
                     >
                         Edit Profile
                     </button>
                 )}
 
                 <div className="flex flex-col items-center px-6 py-8 max-h-[90vh] overflow-hidden">
-                    {/* Avatar */}
                     <div className="relative mb-6">
-                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#67B7D1] shadow">
+                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#67B7D1] shadow dark:border-[#3b9fc1]">
                             {preview ? (
                                 <img src={preview} alt="avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">No Image</div>
                             )}
                         </div>
                         {editMode && (
                             <>
                                 <button
                                     onClick={handleImageClick}
-                                    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow"
+                                    className="absolute bottom-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full shadow"
                                 >
-                                    <MdEdit className="text-xl text-[#EA9282]" />
+                                    <MdEdit className="text-xl text-[#EA9282] dark:text-[#f28b7e]" />
                                 </button>
                                 <input
                                     type="file"
@@ -155,7 +153,6 @@ function AvtarPage() {
                         )}
                     </div>
 
-                    {/* Scrollable Form */}
                     <div className="w-full overflow-y-auto pr-1">
                         <form onSubmit={handleSubmit} className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
@@ -166,27 +163,26 @@ function AvtarPage() {
                                 { label: "Date of Birth", name: "dob", type: "date" }
                             ].map((field, idx) => (
                                 <div key={idx}>
-                                    <label className="text-sm font-medium text-gray-600">{field.label}</label>
+                                    <label className="text-sm font-medium text-gray-600 dark:text-gray-300">{field.label}</label>
                                     <input
                                         type={field.type || "text"}
                                         name={field.name}
                                         value={avatrFrom[field.name]}
                                         onChange={handleChange}
                                         disabled={field.alwaysDisabled || !editMode}
-                                        className="w-full p-2 mt-1 rounded-md border border-gray-300 focus:ring-[#67B7D1] focus:border-[#67B7D1] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-600 focus:ring-[#67B7D1] focus:border-[#67B7D1] dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                 </div>
                             ))}
 
-                            {/* Gender */}
                             <div>
-                                <label className="text-sm font-medium text-gray-600">Gender</label>
+                                <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Gender</label>
                                 <select
                                     name="gender"
                                     value={avatrFrom.gender}
                                     onChange={handleChange}
                                     disabled={!editMode}
-                                    className="w-full p-2 mt-1 rounded-md border border-gray-300 focus:ring-[#67B7D1] focus:border-[#67B7D1] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-600 focus:ring-[#67B7D1] focus:border-[#67B7D1] dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="">Select Gender</option>
                                     {["male", "female", "other"].map((g) => (
@@ -195,20 +191,18 @@ function AvtarPage() {
                                 </select>
                             </div>
 
-                            {/* Bio */}
                             <div className="md:col-span-2">
-                                <label className="text-sm font-medium text-gray-600">Bio</label>
+                                <label className="text-sm font-medium text-gray-600 dark:text-gray-300">Bio</label>
                                 <textarea
                                     name="bio"
                                     value={avatrFrom.bio}
                                     onChange={handleChange}
                                     rows={3}
                                     disabled={!editMode}
-                                    className="w-full p-2 mt-1 rounded-md border border-gray-300 focus:ring-[#67B7D1] focus:border-[#67B7D1] resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-600 focus:ring-[#67B7D1] focus:border-[#67B7D1] resize-none dark:bg-gray-800 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                 ></textarea>
                             </div>
 
-                            {/* Buttons */}
                             {editMode && (
                                 <div className="md:col-span-2 flex justify-between mt-4">
                                     <motion.button
@@ -216,7 +210,7 @@ function AvtarPage() {
                                         whileTap={{ scale: 0.95 }}
                                         onClick={handleCancel}
                                         type="button"
-                                        className="bg-[#EA9282] hover:bg-[#d47d6f] text-white px-4 py-2 rounded-md"
+                                        className="bg-[#EA9282] hover:bg-[#d47d6f] dark:bg-[#f28b7e] dark:hover:bg-[#e67164] text-white px-4 py-2 rounded-md"
                                     >
                                         Cancel
                                     </motion.button>
@@ -227,8 +221,8 @@ function AvtarPage() {
                                         disabled={!formChanged}
                                         className={`px-6 py-2 rounded-md font-medium shadow 
                                             ${formChanged
-                                                ? "bg-[#67B7D1] hover:bg-[#58a5c3] text-white"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                                                ? "bg-[#67B7D1] hover:bg-[#58a5c3] dark:bg-[#3b9fc1] dark:hover:bg-[#2f91b2] text-white"
+                                                : "bg-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed"}`}
                                     >
                                         Update Profile
                                     </motion.button>

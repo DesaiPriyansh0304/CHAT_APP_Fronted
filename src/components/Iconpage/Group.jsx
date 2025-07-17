@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserGroups, addGroup } from '../../feature/Slice/UserGroup';
+import { deleteGroup, leaveGroup } from '../../feature/Slice/DeleteGroup'; // ✅ ADD THIS
 import CreateGroupModal from '../Group/Groupadd';
 import AddMemberModal from '../Group/AddMemberModal';
 import { RiGroupLine, RiDeleteBin6Line } from 'react-icons/ri';
@@ -12,6 +13,8 @@ import { MdBlockFlipped } from "react-icons/md";
 const GroupList = ({ selectGroup, setSelectGroup }) => {
   const dispatch = useDispatch();
   const { groups, loading, error } = useSelector((state) => state.userGroups);
+  const { userData } = useSelector((state) => state.loginuser);
+  const loginUserId = userData?._id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,11 +29,35 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
     setActivegroupMenuId(id);
   };
 
-  const dotMenu = [
-    { id: 0, title: "ADD Member", icon: <IoIosPersonAdd /> },
-    { id: 1, title: "Block Group", icon: <MdBlockFlipped /> },
-    { id: 2, title: "Delete Group", icon: <RiDeleteBin6Line /> },
-  ];
+  const getUserRoleInGroup = (group, userId) => {
+    const entry = group.userIds.find((u) => u.user._id === userId);
+    return entry?.role || null;
+  };
+
+  const getDotMenuByRole = (role) => {
+    switch (role) {
+      case "admin":
+        return [
+          { id: 0, title: "ADD Member", icon: <IoIosPersonAdd /> },
+          { id: 1, title: "Block Group", icon: <MdBlockFlipped /> },
+          { id: 2, title: "Delete Group", icon: <RiDeleteBin6Line /> },
+          { id: 3, title: "Leave Group", icon: <RiDeleteBin6Line /> },
+        ];
+      case "subadmin":
+        return [
+          { id: 0, title: "ADD Member", icon: <IoIosPersonAdd /> },
+          { id: 1, title: "Block Group", icon: <MdBlockFlipped /> },
+          { id: 2, title: "Leave Group", icon: <RiDeleteBin6Line /> },
+        ];
+      case "member":
+        return [
+          { id: 1, title: "Block Group", icon: <MdBlockFlipped /> },
+          { id: 2, title: "Leave Group", icon: <RiDeleteBin6Line /> },
+        ];
+      default:
+        return [];
+    }
+  };
 
   useEffect(() => {
     const handleClickAnywhere = (event) => {
@@ -69,12 +96,12 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
 
   return (
     <div className="flex h-screen w-full">
-      <div className="p-4 bg-[#f5f7fb] text-gray-800 w-full">
+      <div className="p-4  text-gray-800 w-full overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Groups</h2>
+          <h2 className="text-2xl dark:text-[var(--text-color3)] font-semibold">Groups</h2>
           <RiGroupLine
-            className="text-xl text-gray-600 hover:text-black cursor-pointer mr-3.5"
+            className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-black cursor-pointer mr-3.5"
             onClick={() => setIsModalOpen(true)}
           />
         </div>
@@ -92,7 +119,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
         </div>
 
         {/* Group List */}
-        <div className="mt-10">
+        <div className="mt-6">
           <ul className="flex flex-col gap-4">
             {loading ? (
               <p>Loading groups...</p>
@@ -101,58 +128,83 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
             ) : filteredGroups.length === 0 ? (
               <p className="text-gray-500">No groups found</p>
             ) : (
-              filteredGroups.map((group, index) => (
-                <li
-                  key={group._id || index}
-                  className={`cursor-pointer px-2 py-2 rounded hover:bg-[#e3ecff] ${selectGroup?._id === group._id ? 'bg-[#d4dfff]' : ''
-                    } relative`}
-                  onClick={() => setSelectGroup(group)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-700 font-semibold">
-                        {group.groupName.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="font-medium">#{group.groupName}</span>
-                    </div>
-                    <BsThreeDots
-                      className="text-lg text-gray-500 cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleMenu(group._id);
-                      }}
-                    />
-                  </div>
+              filteredGroups.map((group, index) => {
+                const userRole = getUserRoleInGroup(group, loginUserId);
+                const dotMenu = getDotMenuByRole(userRole);
 
-                  {/* Dot Menu */}
-                  {isdotMenu && activegroupMenuId === group._id && (
-                    <div
-                      ref={dotmenuRef}
-                      className="absolute right-3 mt-2 w-40 bg-white border border-blue-300 rounded-md shadow-md z-10"
-                    >
-                      <ul>
-                        {dotMenu.map(({ title, id, icon }) => (
-                          <li
-                            key={id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (title === "ADD Member") {
-                                setTargetGroupId(group._id);
-                                setIsAddMemberOpen(true);
-                                setIsdotMenu(false);
-                              }
-                            }}
-                            className="hover:bg-gray-100 cursor-pointer px-3 py-2 flex justify-between items-center text-sm text-gray-700"
+                return (
+                  <li
+                    key={group._id || index}
+                    className={`cursor-pointer px-2 py-2 rounded  ${selectGroup?._id === group._id ? 'bg-[#d4dfff] dark:text-[var(----text-color)]' : ''
+                      } relative`}
+                    onClick={() => setSelectGroup(group)}
+                  >
+                    <div className="flex items-center justify-between relative">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-700 font-semibold">
+                          {group.groupName.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium dark:text-[var(--text-color3)]">#{group.groupName}</span>
+                      </div>
+
+                      <div className="relative">
+                        <BsThreeDots
+                          className="text-lg text-gray-500 cursor-pointer dark:text-[var(--text-color)]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleMenu(group._id);
+                          }}
+                        />
+
+                        {/* Dot Menu */}
+                        {isdotMenu && activegroupMenuId === group._id && (
+                          <div
+                            ref={dotmenuRef}
+                            className="absolute bottom-10 right-0 w-44 bg-white border-4 border-blue-300 rounded-md shadow-md z-50"
                           >
-                            <span>{title}</span>
-                            <span className="text-blue-500">{icon}</span>
-                          </li>
-                        ))}
-                      </ul>
+                            <ul>
+                              {dotMenu.map(({ title, id, icon }) => (
+                                <li
+                                  key={id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsdotMenu(false);
+
+                                    if (title === "ADD Member") {
+                                      setTargetGroupId(group._id);
+                                      setIsAddMemberOpen(true);
+                                    }
+
+                                    if (title === "Delete Group") {
+                                      dispatch(deleteGroup(group._id)).then(() => {
+                                        dispatch(fetchUserGroups());
+                                      });
+                                    }
+
+                                    if (title === "Leave Group") {
+                                      dispatch(leaveGroup(group._id)).then(() => {
+                                        dispatch(fetchUserGroups());
+                                      });
+                                    }
+
+                                    if (title === "Block Group") {
+                                      console.log("Block Group not implemented yet");
+                                    }
+                                  }}
+                                  className="hover:bg-gray-100 cursor-pointer px-3 py-2 flex justify-between items-center text-sm text-gray-700"
+                                >
+                                  <span>{title}</span>
+                                  <span className="text-blue-500">{icon}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </li>
-              ))
+                  </li>
+                );
+              })
             )}
           </ul>
         </div>
@@ -173,6 +225,9 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
               setIsAddMemberOpen(false);
               setTargetGroupId(null);
             }}
+            existingMemberIds={
+              groups.find((g) => g._id === targetGroupId)?.userIds.map((u) => u.user._id) || []
+            }
             onMembersAdded={() => {
               dispatch(fetchUserGroups());
             }}

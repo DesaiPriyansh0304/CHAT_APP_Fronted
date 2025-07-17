@@ -6,11 +6,12 @@ import Contacts from './Iconpage/Contacts';
 import Setting from './Iconpage/Setting';
 import AvtarPage from '../Pages/AvtarPage'
 import AllUser from './Iconpage/AllUser';
-// import Language from './Iconpage/Language';
+import { useSelector } from 'react-redux';
 
 
 function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, selectGroup, setSelectGroup }) {
 
+  const theme = useSelector((state) => state.theme.mode);
 
   const renderContent = () => {
     switch (activePage) {
@@ -67,7 +68,15 @@ function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, sel
     }
   };
 
-  return <div className='bg-[#f5f7fb]'>{renderContent()}</div>;
+  return (
+    <>
+      <div className={`${theme === 'dark' ? 'dark' : ''}`}>
+        <div className={`min-h-screen bg-[var(--secondary-color)] `}>
+          {renderContent()}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default ChatContainer;

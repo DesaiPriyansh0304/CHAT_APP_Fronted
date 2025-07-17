@@ -128,7 +128,7 @@ export const SenderMessage = ({
 
                                 </div>
                                 {/*sender Full Name*/}
-                                <div className="text-xs text-gray-500 mt-1.5 text-right">
+                                <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-right">
                                     {user?.firstname} {user?.lastname}
                                 </div>
                             </li>
@@ -305,7 +305,7 @@ export const ReceiverMessage = ({
                                 )}
 
                                 {/* Sender name */}
-                                <div className="text-xs text-gray-500 mt-1.5 text-left">
+                                <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-left">
                                     {senderName || 'User'}
                                 </div>
                             </li>

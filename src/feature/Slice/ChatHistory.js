@@ -1,19 +1,17 @@
+// ✅ ChatHistory Slice (ChatHistory.js or ChatHistory.ts)
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const URL = import.meta.env.VITE_REACT_APP;
 
-// Fetch chat history
 export const fetchChatHistory = createAsyncThunk(
   "chat/fetchChatHistory",
   async ({ userId1, userId2, groupId, page = 1 }, { rejectWithValue }) => {
     try {
       const params = groupId ? { groupId, page } : { userId1, userId2, page };
-
       const { data } = await axios.get(`${URL}/api/msg/chat-history`, {
         params,
       });
-      // console.log("✅data --->/Chathistory", data);
 
       return {
         messages: data.chatHistory,
@@ -25,7 +23,6 @@ export const fetchChatHistory = createAsyncThunk(
         groupUsers: data.groupUsers || [],
       };
     } catch (error) {
-      console.error("❌Chat history fetch error:", error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -43,6 +40,7 @@ const chatHistorySlice = createSlice({
     sender: null,
     receiver: null,
     groupUsers: [],
+    searchQuery: "",
   },
   reducers: {
     setMessages: (state, action) => {
@@ -63,6 +61,9 @@ const chatHistorySlice = createSlice({
     },
     addMessagesToTop: (state, action) => {
       state.messages = [...action.payload, ...state.messages];
+    },
+    setSearchQuery: (state, action) => {
+      state.searchQuery = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -105,12 +106,10 @@ const chatHistorySlice = createSlice({
           };
         });
 
-        if (currentPage > 1) {
-          state.messages = [...flattenedMessages, ...state.messages];
-        } else {
-          state.messages = flattenedMessages;
-        }
-
+        state.messages =
+          currentPage > 1
+            ? [...flattenedMessages, ...state.messages]
+            : flattenedMessages;
         state.currentPage = currentPage;
         state.totalPages = totalPages;
         state.totalMessages = totalMessages;
@@ -126,7 +125,18 @@ const chatHistorySlice = createSlice({
   },
 });
 
-export const { setMessages, addOwnMessage, clearMessages } =
+export const { setMessages, addOwnMessage, clearMessages, setSearchQuery } =
   chatHistorySlice.actions;
+
+export const selectFilteredMessages = (state) => {
+  const { messages, searchQuery } = state.chatHistory;
+  if (!searchQuery) return messages;
+  const lower = searchQuery.toLowerCase();
+  return messages.filter(
+    (msg) =>
+      (msg.text || "").toLowerCase().includes(lower) ||
+      (msg.content || "").toString().toLowerCase().includes(lower)
+  );
+};
 
 export default chatHistorySlice.reducer;

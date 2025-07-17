@@ -116,7 +116,7 @@ const OtherUser = ({ onChat }) => {
                             users.map((user, i) => (
                                 <motion.tr
                                     key={user.id}
-                                    className="border-t hover:bg-gradient-to-r from-green-50 to-blue-50 transition duration-300"
+                                    className="border-t hover:bg-gradient-to-r from-green-50 to-blue-50 transitiondark:hover:bg-gradient-to-r dark:hover:from-[#86efac] dark:hover:via-[#93c5fd] dark:hover:to-[#f87171] dark:hover:text-black  duration-300"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}

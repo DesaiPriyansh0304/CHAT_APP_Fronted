@@ -57,7 +57,10 @@ const InvitedByUser = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="border-t hover:bg-gradient-to-r from-blue-50 to-blue-100 transition"
+                                    className="border-t hover:bg-gradient-to-r from-blue-50 to-blue-100 dark:hover:bg-gradient-to-r 
+dark:hover:from-[#93c5fd] 
+dark:hover:to-[#f87171]
+dark:hover:text-black transition"
                                 >
                                     <td className="py-2 px-4">
                                         {user.profile_avatar ? (

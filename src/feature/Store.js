@@ -15,6 +15,8 @@ import favoriteReducer from "../feature/Slice/favoriteSlice";
 import invitedUsersReducer from "../feature/Slice/InvitedUsersSlice";
 import searchUserReducer from "../feature/Slice/SearchUserSlice";
 import filteredInvitedUsersReducer from "../feature/Slice/FilteredInvitedUsers";
+import groupActionReducer from "../feature/Slice/DeleteGroup";
+import themeReducer from "../feature/Slice/ThemeSlice";
 
 const store = configureStore({
   reducer: {
@@ -41,6 +43,8 @@ const store = configureStore({
     //User Data Slice
     filteredInvitedUsers: filteredInvitedUsersReducer, //filter in user data
     invitedUsers: invitedUsersReducer, //invited user and invited by use data
+    groupAction: groupActionReducer,
+    theme: themeReducer,
   },
 });
 

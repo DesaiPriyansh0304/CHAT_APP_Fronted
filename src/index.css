@@ -1,5 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Sedan+SC&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* :root {
+    --primary-color: #222831;
+    --secondary-color: #393E46;
+    --bg-color: #00ADB5;
+    --text-color: #EEEEEE;
+} */
+:root {
+    --primary-color: ;
+    --secondary-color: ;
+    --bg-color: ;
+    --text-color: ;
+}
+
+
+.dark {
+    --primary-color: #222831;
+    --secondary-color: #393E46;
+    --therd-color: #3C3D37;
+    --bg-color: #948979;
+    --text-color1: #DFD0B8;
+    --text-color: #00ADB5;
+    --text-gradient: linear-gradient(to right, #00ADB5, #3CD3AD);
+    --text-color3: #F1EFEC;
+
+}
 
 /* * {
     font-family: "Sedan SC", serif;

@@ -11,20 +11,14 @@ import {
     IoSearchOutline,
 } from 'react-icons/io5';
 import { BsThreeDots } from 'react-icons/bs';
-import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup'
+import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup';
 
 function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
-
-    // console.log('✌️selectUser --->', selectUser);
-    // console.log('✌️selectGroup --->', selectGroup);
     const [showMoreOptions, setShowMoreOptions] = useState(false);
-    const [showCallModal, setShowCallModal] = useState(false); //Aduiocall
-    const [showVideoModal, setShowVideoModal] = useState(false); // Video call modal
+    const [showCallModal, setShowCallModal] = useState(false);
+    const [showVideoModal, setShowVideoModal] = useState(false);
     const [callData, setCallData] = useState(null);
     const [showSearchBox, setShowSearchBox] = useState(false);
-    // console.log('✌️showVideoModal --->', showVideoModal);
-    // console.log('✌️showCallModal --->', showCallModal);
-
 
     const topItems = [
         { id: 1, icon: <IoSearchOutline />, title: 'Search' },
@@ -45,7 +39,6 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
         const handleClickAnywhere = (event) => {
             if (showMoreOptions && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
                 setShowMoreOptions(false);
-
             }
         };
 
@@ -58,44 +51,67 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
     const isUserSelected = selectUser && Object.keys(selectUser).length > 0;
     const isGroupSelected = selectGroup && Object.keys(selectGroup).length > 0;
 
-    //user header if user is selected
+    const commonHeaderStyle = "flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]";
+    const userNameText = "text-gray-900 dark:text-white";
+    const typingText = "text-sm text-gray-500 dark:text-gray-400";
+    const buttonTextColor = "text-gray-500 dark:text-gray-300 text-xl";
+    const hoverBtn = "hover:text-blue-600 dark:hover:text-blue-400";
+
+    const renderMoreMenu = () => (
+        <div
+            className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 text-sm text-gray-700 dark:text-gray-200"
+            ref={dotmenuRef}
+        >
+            {dotUpsideItems.map(({ id, icon, title }) => (
+                <button
+                    key={id}
+                    className="flex items-center justify-between w-full px-4 py-2 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => setShowMoreOptions(false)}
+                    type="button"
+                >
+                    <span>{title}</span>
+                    <span className="text-blue-500 text-base">{icon}</span>
+                </button>
+            ))}
+        </div>
+    );
+
     if (isUserSelected) {
         return (
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-white">
-                <div className="flex items-center space-x-3"
-                    onClick={onProfileClick}>
+            <div className={commonHeaderStyle}>
+                <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileClick}>
                     <img
                         className="w-12 h-12 rounded-full object-cover"
                         alt={`${selectUser.firstname} ${selectUser.lastname}`}
                         src={selectUser.img || selectUser.profile_avatar || 'https://via.placeholder.com/40'}
                     />
-                    <div className="text-gray-900">
+                    <div className={userNameText}>
                         <div className="flex items-center gap-2 font-semibold">
                             <span>{`${selectUser.firstname} ${selectUser.lastname}`}</span>
                             {selectUser.online && (
                                 <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
                             )}
                         </div>
-                        {isTyping && <span className="text-sm text-gray-500">typing...</span>}
+                        {isTyping && <span className={typingText}>typing...</span>}
                     </div>
                 </div>
 
-                <div className="flex items-center gap-7 text-gray-500 text-xl ">
+                <div className={`flex items-center gap-7 ${buttonTextColor}`}>
                     {topItems.map(({ id, icon, title }) => (
                         <button
                             key={id}
                             title={title}
-                            className="hover:text-blue-600 cursor-pointer"
+                            className={hoverBtn}
                             type="button"
                             onClick={() => {
                                 if (title === 'Call') {
                                     setCallData(isUserSelected ? selectUser : selectGroup);
                                     setShowCallModal(true);
                                 } else if (title === 'Video Call') {
-                                    setShowVideoModal(true);
                                     setCallData(isUserSelected ? selectUser : selectGroup);
+                                    setShowVideoModal(true);
                                 } else if (title === 'Search') {
-                                    setShowSearchBox(true)
+                                    setShowSearchBox(true);
                                 } else if (title === 'Profile') {
                                     onProfileClick();
                                 }
@@ -104,31 +120,17 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
                             {icon}
                         </button>
                     ))}
+
                     <div className="relative">
                         <button
                             onClick={() => setShowMoreOptions((prev) => !prev)}
                             title="More"
-                            className="hover:text-black cursor-pointer mr-5"
+                            className="hover:text-black dark:hover:text-white cursor-pointer mr-5"
                             type="button"
                         >
                             <BsThreeDots />
                         </button>
-                        {showMoreOptions && (
-                            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 text-sm text-gray-700"
-                                ref={dotmenuRef}>
-                                {dotUpsideItems.map(({ id, icon, title }) => (
-                                    <button
-                                        key={id}
-                                        className="flex items-center justify-between w-full px-4 py-2 gap-2 hover:bg-gray-100"
-                                        onClick={() => setShowMoreOptions(false)}
-                                        type="button"
-                                    >
-                                        <span>{title}</span>
-                                        <span className="text-blue-500 text-base">{icon}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        {showMoreOptions && renderMoreMenu()}
                     </div>
                 </div>
 
@@ -137,86 +139,68 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
                     <AudioCallModal
                         user={callData}
                         onCancel={() => setShowCallModal(false)}
-                        onCall={() => {
-                            setShowCallModal(false);
-                            // console.log('Calling:', callData);
-
-                        }}
+                        onCall={() => setShowCallModal(false)}
                     />
                 )}
+
                 {/* Video Call Modal */}
                 {showVideoModal && (
                     <VideoCallModal
                         user={callData}
                         onCancel={() => setShowVideoModal(false)}
-                        onCall={() => {
-                            setShowVideoModal(false);
-                            // console.log('Video calling:', callData);
-                        }}
+                        onCall={() => setShowVideoModal(false)}
                     />
                 )}
-                {/* serchbox Modal */}
+
+                {/* Search Box */}
                 {showSearchBox && (
-                    <SearchBox onClose={() => setShowSearchBox(false)}
+                    <SearchBox
+                        onClose={() => setShowSearchBox(false)}
                         onSearch={(value) => {
                             console.log('🔍 Search Payload:', value);
-                        }} />
+                        }}
+                    />
                 )}
             </div>
         );
     }
 
-    //  group header if group is selected
     if (isGroupSelected) {
         return (
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-white">
-                <div className="flex items-center space-x-3"
-                    onClick={onProfileClick}>
+            <div className={commonHeaderStyle}>
+                <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileClick}>
                     <img
                         className="w-12 h-12 rounded-full object-cover"
                         alt={selectGroup.groupName}
                         src={'https://via.placeholder.com/40?text=G'}
                     />
-                    <div className="text-gray-900">
+                    <div className={userNameText}>
                         <div className="flex items-center gap-2 font-semibold">
                             <span>{selectGroup.groupName}</span>
                         </div>
-                        <span className="text-sm text-gray-500">
+                        <span className={typingText}>
                             Created by: {selectGroup.createdBy.firstname} {selectGroup.createdBy.lastname}
                         </span>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-7 text-gray-500 text-xl">
+                <div className={`flex items-center gap-7 ${buttonTextColor}`}>
                     {topItems.map(({ id, icon, title }) => (
-                        <button key={id} title={title} className="hover:text-blue-600 " type="button">
+                        <button key={id} title={title} className={hoverBtn} type="button">
                             {icon}
                         </button>
                     ))}
+
                     <div className="relative">
                         <button
                             onClick={() => setShowMoreOptions((prev) => !prev)}
                             title="More"
-                            className="hover:text-black cursor-pointer mr-5"
+                            className="hover:text-black dark:hover:text-white cursor-pointer mr-5"
                             type="button"
                         >
                             <BsThreeDots />
                         </button>
-                        {showMoreOptions && (
-                            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg z-10 text-sm text-gray-700">
-                                {dotUpsideItems.map(({ id, icon, title }) => (
-                                    <button
-                                        key={id}
-                                        className="flex items-center justify-between w-full px-4 py-2 gap-2 hover:bg-gray-100"
-                                        onClick={() => setShowMoreOptions(false)}
-                                        type="button"
-                                    >
-                                        <span>{title}</span>
-                                        <span className="text-blue-500 text-base">{icon}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        {showMoreOptions && renderMoreMenu()}
                     </div>
                 </div>
             </div>
@@ -227,5 +211,3 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick }) {
 }
 
 export default Header;
-
-

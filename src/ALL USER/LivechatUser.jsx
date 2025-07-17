@@ -31,7 +31,7 @@ const LiveChatUser = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04 }}
-                className="border-t hover:bg-gradient-to-r from-purple-50 to-indigo-50 transition"
+                className="border-t hover:bg-gradient-to-r from-purple-50 to-indigo-50 dark:hover:bg-gradient-to-r dark:hover:from-[#d8b4fe]  dark:hover:to-[#93c5fd] dark:hover:text-black transition"
             >
                 <td className="py-2 px-4">
                     {user.profile_avatar ? (
