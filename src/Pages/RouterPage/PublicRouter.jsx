@@ -3,13 +3,13 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const PublicRoute = () => {
+
+    {/* Auth Slice */ }
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-    const status = useSelector((state) => state.checkAuth.status);
 
-    if (status === "loading") {
-        return <p className="text-white text-center mt-10">Checking auth...</p>;
+    if (isAuthenticated === null || isAuthenticated === undefined) {
+        return <div>Loading...</div>;
     }
-
     if (isAuthenticated) {
         return <Navigate to="/" replace />;
     }

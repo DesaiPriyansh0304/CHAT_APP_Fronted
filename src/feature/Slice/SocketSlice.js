@@ -58,6 +58,11 @@ export const connectSocket = (user) => (dispatch) => {
     dispatch(setConnectionStatus(true));
   });
 
+  socketInstance.emit("openChatWith", {
+    userId: user._id || user.userId,
+    chatWithUserId: null, // initially no chat open
+  });
+
   socketInstance.on("connect_error", (err) => {
     console.error("⚫Socket connection error:/SocketSlice", err.message);
     dispatch(setConnectionStatus(false));
@@ -117,6 +122,18 @@ export const connectSocket = (user) => (dispatch) => {
     console.log("🔁 Reconnected to socket server!/SocketSlice");
   });
 };
+
+export const markMessagesAsRead =
+  ({ senderId, receiverId }) =>
+  () => {
+    if (socketInstance && socketInstance.connected) {
+      console.log("✅ Emitting markMessagesAsRead to backend", {
+        senderId,
+        receiverId,
+      });
+      socketInstance.emit("markMessagesAsRead", { senderId, receiverId });
+    }
+  };
 
 //disconnnected SOCKET.IO
 export const disconnectSocket = () => (dispatch) => {

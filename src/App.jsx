@@ -5,18 +5,20 @@ import Home from './Pages/Home';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
 import { Toaster } from 'react-hot-toast';
-import PrivateRoute from "./Pages/PrivetRouter";
-import PublicRoute from "./Pages/PublicRouter";
+import PrivateRoute from "./Pages/RouterPage/PrivetRouter";
+import PublicRoute from "./Pages/RouterPage/PublicRouter";
 import OtpVerify from "./Pages/OTPVerify";
 import ForgetPassword from "./Pages/forgetpassword";
 import ResetPassword from "./Pages/ResetPassword";
 import { useSelector } from "react-redux";
 
+
 function App() {
 
-
+  {/*Theme Slice*/ }
   const theme = useSelector((state) => state.theme.mode);
 
+  {/*change value in theme*/ }
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {
@@ -27,26 +29,30 @@ function App() {
   }, [theme]);
 
   return (
-    <div className="w-screen h-screen">
-      <Toaster />
-      <Routes>
-        {/* Private routes */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/contact/:token" element={<Home />} />
-          <Route path="/:tab" element={<Home />} />
-        </Route>
+    <>
+      <div className="w-screen h-screen">
+        <Toaster />
+        <Routes>
 
-        {/* Public routes */}
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/otp-verify" element={<OtpVerify />} />
-          <Route path="/forget-password" element={<ForgetPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-        </Route>
-      </Routes>
-    </div>
+          {/* 🔐----------------- Private routes ------------------ */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/" element={<Home />} />                          {/*main router*/}
+            <Route path="/contact/:token" element={<Home />} />            {/*contact verifiction router/token*/}
+            <Route path="/:tab" element={<Home />} />                      {/*all icon router*/}
+          </Route>
+
+          {/* 🆓----------------- Public routes ------------------ */}
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />                     {/*login router*/}
+            <Route path="/register" element={<Register />} />               {/*register router*/}
+            <Route path="/otp-verify" element={<OtpVerify />} />            {/*otp-verify router*/}
+            <Route path="/forget-password" element={<ForgetPassword />} />  {/*forget-password router*/}
+            <Route path="/reset-password" element={<ResetPassword />} />    {/*reset-password router*/}
+          </Route>
+
+        </Routes>
+      </div>
+    </>
   );
 }
 

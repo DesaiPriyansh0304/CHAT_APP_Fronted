@@ -13,12 +13,35 @@ const Chatbody = ({
     groupUsers,
     currentPage,
     totalPages,
+    selectUser,
+    selectGroup,
 }) => {
     const containerRef = useRef(null);
     const [previewMedia, setPreviewMedia] = useState(null);
     const [isImagePreview, setIsImagePreview] = useState(true);
 
-    const messages = useSelector(selectFilteredMessages);
+    const allMessages = useSelector(selectFilteredMessages);
+
+    const currentUserId = String(user._id || user.userId);
+    const selectedUserId = selectUser?._id;
+    const selectedGroupId = selectGroup?._id;
+
+    // Filter messages for private or group chat
+    const messages = allMessages.filter((msg) => {
+        const senderId = String(msg.senderId);
+        const receiverId = String(msg.receiverId);
+        const groupId = msg.groupId;
+
+        if (selectUser) {
+            return (
+                (senderId === currentUserId && receiverId === selectedUserId) ||
+                (senderId === selectedUserId && receiverId === currentUserId)
+            );
+        } else if (selectGroup) {
+            return groupId === selectedGroupId;
+        }
+        return false;
+    });
 
     useEffect(() => {
         const container = containerRef.current;
@@ -45,7 +68,6 @@ const Chatbody = ({
     return (
         <div ref={containerRef} className="h-full w-full overflow-y-auto px-4 py-2 space-y-2 bg-gray-50 dark:bg-[#222831] transition-colors duration-300">
             {messages.map((msg, idx) => {
-                const currentUserId = String(user._id || user.userId);
                 const senderId = String(msg.senderId);
                 const isSender = senderId === currentUserId;
 

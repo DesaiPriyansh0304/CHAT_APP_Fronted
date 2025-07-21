@@ -8,7 +8,7 @@ import AllUser from '../components/Iconpage/AllUser';
 
 function Home() {
   const { tab, token } = useParams();
-  const currentTab = tab || (token ? 'contact' : 'chats');
+  const currentTab = tab || (token ? '' : 'chats');
   const [selectedUser, setSelectedUser] = useState(null);   //User Data
   const [selectGroup, setSelectGroup] = useState(null);     //Group Data
   // const [activePage, setActivePage] = useState('Contacts');    //Page Data

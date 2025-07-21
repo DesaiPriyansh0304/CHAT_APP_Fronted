@@ -1,51 +1,39 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../feature/Slice/AuthSlice";
-import checkAuthReducer from "../feature/Slice/GetuserSlice";
-import updateProfileReducer from "../feature/Slice/Updateprofile";
-import socketReducer from "../feature/Slice/SocketSlice";
-import getUserReducer from "../feature/Slice/GetUserMessage";
-import userReducer from "../feature/Slice/FetchUserdata";
-import markmessagesReducer from "../feature/Slice/MarkSlice";
-import chatReducer from "../feature/Slice/ChatSlice";
-import onlineUsersReducer from "../feature/Slice/OnlineuserSlice";
-import chatHistoryReducer from "../feature/Slice/ChatHistory";
-import userGroupsReducer from "../feature/Slice/UserGroup";
-import loginuserReducer from "../feature/Slice/LoginUserSlice";
-import favoriteReducer from "../feature/Slice/favoriteSlice";
-import invitedUsersReducer from "../feature/Slice/InvitedUsersSlice";
-import searchUserReducer from "../feature/Slice/SearchUserSlice";
-import filteredInvitedUsersReducer from "../feature/Slice/FilteredInvitedUsers";
-import groupActionReducer from "../feature/Slice/DeleteGroup";
-import themeReducer from "../feature/Slice/ThemeSlice";
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
+//all Slice import
+import rootReducer from "./Slice/index";
 
+//store value
+const persistConfig = {
+  key: "root",
+  version: 1,
+  storage,
+  whitelist: ["auth", "theme"],
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+//create in store
 const store = configureStore({
-  reducer: {
-    //user store data
-    auth: authReducer,
-    checkAuth: checkAuthReducer,
-    updateProfile: updateProfileReducer,
-    //soket Slice
-    socket: socketReducer,
-    onlineUsers: onlineUsersReducer, //online user data
-    chat: chatReducer,
-    // message slices
-    getUserMessage: getUserReducer,
-    users: userReducer,
-    // sendmessages: sendReducer,
-    markmessages: markmessagesReducer,
-    chatHistory: chatHistoryReducer,
-    //Group
-    userGroups: userGroupsReducer,
-    loginuser: loginuserReducer,
-    searchUser: searchUserReducer,
-    //favorite Item
-    favorite: favoriteReducer,
-    //User Data Slice
-    filteredInvitedUsers: filteredInvitedUsersReducer, //filter in user data
-    invitedUsers: invitedUsersReducer, //invited user and invited by use data
-    groupAction: groupActionReducer,
-    theme: themeReducer,
-  },
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
+// Export both store and persistor
+export const persistor = persistStore(store);
 export default store;

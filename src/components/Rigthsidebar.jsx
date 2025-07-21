@@ -146,7 +146,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       const senderId =
         typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
       if (senderId === currentUserId) return;
-      const contentArray = Array.isArray(data.content) ? data.content : [data.content];
+      const contentArray = Array.isArray(data.content) ? data.content : [data.content || data.image || data.file || data.textMessage || ''];
       const firstContent = contentArray[0] || '';
       dispatch(addOwnMessage({
         ...data,

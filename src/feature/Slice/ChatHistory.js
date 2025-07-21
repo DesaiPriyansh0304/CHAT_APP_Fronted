@@ -65,6 +65,12 @@ const chatHistorySlice = createSlice({
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
     },
+    markMessageAsRead: (state, action) => {
+      const messageId = action.payload;
+      state.messages = state.messages.map((msg) =>
+        msg._id === messageId ? { ...msg, isRead: true } : msg
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -103,6 +109,7 @@ const chatHistorySlice = createSlice({
             text: msg.text || "",
             content: msg.content || "",
             type: msg.type || "text",
+            isRead: msg.isRead || false,
           };
         });
 
@@ -125,8 +132,13 @@ const chatHistorySlice = createSlice({
   },
 });
 
-export const { setMessages, addOwnMessage, clearMessages, setSearchQuery } =
-  chatHistorySlice.actions;
+export const {
+  setMessages,
+  addOwnMessage,
+  clearMessages,
+  setSearchQuery,
+  markMessageAsRead,
+} = chatHistorySlice.actions;
 
 export const selectFilteredMessages = (state) => {
   const { messages, searchQuery } = state.chatHistory;
