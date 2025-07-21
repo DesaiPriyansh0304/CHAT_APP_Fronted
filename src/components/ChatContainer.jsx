@@ -1,16 +1,21 @@
 import React from 'react';
-import Chats from './Iconpage/Chats';
-import ProfilePage from '../Pages/ProfilePage';
-import Group from './Iconpage/Group';
-import Contacts from './Iconpage/Contacts';
-import Setting from './Iconpage/Setting';
-import AvtarPage from '../Pages/AvtarPage'
-import AllUser from './Iconpage/AllUser';
+import Chats from './main-Icon-page/Chats';
+import ProfilePage from './main-Icon-page/ProfilePage';
+import Group from './main-Icon-page/Group';
+import Contacts from './main-Icon-page/Contacts';
+import Setting from './main-Icon-page/Setting';
+import AvtarPage from '../Pages/AvtarPage';
+import AllUser from './main-Icon-page/AllUser';
 import { useSelector } from 'react-redux';
 
-
-function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, selectGroup, setSelectGroup }) {
-
+function ChatContainer({
+  selectUser,
+  SetSelectUser,
+  activePage,
+  setUserChat,
+  selectGroup,
+  setSelectGroup,
+}) {
   const theme = useSelector((state) => state.theme.mode);
 
   const renderContent = () => {
@@ -34,10 +39,7 @@ function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, sel
       case 'group':
         return (
           <div>
-            <Group
-              selectGroup={selectGroup}
-              setSelectGroup={setSelectGroup}
-            />
+            <Group selectGroup={selectGroup} setSelectGroup={setSelectGroup} />
           </div>
         );
       case 'contact':
@@ -71,9 +73,7 @@ function ChatContainer({ selectUser, SetSelectUser, activePage, setUserChat, sel
   return (
     <>
       <div className={`${theme === 'dark' ? 'dark' : ''}`}>
-        <div className={`min-h-screen bg-[var(--secondary-color)] `}>
-          {renderContent()}
-        </div>
+        <div className={`min-h-screen bg-[var(--secondary-color)] `}>{renderContent()}</div>
       </div>
     </>
   );

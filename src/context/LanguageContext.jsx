@@ -1,10 +1,10 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext } from 'react';
 
 //  language object
 const defaultLanguage = {
-  code: "en",
-  label: "English",
-  flag: "🇬🇧",
+  code: 'en',
+  label: 'English',
+  flag: '🇬🇧',
 };
 
 const LanguageContext = createContext({

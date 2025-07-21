@@ -1,40 +1,40 @@
-import { combineReducers } from "@reduxjs/toolkit";
+import { combineReducers } from '@reduxjs/toolkit';
 
 // Auth-reducers
-import authReducer from "./Auth/AuthSlice";
-import loginuserReducer from "./Auth/LoginUserSlice";
+import authReducer from './Auth/AuthSlice';
+import loginuserReducer from './Auth/LoginUserSlice';
 
 // User-related reducers
 // import checkAuthReducer from "./GetuserSlice";
-import updateProfileReducer from "./Updateprofile";
-import userReducer from "./FetchUserdata";
-import searchUserReducer from "./SearchUserSlice";
-import favoriteReducer from "./favoriteSlice";
-import invitedUsersReducer from "./InvitedUsersSlice";
+// import updateProfileReducer from "./Updateprofile";
+import userReducer from './FetchUserdata';
+import searchUserReducer from './SearchUserSlice';
+import favoriteReducer from './favoriteSlice';
+import invitedUsersReducer from './Invited-User/InvitedUsersSlice';
 
 // Chat-related reducers
-import chatReducer from "./ChatSlice";
-import chatHistoryReducer from "./ChatHistory";
-import getUserReducer from "./GetUserMessage";
-import markmessagesReducer from "./MarkSlice";
-import userGroupsReducer from "./UserGroup";
+import chatReducer from './ChatSlice';
+import chatHistoryReducer from './Chat/ChatHistory';
+import getUserReducer from './GetUserMessage';
+import markmessagesReducer from './MarkSlice';
+import userGroupsReducer from './Group/UserGroup';
 
 // Socket & Online
-import socketReducer from "./SocketSlice";
-import onlineUsersReducer from "./SocketSlice"; // same slice used
+import socketReducer from './Socket/SocketSlice';
+import onlineUsersReducer from './Socket/OnlineuserSlice'; // same slice used
 
 // Group-related reducers
-import groupActionReducer from "./DeleteGroup";
-import filteredInvitedUsersReducer from "./FilteredInvitedUsers";
+import groupActionReducer from './Group/DeleteGroup';
+import filteredInvitedUsersReducer from './Invited-User/FilteredInvitedUsers';
 
 // Theme
-import themeReducer from "./Theme/ThemeSlice";
+import themeReducer from './Theme/ThemeSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   loginuser: loginuserReducer,
   // checkAuth: checkAuthReducer,
-  updateProfile: updateProfileReducer,
+  // updateProfile: updateProfileReducer,
   users: userReducer,
   searchUser: searchUserReducer,
   favorite: favoriteReducer,

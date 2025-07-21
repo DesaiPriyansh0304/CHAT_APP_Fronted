@@ -4,15 +4,15 @@ import Slidbar from '../components/Slidbar';
 import Rightsidebar from '../components/Rigthsidebar';
 import ChatContainer from '../components/ChatContainer';
 import AvtarPage from './AvtarPage';
-import AllUser from '../components/Iconpage/AllUser';
+import AllUser from '../components/main-Icon-page/AllUser';
 
 function Home() {
   const { tab, token } = useParams();
   const currentTab = tab || (token ? '' : 'chats');
-  const [selectedUser, setSelectedUser] = useState(null);   //User Data
-  const [selectGroup, setSelectGroup] = useState(null);     //Group Data
+  const [selectedUser, setSelectedUser] = useState(null); //User Data
+  const [selectGroup, setSelectGroup] = useState(null); //Group Data
   // const [activePage, setActivePage] = useState('Contacts');    //Page Data
-  const [userchat, setUserChat] = useState("1")             //Chat Data
+  const [userchat, setUserChat] = useState('1'); //Chat Data
 
   //user Data
   const handleUserSelect = (user) => {
@@ -30,11 +30,10 @@ function Home() {
 
   return (
     <>
-      <div className='w-full h-screen bg-white'>
-
+      <div className="w-full h-screen bg-white">
         {currentTab === 'alluser' ? (
-          <div className='h-full grid grid-cols-[6%_94%]'>
-            <div className='h-screen'>
+          <div className="h-full grid grid-cols-[6%_94%]">
+            <div className="h-screen">
               <Slidbar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
@@ -42,13 +41,13 @@ function Home() {
                 setSelectGroup={handleGroupSelect}
               />
             </div>
-            <div className='h-screen'>
+            <div className="h-screen">
               <AllUser />
             </div>
           </div>
         ) : currentTab === 'avtarpage' ? (
-          <div className='h-full grid grid-cols-[6%_94%]'>
-            <div className='h-screen'>
+          <div className="h-full grid grid-cols-[6%_94%]">
+            <div className="h-screen">
               <Slidbar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
@@ -56,14 +55,14 @@ function Home() {
                 setSelectGroup={handleGroupSelect}
               />
             </div>
-            <div className='h-screen'>
+            <div className="h-screen">
               <AvtarPage />
             </div>
           </div>
         ) : (
           // Default Layout (Sidebar + ChatContainer + Rightsidebar)
-          <div className='h-full grid grid-cols-[6%_25%_69%] '>
-            <div className='h-screen overflow-hidden'>
+          <div className="h-full grid grid-cols-[6%_25%_69%] ">
+            <div className="h-screen overflow-hidden">
               <Slidbar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
@@ -72,7 +71,7 @@ function Home() {
               />
             </div>
 
-            <div className='h-screen overflow-hidden'>
+            <div className="h-screen overflow-hidden">
               <ChatContainer
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
@@ -83,7 +82,7 @@ function Home() {
               />
             </div>
 
-            <div className='h-screen'>
+            <div className="h-screen">
               <Rightsidebar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}

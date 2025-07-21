@@ -1,18 +1,16 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const URL = import.meta.env.VITE_REACT_APP;
 
 export const getUserMessage = createAsyncThunk(
-  "getUserMessage/fetch",
+  'getUserMessage/fetch',
   async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("Authtoken");
+    const token = localStorage.getItem('Authtoken');
 
     if (!token) {
-      return rejectWithValue(
-        "❌No token found. Please login again./CreateGroup"
-      );
+      return rejectWithValue('❌No token found. Please login again./CreateGroup');
     }
 
     try {
@@ -27,36 +25,36 @@ export const getUserMessage = createAsyncThunk(
         };
       }
       // console.log("✅response /msg/user--->getUserMessage.js", response);
-      return rejectWithValue("Failed to fetch user messages");
+      return rejectWithValue('Failed to fetch user messages');
     } catch (error) {
-      toast.error("Update Profile Error");
+      toast.error('Update Profile Error');
       return rejectWithValue(error.message);
     }
   }
 );
 
 const getUserMessageSlice = createSlice({
-  name: "getUserMessage",
+  name: 'getUserMessage',
   initialState: {
     authUser: [],
     unseenMessages: {},
-    status: "idle",
+    status: 'idle',
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getUserMessage.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
         state.error = null;
       })
       .addCase(getUserMessage.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.authUser = action.payload.users;
         state.unseenMessages = action.payload.unseenMessages;
       })
       .addCase(getUserMessage.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = 'failed';
         state.error = action.payload || action.error.message;
       });
   },

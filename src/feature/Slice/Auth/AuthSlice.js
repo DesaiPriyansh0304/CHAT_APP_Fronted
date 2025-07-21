@@ -1,48 +1,35 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
-const token = localStorage.getItem("Authtoken");
-const user = JSON.parse(localStorage.getItem("AuthUser"));
+const token = localStorage.getItem('Authtoken');
 
 const initialState = {
-  user: user || null,
   token: token || null,
-  isAuthenticated: !!token && !!user,
+  isAuthenticated: !!token,
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
-    //  Called on successful login
-    addUser: (state, action) => {
-      // Ensure _id is always present (fallback if missing)
-      const { user, token, userId } = action.payload;
-      const userData = {
-        ...user,
-        _id: user._id || userId || user.userId,
-      };
-      state.user = userData;
+    // Called on successful login
+    addToken: (state, action) => {
+      const { token } = action.payload;
       state.token = token;
       state.isAuthenticated = true;
-      // Store in localStorage
-      localStorage.setItem("Authtoken", token);
-      localStorage.setItem("AuthUser", JSON.stringify(userData));
+      localStorage.setItem('Authtoken', token);
     },
-    // Logout and clear everything
+    // Logout
     logout: (state) => {
-      state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      localStorage.removeItem("Authtoken");
-      localStorage.removeItem("AuthUser");
+      localStorage.removeItem('Authtoken');
     },
-    // Set user as authenticated
+    // Force set isAuthenticated (if needed)
     setAuthenticated: (state, action) => {
-      state.user = action.payload.user;
-      state.isAuthenticated = true;
+      state.isAuthenticated = action.payload;
     },
   },
 });
 
-export const { addUser, logout, setAuthenticated } = authSlice.actions;
+export const { addToken, logout, setAuthenticated } = authSlice.actions;
 export default authSlice.reducer;

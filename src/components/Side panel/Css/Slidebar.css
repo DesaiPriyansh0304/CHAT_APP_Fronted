@@ -1,0 +1,36 @@
+/* Slidebar.css */
+
+.dark .invisible-animated-border {
+  position: relative;
+  border-radius: 0.75rem;
+  /* rounded-xl */
+  overflow: hidden;
+  z-index: 0;
+}
+
+.dark .invisible-animated-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(90deg, rgb(26, 159, 72), rgb(255, 255, 0), rgb(237, 29, 29));
+  border-radius: inherit;
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: shineBorder 3s linear infinite;
+  z-index: -1;
+}
+
+@keyframes shineBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}

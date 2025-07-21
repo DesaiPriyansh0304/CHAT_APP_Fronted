@@ -1,18 +1,16 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const URL = import.meta.env.VITE_REACT_APP;
 
 export const addFavorite = createAsyncThunk(
-  "favorite/addFavorite",
+  'favorite/addFavorite',
   async ({ messageId, chatType, content, type }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("Authtoken");
+      const token = localStorage.getItem('Authtoken');
 
       if (!token) {
-        return rejectWithValue(
-          "❌No token found. Please login again./favorite"
-        );
+        return rejectWithValue('❌No token found. Please login again./favorite');
       }
 
       const res = await axios.post(
@@ -33,7 +31,7 @@ export const addFavorite = createAsyncThunk(
 );
 
 const favoriteSlice = createSlice({
-  name: "favorite",
+  name: 'favorite',
   initialState: {
     loading: false,
     error: null,
@@ -58,7 +56,7 @@ const favoriteSlice = createSlice({
       })
       .addCase(addFavorite.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.msg || "Something went wrong to favorite";
+        state.error = action.payload?.msg || 'Something went wrong to favorite';
       });
   },
 });

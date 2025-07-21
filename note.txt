@@ -530,3 +530,17 @@ export default Chatbody;
 
         Avtar page
         all user page
+
+
+        fiteruser in one time api call   
+        other page 
+        
+
+        {
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "endOfLine": "lf"
+}

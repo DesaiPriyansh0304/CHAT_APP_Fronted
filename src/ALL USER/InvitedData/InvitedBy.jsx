@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchInvitedUsers } from '../../feature/Slice/InvitedUsersSlice';
-import { motion } from 'framer-motion';
+import { fetchInvitedUsers } from '../../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
+import { motion } from 'framer-motion';
 
 const InvitedByUser = () => {
     const dispatch = useDispatch();
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 400);
 
-    const { invitedBy, loading } = useSelector((state) => state.invitedUsers);
+    const { invitedBy, loading, isLoaded } = useSelector((state) => state.invitedUsers);
 
     useEffect(() => {
-        dispatch(fetchInvitedUsers(debouncedSearch));
-    }, [dispatch, debouncedSearch]);
+        if (!isLoaded) {
+            dispatch(fetchInvitedUsers(debouncedSearch));
+        }
+    }, [dispatch, debouncedSearch, isLoaded]);
 
     return (
         <div className="p-4">
@@ -31,7 +33,10 @@ const InvitedByUser = () => {
 
             <div className="overflow-x-auto rounded-lg shadow">
                 <table className="min-w-full border border-blue-300 rounded-lg overflow-hidden">
-                    <thead className="text-white" style={{ background: 'linear-gradient(to right, #67B7D1, #2D5D85)' }}>
+                    <thead
+                        className="text-white"
+                        style={{ background: 'linear-gradient(to right, #67B7D1, #2D5D85)' }}
+                    >
                         <tr>
                             <th className="py-2 px-4 text-left">Profile</th>
                             <th className="py-2 px-4 text-left">Full Name</th>
@@ -57,10 +62,7 @@ const InvitedByUser = () => {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="border-t hover:bg-gradient-to-r from-blue-50 to-blue-100 dark:hover:bg-gradient-to-r 
-dark:hover:from-[#93c5fd] 
-dark:hover:to-[#f87171]
-dark:hover:text-black transition"
+                                    className="border-t hover:bg-gradient-to-r from-blue-50 to-blue-100 dark:hover:bg-gradient-to-r dark:hover:from-[#93c5fd] dark:hover:to-[#f87171] dark:hover:text-black transition"
                                 >
                                     <td className="py-2 px-4">
                                         {user.profile_avatar ? (
@@ -75,7 +77,9 @@ dark:hover:text-black transition"
                                             </div>
                                         )}
                                     </td>
-                                    <td className="py-2 px-4">{user.firstname} {user.lastname}</td>
+                                    <td className="py-2 px-4">
+                                        {user.firstname} {user.lastname}
+                                    </td>
                                     <td className="py-2 px-4">{user.email}</td>
                                     <td className="py-2 px-4 capitalize">{user.gender}</td>
                                     <td className="py-2 px-4">
@@ -86,7 +90,9 @@ dark:hover:text-black transition"
                                         {user.bio || '—'}
                                     </td>
                                     <td className="py-2 px-4">
-                                        <span className={`font-medium ${user.is_Confirmed ? 'text-blue-700' : 'text-blue-500'}`}>
+                                        <span
+                                            className={`font-medium ${user.is_Confirmed ? 'text-blue-700' : 'text-blue-500'}`}
+                                        >
                                             {user.is_Confirmed ? 'Online' : 'Offline'}
                                         </span>
                                     </td>

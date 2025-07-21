@@ -1,22 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  connectSocket,
-  disconnectSocket,
-} from '../feature/Slice/SocketSlice';
+import { connectSocket, disconnectSocket } from '../feature/Slice/Socket/SocketSlice';
 import {
   addOwnMessage,
   setMessages,
   fetchChatHistory,
   setSearchQuery,
-} from '../feature/Slice/ChatHistory';
+} from '../feature/Slice/Chat/ChatHistory';
 import Header from './Rigthsidebar/Header';
 import Chatbody from './Rigthsidebar/Chatbody';
 import Inputside from './Rigthsidebar/Inputside';
 import RightProfilePanel from './Rigthsidebar/chatprofiledata';
 
 const buildPrivateMessagePayload = ({
-  user, selectUser, message, image = [], file = [], fileName = [],
+  user,
+  selectUser,
+  message,
+  image = [],
+  file = [],
+  fileName = [],
 }) => ({
   senderId: user._id || user.userId,
   receiverId: selectUser._id,
@@ -30,7 +32,12 @@ const buildPrivateMessagePayload = ({
 });
 
 const buildGroupMessagePayload = ({
-  user, selectGroup, message, image = [], file = [], fileName = [],
+  user,
+  selectGroup,
+  message,
+  image = [],
+  file = [],
+  fileName = [],
 }) => ({
   senderId: user._id || user.userId,
   groupId: selectGroup._id,
@@ -46,9 +53,9 @@ const buildGroupMessagePayload = ({
 const Rightsidebar = ({ selectUser, selectGroup }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const {
-    messages, loadingHistory, currentPage, totalPages, sender, receiver,
-  } = useSelector((state) => state.chatHistory);
+  const { messages, loadingHistory, currentPage, totalPages, sender, receiver } = useSelector(
+    (state) => state.chatHistory
+  );
   // console.log("🧠 Redux chatHistory:", {
   //   currentPage,
   //   totalPages,
@@ -67,8 +74,9 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   const scrollEnd = useRef();
 
   useEffect(() => {
-    if (!selectUser && !selectGroup) return;
+    if (!user || (!selectUser && !selectGroup)) return;
     dispatch(setMessages([]));
+
     const payload = selectGroup
       ? { groupId: selectGroup._id, page: 1 }
       : {
@@ -76,6 +84,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
         userId2: selectUser._id,
         page: 1,
       };
+
     dispatch(fetchChatHistory(payload));
   }, [selectUser, selectGroup, user, dispatch]);
 
@@ -102,9 +111,8 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   };
 
   useEffect(() => {
-    dispatch(setSearchQuery("")); // clear search on new chat
+    dispatch(setSearchQuery('')); // clear search on new chat
   }, [selectUser, selectGroup]);
-
 
   useEffect(() => {
     if (emoji) setMessage((prev) => prev + emoji);
@@ -146,16 +154,20 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       const senderId =
         typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
       if (senderId === currentUserId) return;
-      const contentArray = Array.isArray(data.content) ? data.content : [data.content || data.image || data.file || data.textMessage || ''];
+      const contentArray = Array.isArray(data.content)
+        ? data.content
+        : [data.content || data.image || data.file || data.textMessage || ''];
       const firstContent = contentArray[0] || '';
-      dispatch(addOwnMessage({
-        ...data,
-        text: data.text || firstContent || '',
-        content: contentArray,
-        type: data.type || 'text',
-        image: data.type === 'image' ? firstContent : '',
-        file: data.type === 'file' ? firstContent : '',
-      }));
+      dispatch(
+        addOwnMessage({
+          ...data,
+          text: data.text || firstContent || '',
+          content: contentArray,
+          type: data.type || 'text',
+          image: data.type === 'image' ? firstContent : '',
+          file: data.type === 'file' ? firstContent : '',
+        })
+      );
     };
 
     const handlePrivateMessage = (data) => {
@@ -164,14 +176,16 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       if (senderId === currentUserId) return;
       const contentArray = Array.isArray(data.content) ? data.content : [data.content];
       const firstContent = contentArray[0] || '';
-      dispatch(addOwnMessage({
-        ...data,
-        text: data.text || firstContent || '',
-        content: contentArray,
-        type: data.type || 'text',
-        image: data.type === 'image' ? firstContent : '',
-        file: data.type === 'file' ? firstContent : '',
-      }));
+      dispatch(
+        addOwnMessage({
+          ...data,
+          text: data.text || firstContent || '',
+          content: contentArray,
+          type: data.type || 'text',
+          image: data.type === 'image' ? firstContent : '',
+          file: data.type === 'file' ? firstContent : '',
+        })
+      );
     };
 
     socket.on('groupMessage', handleGroupMessage);
@@ -247,8 +261,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
       : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
 
-    const contentArray =
-      image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
+    const contentArray = image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
 
     const messageObject = {
       ...payload,
@@ -270,11 +283,10 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     setFileName([]);
   };
 
-
   const { groupUsers } = useSelector((state) => state.chatHistory);
 
   useEffect(() => {
-    console.log("🧑‍🤝‍🧑 Group Members:");
+    console.log('🧑‍🤝‍🧑 Group Members:');
     groupUsers.forEach(({ user, role }) => {
       // console.log('✌️user --->', user);
       if (user) {
@@ -282,7 +294,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       }
     });
   }, [groupUsers]);
-
 
   if (!selectUser && !selectGroup) {
     return (
@@ -293,9 +304,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           src="https://via.placeholder.com/128?text=No+Chat"
         />
         <h2 className="text-lg font-semibold mb-2">No chat selected</h2>
-        <p className="text-sm text-gray-600">
-          Please select a conversation to start chatting.
-        </p>
+        <p className="text-sm text-gray-600">Please select a conversation to start chatting.</p>
       </div>
     );
   }
@@ -317,7 +326,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
             </div>
           )}
         </div>
-
 
         <div className="flex-1 overflow-y-auto">
           {loadingHistory && (

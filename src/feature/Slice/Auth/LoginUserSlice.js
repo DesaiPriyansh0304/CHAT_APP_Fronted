@@ -1,41 +1,45 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { logout } from "./AuthSlice";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { logout } from './AuthSlice';
 
 const URL = import.meta.env.VITE_REACT_APP;
-{
-  /*Login User data*/
-}
+
 export const fetchLoginUser = createAsyncThunk(
-  "user/fetchLoginUser",
+  'user/fetchLoginUser',
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("Authtoken");
-      // console.log("ℹ️ token --->/LoginUserSlice", token);
+      const token = localStorage.getItem('Authtoken');
+      // console.log("ℹ️token --->/LoginUserDataSlice", token);
       if (!token) {
-        dispatch(logout());
-        return rejectWithValue("Token not found - LoginUserSlice");
+        dispatch(logout()); // optional
+        return rejectWithValue('Token not found');
       }
 
-      const response = await axios.get(`${URL}/api/auth/getloginuser`, {
+      const response = await axios.get(`${URL}/api/auth/check`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      // console.log("🧾response --->/LoginUserSlice", response);
-      // console.log("📦LoginUserSlice response.data.user:", response.data.user);
-      return response.data.user;
+
+      // console.log("✌️response --->", response);
+      // console.log("✌️response.data.user --->", response.data.user);
+
+      if (response.data.success && response.data.user) {
+        return { user: response.data.user, token };
+      } else {
+        dispatch(logout());
+        return rejectWithValue('Invalid response from server');
+      }
     } catch (error) {
-      console.log("🔴error --->/LoginUserSlice", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch LoginUser Data"
-      );
+      dispatch(logout());
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user');
     }
   }
 );
 
-const userSlice = createSlice({
-  name: "loginuser",
+/* 🧠 Slice */
+const loginUserSlice = createSlice({
+  name: 'loginUser',
   initialState: {
     userData: null,
     loading: false,
@@ -44,7 +48,10 @@ const userSlice = createSlice({
   reducers: {
     logoutUser: (state) => {
       state.userData = null;
-      localStorage.removeItem("Authtoken");
+      localStorage.removeItem('Authtoken');
+    },
+    setUserData: (state, action) => {
+      state.userData = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -55,7 +62,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchLoginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.userData = action.payload;
+        state.userData = action.payload.user;
       })
       .addCase(fetchLoginUser.rejected, (state, action) => {
         state.loading = false;
@@ -64,5 +71,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { logoutUser } = userSlice.actions;
-export default userSlice.reducer;
+export const { logoutUser, setUserData } = loginUserSlice.actions;
+export default loginUserSlice.reducer;
