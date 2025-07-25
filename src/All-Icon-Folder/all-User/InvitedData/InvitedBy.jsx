@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchInvitedUsers } from '../../feature/Slice/Invited-User/InvitedUsersSlice';
+import { fetchInvitedUsers } from '../../../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 
 const InvitedByUser = () => {
+
     const dispatch = useDispatch();
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState('');   //serchbar
     const [debouncedSearch] = useDebounce(search, 400);
 
+    //invited user data slice
     const { invitedBy, loading, isLoaded } = useSelector((state) => state.invitedUsers);
 
+    {/*slice call in invited User data*/ }
     useEffect(() => {
         if (!isLoaded) {
             dispatch(fetchInvitedUsers(debouncedSearch));
@@ -19,18 +22,25 @@ const InvitedByUser = () => {
 
     return (
         <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-                People Who Invited You
-            </h2>
+            {/*title*/}
+            <div>
+                <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                    People Who Invited You
+                </h2>
+            </div>
 
-            <input
-                type="text"
-                placeholder="Search by name or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="mb-6 px-4 py-2 border border-blue-300 rounded-md w-full max-w-md outline-none focus:ring-2 focus:ring-blue-400"
-            />
+            {/*serch input*/}
+            <div>
+                <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="mb-6 px-4 py-2 border border-blue-300 rounded-md w-full max-w-md outline-none focus:ring-2 focus:ring-blue-400"
+                />
+            </div>
 
+            {/*table data and user detail*/}
             <div className="overflow-x-auto rounded-lg shadow">
                 <table className="min-w-full border border-blue-300 rounded-lg overflow-hidden">
                     <thead

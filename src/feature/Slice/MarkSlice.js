@@ -1,80 +1,46 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const URL = import.meta.env.VITE_REACT_APP;
-
-export const markMessageSeen = createAsyncThunk(
-  'messages/markSeen',
-  async (messageId, { getState, rejectWithValue }) => {
-    const token = getState().auth.token;
-
+// Thunk to emit the event
+export const markMessagesAsRead = createAsyncThunk(
+  "markAsRead/markMessagesAsRead",
+  async ({ senderId, receiverId }, { getState, rejectWithValue }) => {
     try {
-      await axios.put(
-        `${URL}/api/msg/mark/${messageId}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return messageId;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+      const socket = getState().socket.socket; // get socketInstance from redux
+
+      if (socket && socket.connected) {
+        console.log("✅ Emitting markMessagesAsRead", { senderId, receiverId });
+        socket.emit("markMessagesAsRead", { senderId, receiverId });
+        return { success: true };
+      } else {
+        return rejectWithValue("Socket not connected");
+      }
+    } catch (error) {
+      return rejectWithValue(error.message || "Unknown error");
     }
   }
 );
 
-const messageSlice = createSlice({
-  name: 'markmessages',
+const markAsReadSlice = createSlice({
+  name: "markAsRead",
   initialState: {
-    messages: [],
-    unseenMessages: {},
-    status: 'idle',
+    isMarkingRead: false,
     error: null,
   },
-  reducers: {
-    receiveMessage: (state, action) => {
-      const { message, selectedUserId } = action.payload;
-
-      if (selectedUserId && message.senderId === selectedUserId) {
-        message.seen = true;
-        state.messages.push(message);
-      } else {
-        state.unseenMessages[message.senderId] = (state.unseenMessages[message.senderId] || 0) + 1;
-      }
-    },
-    setSelectedUser: (state, action) => {
-      const userId = action.payload;
-      if (state.unseenMessages[userId]) {
-        delete state.unseenMessages[userId];
-      }
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(markMessageSeen.pending, (state) => {
-        state.status = 'loading';
+      .addCase(markMessagesAsRead.pending, (state) => {
+        state.isMarkingRead = true;
+        state.error = null;
       })
-      .addCase(markMessageSeen.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-
-        const messageId = action.payload;
-        console.log('messageId/markmessage --->', messageId);
-        for (const senderId in state.unseenMessages) {
-          if (state.unseenMessages[senderId] > 0) {
-            state.unseenMessages[senderId] -= 1;
-            if (state.unseenMessages[senderId] === 0) {
-              delete state.unseenMessages[senderId];
-            }
-            break;
-          }
-        }
+      .addCase(markMessagesAsRead.fulfilled, (state) => {
+        state.isMarkingRead = false;
       })
-      .addCase(markMessageSeen.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || action.error.message;
+      .addCase(markMessagesAsRead.rejected, (state, action) => {
+        state.isMarkingRead = false;
+        state.error = action.payload || "Failed to mark messages as read";
       });
   },
 });
 
-export const { receiveMessage, setSelectedUser } = messageSlice.actions;
-export default messageSlice.reducer;
+export default markAsReadSlice.reducer;

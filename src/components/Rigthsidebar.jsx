@@ -1,12 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { connectSocket, disconnectSocket } from '../feature/Slice/Socket/SocketSlice';
+import {
+  connectSocket,
+  disconnectSocket,
+  markMessagesAsRead,
+} from '../feature/Slice/Socket/SocketSlice';
 import {
   addOwnMessage,
   setMessages,
   fetchChatHistory,
   setSearchQuery,
 } from '../feature/Slice/Chat/ChatHistory';
+import {
+  incrementUnreadCount,
+  resetChatUnreadCount,
+} from '../feature/Slice/unreadCountSlice';
+
 import Header from './Rigthsidebar/Header';
 import Chatbody from './Rigthsidebar/Chatbody';
 import Inputside from './Rigthsidebar/Inputside';
@@ -27,8 +36,8 @@ const buildPrivateMessagePayload = ({
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
   fileName: file.length ? fileName : null,
-  messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
-  type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
+  messageType: image.length ? 'image' : file.length ? 'file' : 'text',
+  type: image.length ? 'image' : file.length ? 'file' : 'text',
 });
 
 const buildGroupMessagePayload = ({
@@ -41,26 +50,28 @@ const buildGroupMessagePayload = ({
 }) => ({
   senderId: user._id || user.userId,
   groupId: selectGroup._id,
+  groupName: selectGroup.groupName || selectGroup.name,
   createdAt: new Date().toISOString(),
   textMessage: message.trim() || null,
   base64Image: image.length ? image : null,
   base64File: file.length ? file : null,
-  fileNames: file.length ? fileName : null,
-  messageType: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
-  type: image.length > 0 ? 'image' : file.length > 0 ? 'file' : 'text',
+  fileName: file.length ? fileName : null,
+  messageType: image.length ? 'image' : file.length ? 'file' : 'text',
+  type: image.length ? 'image' : file.length ? 'file' : 'text',
 });
 
 const Rightsidebar = ({ selectUser, selectGroup }) => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
-  const { messages, loadingHistory, currentPage, totalPages, sender, receiver } = useSelector(
-    (state) => state.chatHistory
-  );
-  // console.log("🧠 Redux chatHistory:", {
-  //   currentPage,
-  //   totalPages,
-  // });
+  const { userData: user } = useSelector((state) => state.loginuser);
+  const { messages, loadingHistory, currentPage, totalPages, sender, receiver, groupUsers } =
+    useSelector((state) => state.chatHistory);
   const { socket, isConnected } = useSelector((state) => state.socket);
+
+  const currentChatId = selectUser?._id || selectGroup?._id;
+
+  // const unreadCount = useSelector(
+  //   (state) => state.unreadCount.chatWiseCount[currentChatId] || 0
+  // );
 
   const [message, setMessage] = useState('');
   const [typing, setTyping] = useState(false);
@@ -73,56 +84,74 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const scrollEnd = useRef();
 
+  // ✅ Track sent messages to avoid duplicates
+  const [sentMessageIds, setSentMessageIds] = useState(new Set());
+
   useEffect(() => {
     if (!user || (!selectUser && !selectGroup)) return;
+
     dispatch(setMessages([]));
+    // ✅ Clear sent message IDs when switching chats
+    setSentMessageIds(new Set());
+
+    const chatData = selectGroup
+      ? {
+        userId: user._id || user.userId,
+        chatWithUserId: null,
+        chatType: 'group',
+        groupId: selectGroup._id,
+      }
+      : {
+        userId: user._id || user.userId,
+        chatWithUserId: selectUser._id,
+        chatType: 'private',
+        groupId: null,
+      };
+
+    socket?.emit('openChatWith', chatData);
 
     const payload = selectGroup
       ? { groupId: selectGroup._id, page: 1 }
-      : {
-        userId1: user._id || user.userId,
-        userId2: selectUser._id,
-        page: 1,
-      };
+      : { userId1: user._id || user.userId, userId2: selectUser._id, page: 1 };
 
     dispatch(fetchChatHistory(payload));
-  }, [selectUser, selectGroup, user, dispatch]);
-
-  // ✅ Log sender, receiver, and group ID
-  useEffect(() => {
-    // if (sender) console.log("🟢 Sender:", sender);
-    // if (receiver) console.log("🔵 Receiver:", receiver);
-    // if (selectGroup?._id) console.log("👥 Group ID:", selectGroup._id);
-  }, [sender, receiver, selectGroup]);
-
-  //page in history data
-  const handleFetchOlderMessages = async () => {
-    if (loadingHistory || currentPage >= totalPages) return;
-
-    const payload = selectGroup
-      ? { groupId: selectGroup._id, page: currentPage + 1 }
-      : {
-        userId1: user._id || user.userId,
-        userId2: selectUser._id,
-        page: currentPage + 1,
-      };
-
-    await dispatch(fetchChatHistory(payload)); // Ensure it’s awaited
-  };
+  }, [selectUser, selectGroup, user, dispatch, socket]);
 
   useEffect(() => {
-    dispatch(setSearchQuery('')); // clear search on new chat
-  }, [selectUser, selectGroup]);
+    if (currentChatId && socket) {
+      if (selectUser) {
+        socket.emit('openChatWith', {
+          userId: user._id || user.userId,
+          chatWithUserId: selectUser._id,
+          chatType: 'private',
+        });
+        dispatch(
+          markMessagesAsRead({
+            senderId: user._id || user.userId,
+            receiverId: selectUser._id,
+          })
+        );
+      } else if (selectGroup) {
+        socket.emit('openChatWith', {
+          userId: user._id || user.userId,
+          groupId: selectGroup._id,
+          chatType: 'group',
+        });
+      }
+
+      dispatch(resetChatUnreadCount(currentChatId));
+    }
+  }, [currentChatId, socket, selectUser, selectGroup, user, dispatch]);
 
   useEffect(() => {
     if (emoji) setMessage((prev) => prev + emoji);
   }, [emoji]);
 
   useEffect(() => {
-    if (!user || !user.userId) return;
+    if (!user || !user._id) return;
+    console.log('✌️user._id --->', user._id);
     const timeout = setTimeout(() => {
-      const patchedUser = { ...user, _id: user.userId };
-      dispatch(connectSocket(patchedUser));
+      dispatch(connectSocket(user));
     }, 200);
     return () => {
       clearTimeout(timeout);
@@ -133,9 +162,7 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   useEffect(() => {
     if (!socket) return;
     socket.on('typing', ({ senderId, isTyping }) => {
-      if (senderId === selectUser?._id) {
-        setIsTyping(isTyping);
-      }
+      if (senderId === selectUser?._id) setIsTyping(isTyping);
     });
     return () => socket.off('typing');
   }, [socket, selectUser]);
@@ -151,41 +178,96 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
     const currentUserId = String(user._id || user.userId);
 
     const handleGroupMessage = (data) => {
-      const senderId =
-        typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
-      if (senderId === currentUserId) return;
+      console.log("📨 Received group message:", data);
+
+      const senderId = String(data.senderId?._id || data.senderId);
+      const messageId = data._id || data.messageId || data.createdAt;
+
+      // ✅ Fixed: જો આ message આપણે જ મોકલ્યો હોય તો ignore કરો
+      if (senderId === currentUserId) {
+        console.log("🚫 Ignoring own message from socket");
+        return;
+      }
+
+      // ✅ Check if message already processed
+      if (sentMessageIds.has(messageId)) {
+        console.log("🚫 Message already processed:", messageId);
+        return;
+      }
+
+      // ✅ Fixed: માત્ર current group ના messages જ process કરો
+      if (selectGroup && data.groupId !== selectGroup._id) {
+        console.log("📝 Message for different group, updating unread count");
+        dispatch(incrementUnreadCount({ chatId: data.groupId }));
+        return;
+      }
+
       const contentArray = Array.isArray(data.content)
         ? data.content
         : [data.content || data.image || data.file || data.textMessage || ''];
-      const firstContent = contentArray[0] || '';
-      dispatch(
-        addOwnMessage({
-          ...data,
-          text: data.text || firstContent || '',
-          content: contentArray,
-          type: data.type || 'text',
-          image: data.type === 'image' ? firstContent : '',
-          file: data.type === 'file' ? firstContent : '',
-        })
-      );
+
+      const messageObj = {
+        ...data,
+        messageId: messageId,
+        text: data.text || data.textMessage || contentArray[0] || '',
+        content: contentArray,
+        type: data.type || 'text',
+        image: data.type === 'image' ? contentArray[0] : '',
+        file: data.type === 'file' ? contentArray[0] : '',
+        createdAt: data.createdAt || new Date().toISOString(),
+      };
+
+      console.log("✅ Adding group message to UI:", messageObj);
+      dispatch(addOwnMessage(messageObj));
+
+      // ✅ Mark message as processed
+      setSentMessageIds(prev => new Set([...prev, messageId]));
     };
 
     const handlePrivateMessage = (data) => {
-      const senderId =
-        typeof data.senderId === 'object' ? String(data.senderId._id) : String(data.senderId);
-      if (senderId === currentUserId) return;
-      const contentArray = Array.isArray(data.content) ? data.content : [data.content];
-      const firstContent = contentArray[0] || '';
-      dispatch(
-        addOwnMessage({
-          ...data,
-          text: data.text || firstContent || '',
-          content: contentArray,
-          type: data.type || 'text',
-          image: data.type === 'image' ? firstContent : '',
-          file: data.type === 'file' ? firstContent : '',
-        })
-      );
+      console.log("📨 Received private message:", data);
+
+      const senderId = String(data.senderId?._id || data.senderId);
+      const messageId = data._id || data.messageId || data.createdAt;
+
+      // ✅ Fixed: જો આ message આપણે જ મોકલ્યો હોય તો ignore કરો
+      if (senderId === currentUserId) {
+        console.log("🚫 Ignoring own message from socket");
+        return;
+      }
+
+      // ✅ Check if message already processed
+      if (sentMessageIds.has(messageId)) {
+        console.log("🚫 Message already processed:", messageId);
+        return;
+      }
+
+      const contentArray = Array.isArray(data.content)
+        ? data.content
+        : [data.content || ''];
+
+      const messageObj = {
+        ...data,
+        messageId: messageId,
+        text: data.text || data.textMessage || contentArray[0] || '',
+        content: contentArray,
+        type: data.type || 'text',
+        image: data.type === 'image' ? contentArray[0] : '',
+        file: data.type === 'file' ? contentArray[0] : '',
+        createdAt: data.createdAt || new Date().toISOString(),
+      };
+
+      // ✅ Fixed: માત્ર current chat ના messages જ show કરો
+      if (selectUser && senderId === selectUser._id) {
+        console.log("✅ Adding private message to UI:", messageObj);
+        dispatch(addOwnMessage(messageObj));
+
+        // ✅ Mark message as processed
+        setSentMessageIds(prev => new Set([...prev, messageId]));
+      } else {
+        console.log("📝 Message for different chat, updating unread count");
+        dispatch(incrementUnreadCount({ chatId: senderId }));
+      }
     };
 
     socket.on('groupMessage', handleGroupMessage);
@@ -195,11 +277,27 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       socket.off('groupMessage', handleGroupMessage);
       socket.off('privateMessage', handlePrivateMessage);
     };
-  }, [socket, dispatch, user]);
+  }, [socket, dispatch, user, selectUser, selectGroup, sentMessageIds]);
 
   useEffect(() => {
     scrollEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleFetchOlderMessages = async () => {
+    if (loadingHistory || currentPage >= totalPages) return;
+    const payload = selectGroup
+      ? { groupId: selectGroup._id, page: currentPage + 1 }
+      : {
+        userId1: user._id || user.userId,
+        userId2: selectUser._id,
+        page: currentPage + 1,
+      };
+    await dispatch(fetchChatHistory(payload));
+  };
+
+  useEffect(() => {
+    dispatch(setSearchQuery(''));
+  }, [selectUser, selectGroup]);
 
   const handleTyping = (e) => {
     setMessage(e.target.value);
@@ -207,93 +305,63 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
       setTyping(true);
       socket?.emit('typing', {
         receiverId: selectUser?._id,
+        groupId: selectGroup?._id,
         isTyping: true,
       });
       setTimeout(() => {
         setTyping(false);
         socket?.emit('typing', {
           receiverId: selectUser?._id,
+          groupId: selectGroup?._id,
           isTyping: false,
         });
       }, 2000);
     }
   };
 
-  // const handleSendMessage = (e) => {
-  //   e.preventDefault();
-  //   const isEmptyMessage = !message.trim() && image.length === 0 && file.length === 0;
-  //   if (isEmptyMessage || (!selectUser && !selectGroup)) return;
-
-  //   const payload = selectGroup
-  //     ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
-  //     : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
-
-  //   const contentArray =
-  //     image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
-
-  //   const messageObject = {
-  //     ...payload,
-  //     text: payload.textMessage,
-  //     images: payload.base64Image,
-  //     files: payload.base64File,
-  //     content: contentArray,
-  //     type: payload.type,
-  //   };
-
-  //   if (!selectGroup) {
-  //     dispatch(addOwnMessage(messageObject));
-  //   }
-
-  //   socket?.emit(selectGroup ? 'groupMessage' : 'privateMessage', payload);
-
-  //   setMessage('');
-  //   setFile([]);
-  //   setImage([]);
-  //   setFileName([]);
-  // };
-
   const handleSendMessage = (e) => {
     e.preventDefault();
-    const isEmptyMessage = !message.trim() && image.length === 0 && file.length === 0;
-    if (isEmptyMessage || (!selectUser && !selectGroup)) return;
+    if (!message.trim() && image.length === 0 && file.length === 0) return;
 
     const payload = selectGroup
       ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
       : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
 
     const contentArray = image.length > 0 ? image : file.length > 0 ? file : [message.trim()];
+    const tempMessageId = `temp_${Date.now()}_${Math.random()}`;
 
+    // ✅ Fixed: Message object બનાવો UI માટે
     const messageObject = {
       ...payload,
+      messageId: tempMessageId,
       text: payload.textMessage,
       images: payload.base64Image,
       files: payload.base64File,
       content: contentArray,
       type: payload.type,
+      createdAt: new Date().toISOString(),
+      senderId: user._id || user.userId,
+      ...(selectGroup ? { groupId: selectGroup._id } : { receiverId: selectUser._id }),
     };
 
-    // Show message immediately for sender
+    console.log("📤 Sending message:", payload);
+    console.log("🖥️ Adding to UI:", messageObject);
+
+    // ✅ Add to sent messages tracker
+    setSentMessageIds(prev => new Set([...prev, tempMessageId]));
+
+    // ✅ First add to UI
     dispatch(addOwnMessage(messageObject));
 
+    // ✅ Then emit to socket
     socket?.emit(selectGroup ? 'groupMessage' : 'privateMessage', payload);
 
+    // ✅ Clear form
     setMessage('');
     setFile([]);
     setImage([]);
     setFileName([]);
   };
-
-  const { groupUsers } = useSelector((state) => state.chatHistory);
-
-  useEffect(() => {
-    console.log('🧑‍🤝‍🧑 Group Members:');
-    groupUsers.forEach(({ user, role }) => {
-      // console.log('✌️user --->', user);
-      if (user) {
-        console.log(`${user.firstname} ${user.lastname} ${user._id} - Role: ${role}`);
-      }
-    });
-  }, [groupUsers]);
 
   if (!selectUser && !selectGroup) {
     return (
@@ -312,20 +380,14 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   return (
     <div className="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden">
       <div className={`flex flex-col h-full ${showProfilePanel ? 'w-[48vw]' : ''}`}>
-        <div className="flex-shrink-0">
-          <Header
-            selectUser={selectUser}
-            selectGroup={selectGroup}
-            isTyping={isTyping}
-            user={user}
-            onProfileClick={() => setShowProfilePanel(true)}
-          />
-          {!isConnected && (
-            <div className="text-red-600 text-sm text-center p-2 bg-yellow-100">
-              🔌 Reconnecting to socket...
-            </div>
-          )}
-        </div>
+        <Header
+          selectUser={selectUser}
+          selectGroup={selectGroup}
+          user={user}
+          setShowProfilePanel={setShowProfilePanel}
+          showProfilePanel={showProfilePanel}
+          isTyping={isTyping}
+        />
 
         <div className="flex-1 overflow-y-auto">
           {loadingHistory && (
@@ -334,7 +396,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           <Chatbody
             selectUser={selectUser}
             selectGroup={selectGroup}
-            // messages={messages}
             user={user}
             scrollEnd={scrollEnd}
             loadingHistory={loadingHistory}
@@ -347,32 +408,32 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           />
         </div>
 
-        <div className="flex-shrink-0 bottom-fixed">
-          <Inputside
-            message={message}
-            setMessage={setMessage}
-            handleTyping={handleTyping}
-            handleSendMessage={handleSendMessage}
-            showEmojiPicker={showEmojiPicker}
-            setShowEmojiPicker={setShowEmojiPicker}
-            selectUser={selectUser}
-            selectGroup={selectGroup}
-            setFile={setFile}
-            setImage={setImage}
-            setEmoji={setEmoji}
-            setFileName={setFileName}
-            file={file}
-            image={image}
-            fileName={fileName}
-          />
-        </div>
+        <Inputside
+          message={message}
+          setMessage={setMessage}
+          handleTyping={handleTyping}
+          handleSendMessage={handleSendMessage}
+          showEmojiPicker={showEmojiPicker}
+          setShowEmojiPicker={setShowEmojiPicker}
+          file={file}
+          setFile={setFile}
+          image={image}
+          setImage={setImage}
+          emoji={emoji}
+          setEmoji={setEmoji}
+          fileName={fileName}
+          setFileName={setFileName}
+          selectUser={selectUser}
+          selectGroup={selectGroup}
+        />
       </div>
 
       {showProfilePanel && (
         <RightProfilePanel
-          userData={selectUser || selectGroup}
-          isGroup={!!selectGroup}
-          onClose={() => setShowProfilePanel(false)}
+          selectUser={selectUser}
+          selectGroup={selectGroup}
+          user={user}
+          setShowProfilePanel={setShowProfilePanel}
         />
       )}
     </div>

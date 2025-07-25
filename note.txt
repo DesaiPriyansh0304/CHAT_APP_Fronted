@@ -544,3 +544,32 @@ export default Chatbody;
   "printWidth": 100,
   "endOfLine": "lf"
 }
+
+
+import { useSelector } from 'react-redux';
+import { selectTotalUnreadCount, selectChatUnreadCount } from './UnreadCountSlice';
+
+// Total unread count
+const totalUnreadCount = useSelector(selectTotalUnreadCount);
+
+// Specific chat ની unread count
+const chatUnreadCount = useSelector(selectChatUnreadCount(userId)); // or groupId
+
+// Chat list માં show કરવા માટે:
+const ChatListItem = ({ user, isGroup = false }) => {
+  const chatId = isGroup ? user._id : user._id; // group આ groupId, private માટે userId
+  const unreadCount = useSelector(selectChatUnreadCount(chatId));
+  
+  return (
+    <div className="chat-item">
+      <span>{user.name}</span>
+      {unreadCount > 0 && (
+        <div className="unread-badge">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// eslint-disable-next-line react-hooks/exhaustive-deps

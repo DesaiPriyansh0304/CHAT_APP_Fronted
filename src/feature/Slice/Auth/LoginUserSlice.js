@@ -1,18 +1,18 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { logout } from './AuthSlice';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { logout } from "./AuthSlice";
 
 const URL = import.meta.env.VITE_REACT_APP;
 
 export const fetchLoginUser = createAsyncThunk(
-  'user/fetchLoginUser',
+  "user/fetchLoginUser",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('Authtoken');
+      const token = localStorage.getItem("Authtoken");
       // console.log("ℹ️token --->/LoginUserDataSlice", token);
       if (!token) {
         dispatch(logout()); // optional
-        return rejectWithValue('Token not found');
+        return rejectWithValue("Token not found");
       }
 
       const response = await axios.get(`${URL}/api/auth/check`, {
@@ -25,21 +25,30 @@ export const fetchLoginUser = createAsyncThunk(
       // console.log("✌️response.data.user --->", response.data.user);
 
       if (response.data.success && response.data.user) {
-        return { user: response.data.user, token };
+        const user = {
+          ...response.data.user,
+          _id: response.data.user._id || response.data.user.id,
+        };
+        console.log("✌️response.data.user._id --->", response.data.user._id);
+        console.log("✌️response.data.user.id --->", response.data.user.id);
+
+        return { user, token };
       } else {
         dispatch(logout());
-        return rejectWithValue('Invalid response from server');
+        return rejectWithValue("Invalid response from server");
       }
     } catch (error) {
       dispatch(logout());
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user');
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch user"
+      );
     }
   }
 );
 
 /* 🧠 Slice */
 const loginUserSlice = createSlice({
-  name: 'loginUser',
+  name: "loginUser",
   initialState: {
     userData: null,
     loading: false,
@@ -48,7 +57,7 @@ const loginUserSlice = createSlice({
   reducers: {
     logoutUser: (state) => {
       state.userData = null;
-      localStorage.removeItem('Authtoken');
+      localStorage.removeItem("Authtoken");
     },
     setUserData: (state, action) => {
       state.userData = action.payload;

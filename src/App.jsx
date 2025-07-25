@@ -1,26 +1,25 @@
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import Home from './Pages/Home';
-import Login from './Public Page/SignIn-SignUP/Login';
-import Register from './Public Page/SignIn-SignUP/Register';
 import { Toaster } from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+//Public Router
+import Home from './Pages/Home';
 import PrivateRoute from './Public Page/RouterPage/PrivetRouter';
 import PublicRoute from './Public Page/RouterPage/PublicRouter';
+//Private routes
+import Login from './Public Page/SignIn-SignUP/Login';
+import Register from './Public Page/SignIn-SignUP/Register';
 import OtpVerify from './Public Page/otp verify/OTPVerify';
 import ForgetPassword from './Public Page/Password/forgetpassword';
 import ResetPassword from './Public Page/Password/ResetPassword';
-import { useSelector } from 'react-redux';
 
 function App() {
-  {
-    /*Theme Slice*/
-  }
+
+  //Theme Slice
   const theme = useSelector((state) => state.theme.mode);
 
-  {
-    /*change value in theme*/
-  }
+  //change value in theme
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {
@@ -37,20 +36,18 @@ function App() {
         <Routes>
           {/* 🔐----------------- Private routes ------------------ */}
           <Route element={<PrivateRoute />}>
-            <Route path="/" element={<Home />} /> {/*main router*/}
-            <Route path="/contact/:token" element={<Home />} />{' '}
-            {/*contact verifiction router/token*/}
-            <Route path="/:tab" element={<Home />} /> {/*all icon router*/}
+            <Route path="/" element={<Home />} />                            {/*main router*/}
+            <Route path="/contact/:token" element={<Home />} />              {/*contact verifiction router/token*/}
+            <Route path="/:tab" element={<Home />} />                        {/*all icon router*/}
           </Route>
 
-          {/* 🆓----------------- Public routes ------------------ */}
+          {/* 🆓----------------- Public routes ------------------- */}
           <Route element={<PublicRoute />}>
-            <Route path="/login" element={<Login />} /> {/*login router*/}
-            <Route path="/register" element={<Register />} /> {/*register router*/}
-            <Route path="/otp-verify" element={<OtpVerify />} /> {/*otp-verify router*/}
-            <Route path="/forget-password" element={<ForgetPassword />} />{' '}
-            {/*forget-password router*/}
-            <Route path="/reset-password" element={<ResetPassword />} /> {/*reset-password router*/}
+            <Route path="/login" element={<Login />} />                      {/*login router*/}
+            <Route path="/register" element={<Register />} />                {/*register router*/}
+            <Route path="/otp-verify" element={<OtpVerify />} />             {/*otp-verify router*/}
+            <Route path="/forget-password" element={<ForgetPassword />} />   {/*forget-password router*/}
+            <Route path="/reset-password" element={<ResetPassword />} />     {/*reset-password router*/}
           </Route>
         </Routes>
       </div>

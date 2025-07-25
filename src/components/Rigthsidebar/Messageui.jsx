@@ -8,6 +8,8 @@ import { RxDotsVertical } from 'react-icons/rx';
 import { RiDeleteBin6Line, RiSaveLine, RiShareForwardBoxFill } from 'react-icons/ri';
 import { BsCopy } from 'react-icons/bs';
 import toast from 'react-hot-toast';
+import { BsCheck, BsCheckAll } from 'react-icons/bs';
+import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
 
 export const SenderMessage = ({
   msg,
@@ -27,6 +29,22 @@ export const SenderMessage = ({
 }) => {
   const { userData: user } = useSelector((state) => state.loginuser);
   // console.log('✌️msg --->', msg);
+
+  const onlineUsers = useSelector(selectOnlineUsers);
+
+  const receiverId = msg.receiverId?._id || msg.receiverId;
+  const seenBy = msg.seenBy || [];
+  const isSeen = seenBy.includes(receiverId);
+  const isReceiverOnline = onlineUsers.includes(receiverId);
+
+  // ✅ Tick logic
+  let tickIcon = <BsCheck className="text-gray-500" />; // Single gray tick (sent)
+  if (isSeen) {
+    tickIcon = <BsCheckAll className="text-blue-500" />; // Seen - blue
+  } else if (isReceiverOnline) {
+    tickIcon = <BsCheckAll className="text-gray-500" />; // Delivered - gray double
+  }
+
 
   return (
     //main div
@@ -93,9 +111,8 @@ export const SenderMessage = ({
                         </button>
                       ))}
                   </div>
-
-                  {/*time zone*/}
-                  <div className=" flex flex-row gap-1.5 items-center mt-1.5 justify-start">
+                  {/* Time + Tick */}
+                  <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
                     <div className="text-xs text-black">
                       <IoTimeOutline />
                     </div>
@@ -106,6 +123,7 @@ export const SenderMessage = ({
                         hour12: true,
                       })}
                     </div>
+                    <div className="text-sm ml-1">{tickIcon}</div>
                   </div>
                 </div>
                 {/*sender Full Name*/}
@@ -159,18 +177,41 @@ export const ReceiverMessage = ({
   let senderName = '';
   const senderId = typeof msg.senderId === 'object' ? msg.senderId._id : msg.senderId;
 
+  // ✅ Group users માંથી sender શોધવાનું સુધારેલું logic
   if (groupUsers?.length) {
     const foundUser = groupUsers.find((u) => {
       const uid = u?.user?._id || u?.user?.userId;
-      return uid === senderId;
+      return String(uid) === String(senderId);
     });
+
     if (foundUser?.user) {
-      senderName = `${foundUser.user.firstname} ${foundUser.user.lastname}`;
+      senderName = `${foundUser.user.firstname || ''} ${foundUser.user.lastname || ''}`.trim();
     }
   }
 
+  // Fallback to receiver if not found in group users
   if (!senderName && receiver) {
-    senderName = `${receiver.firstname} ${receiver.lastname}`;
+    senderName = `${receiver.firstname || ''} ${receiver.lastname || ''}`.trim();
+  }
+
+  // Final fallback
+  if (!senderName) {
+    senderName = 'Unknown User';
+  }
+
+  const onlineUsers = useSelector(selectOnlineUsers);
+
+  const receiverId = msg.receiverId?._id || msg.receiverId;
+  const seenBy = msg.seenBy || [];
+  const isSeen = seenBy.includes(receiverId);
+  const isReceiverOnline = onlineUsers.includes(receiverId);
+
+  // ✅ Tick logic
+  let tickIcon = <BsCheck className="text-gray-500" />; // Single gray tick (sent)
+  if (isSeen) {
+    tickIcon = <BsCheckAll className="text-blue-500" />; // Seen - blue
+  } else if (isReceiverOnline) {
+    tickIcon = <BsCheckAll className="text-gray-500" />; // Delivered - gray double
   }
 
   return (
@@ -183,10 +224,11 @@ export const ReceiverMessage = ({
             let fname = '';
             let lname = '';
 
+            // ✅ સુધારેલું avatar logic
             if (groupUsers?.length) {
               const foundUser = groupUsers.find((u) => {
                 const uid = u?.user?._id || u?.user?.userId;
-                return uid === senderId;
+                return String(uid) === String(senderId);
               });
 
               if (foundUser?.user) {
@@ -206,8 +248,8 @@ export const ReceiverMessage = ({
               <img src={avatar} alt="profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white font-semibold text-lg">
-                {fname?.[0]?.toUpperCase()}
-                {lname?.[0]?.toUpperCase()}
+                {fname?.[0]?.toUpperCase() || '?'}
+                {lname?.[0]?.toUpperCase() || ''}
               </div>
             );
           })()}
@@ -217,74 +259,69 @@ export const ReceiverMessage = ({
           <div>
             <ul>
               <li>
-                {/*chat mes sage and time zone*/}
+                {/* Chat message and time zone */}
                 <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
-                  <div>
-                    {(hasText || hasValidContent) && (
-                      <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
-                        {/* Chat Text (filtered) */}
-                        {hasText && !isLikelyURL(messageText) && (
-                          <p className="whitespace-pre-wrap break-words">{messageText}</p>
-                        )}
+                  {/* Chat Text */}
+                  {hasText && !isLikelyURL(messageText) && (
+                    <p className="whitespace-pre-wrap break-words">{messageText}</p>
+                  )}
 
-                        {/* Image Preview */}
-                        {hasValidContent &&
-                          (isImage || isImageBase64) &&
-                          Array.isArray(msg.content) &&
-                          msg.content.map((url, i) => (
-                            <img
-                              key={i}
-                              src={url}
-                              alt={`sent-img-${i}`}
-                              className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                              onClick={() => {
-                                setPreviewMedia(url);
-                                setIsImagePreview(true);
-                              }}
-                            />
-                          ))}
+                  {/* Image Preview */}
+                  {hasValidContent &&
+                    (isImage || isImageBase64) &&
+                    Array.isArray(msg.content) &&
+                    msg.content.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt={`received-img-${i}`}
+                        className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+                        onClick={() => {
+                          setPreviewMedia(url);
+                          setIsImagePreview(true);
+                        }}
+                      />
+                    ))}
 
-                        {/* File Preview */}
-                        {hasValidContent &&
-                          (isFile || isFileBase64) &&
-                          Array.isArray(msg.content) &&
-                          msg.content.map((url, i) => (
-                            <button
-                              key={i}
-                              onClick={() => {
-                                setPreviewMedia(url);
-                                setIsImagePreview(false);
-                              }}
-                              className="mt-2 flex items-center gap-1 text-sm underline"
-                            >
-                              <FaFileAlt />{' '}
-                              {Array.isArray(msg.fileName)
-                                ? msg.fileName[i]
-                                : fileName || `File ${i + 1}`}
-                            </button>
-                          ))}
+                  {/* File Preview */}
+                  {hasValidContent &&
+                    (isFile || isFileBase64) &&
+                    Array.isArray(msg.content) &&
+                    msg.content.map((url, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setPreviewMedia(url);
+                          setIsImagePreview(false);
+                        }}
+                        className="mt-2 flex items-center gap-1 text-sm underline"
+                      >
+                        <FaFileAlt />{' '}
+                        {Array.isArray(msg.fileName)
+                          ? msg.fileName[i]
+                          : fileName || `File ${i + 1}`}
+                      </button>
+                    ))}
 
-                        {/* Timestamp */}
-                        <div className="flex flex-row gap-1 items-center mt-1.5 justify-end">
-                          <div className="text-xs text-black">
-                            <IoTimeOutline />
-                          </div>
-                          <div className="text-black text-xs">
-                            {new Date(msg.createdAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true,
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  {/* Timestamp */}
+                  <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
+                    <div className="text-xs text-black">
+                      <IoTimeOutline />
+                    </div>
+                    <div className="text-black text-xs">
+                      {new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
+                    </div>
+                    <div className="text-sm ml-1">{tickIcon}</div>
                   </div>
                 </div>
 
                 {/* Sender name */}
                 <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-left">
-                  {senderName || 'User'}
+                  {senderName}
                 </div>
               </li>
             </ul>
@@ -300,7 +337,7 @@ export const ReceiverMessage = ({
             isFile={isFile || isFileBase64}
             position="left"
             onOptionClick={(option) => {
-              console.log('Sender Option Selected:', option);
+              console.log('Receiver Option Selected:', option);
             }}
           />
         </div>
@@ -371,9 +408,8 @@ export const DotMenu = ({
       <RxDotsVertical onClick={toggleMenu} className="text-gray-500 cursor-pointer" />
       {isMenuOpen && (
         <div
-          className={`absolute z-10 mt-2 w-32 bg-white rounded shadow-lg  text-sm ${
-            position === 'left' ? 'left-0' : 'right-0'
-          }`}
+          className={`absolute z-10 mt-2 w-32 bg-white rounded shadow-lg  text-sm ${position === 'left' ? 'left-0' : 'right-0'
+            }`}
         >
           <ul>
             {dotMenu.map((item) => (

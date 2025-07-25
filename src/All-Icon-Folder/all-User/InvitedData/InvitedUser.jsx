@@ -7,15 +7,17 @@ import {
   setFilter,
   setSearchQuery,
   resetFetchedFilter,
-} from '../../feature/Slice/Invited-User/FilteredInvitedUsers';
+} from '../../../feature/Slice/Invited-User/FilteredInvitedUsers';
 
 const InvitedUser = ({ onChat }) => {
   const dispatch = useDispatch();
+
+  {/*filter user data Slice*/ }
   const { users, currentFilter, searchQuery, loading, fetchedFilters } = useSelector(
     (state) => state.filteredInvitedUsers
   );
 
-  const tab = currentFilter;
+  const tab = currentFilter;  //tab
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
   const filteredUsers = users[currentFilter] || [];
 
@@ -26,7 +28,7 @@ const InvitedUser = ({ onChat }) => {
   // console.log('🚥 Loading:', loading);
   // console.log('🔁 Fetched Filters:', fetchedFilters);
 
-  // 👉 When filter or searchQuery changes, fetch if not already
+  // slice api call and store data
   useEffect(() => {
     if (!fetchedFilters[tab]) {
       console.log('📤 Dispatching fetch for:', tab, 'with search:', debouncedSearchQuery);
@@ -34,10 +36,11 @@ const InvitedUser = ({ onChat }) => {
     }
   }, [dispatch, tab, debouncedSearchQuery, fetchedFilters]);
 
-  // ✅ Clear search when tab changes
+  // Clear search when tab changes
   useEffect(() => {
     dispatch(setSearchQuery(''));
   }, [tab]);
+
 
   const getStatusLabel = (invite) => {
     if (invite.user === null && invite.invited_is_Confirmed === true) return 'Verified';
@@ -57,10 +60,14 @@ const InvitedUser = ({ onChat }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-[#EA9282] to-[#67B7D1] bg-clip-text text-transparent">
-        Invited Users
-      </h2>
+      {/*tab*/}
+      <div>
+        <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-[#EA9282] to-[#67B7D1] bg-clip-text text-transparent">
+          Invited Users
+        </h2>
+      </div>
 
+      {/*serchbar*/}
       <div className="flex justify-between items-center mb-4">
         <div className="relative w-1/2">
           <input
@@ -116,6 +123,7 @@ const InvitedUser = ({ onChat }) => {
         </div>
       </div>
 
+      {/*table fild*/}
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full border border-gray-300 overflow-hidden rounded-lg">
           <thead

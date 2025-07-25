@@ -3,7 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectOnlineUsers } from '../feature/Slice/Socket/OnlineuserSlice';
+import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
 
 const OtherUser = ({ onChat }) => {
   const [users, setUsers] = useState([]);

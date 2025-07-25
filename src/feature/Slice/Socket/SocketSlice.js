@@ -1,13 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { io } from 'socket.io-client';
-import { setOnlineUsers } from '../Socket/OnlineuserSlice';
-import { newMessageReceived } from '../ChatSlice';
+import { createSlice } from "@reduxjs/toolkit";
+import { io } from "socket.io-client";
+import { setOnlineUsers } from "../Socket/OnlineuserSlice";
+import { newMessageReceived } from "../ChatSlice";
+import { setUnreadCount } from "../unreadCountSlice";
 
 const URL = import.meta.env.VITE_REACT_APP;
+console.log("✌️URL --->", URL);
 let socketInstance = null;
 
 const socketSlice = createSlice({
-  name: 'socket',
+  name: "socket",
   initialState: {
     socket: null,
     isConnected: false,
@@ -26,91 +28,107 @@ const socketSlice = createSlice({
   },
 });
 
-export const { setSocket, setConnectionStatus, clearSocket } = socketSlice.actions;
+export const { setSocket, setConnectionStatus, clearSocket } =
+  socketSlice.actions;
 
 export const connectSocket = (user) => (dispatch) => {
   //socket connection and  connected or user missing
+  console.log("👉 User received in connectSocket:", user); // ADD THIS LINE
+
   if (!user || socketInstance?.connected) {
-    console.log('⚠️ Socket already connected or user missing/SocketSlice', {
+    console.log("⚠️ Socket already connected or user missing/SocketSlice", {
       hasUser: !!user,
       socketConnected: socketInstance?.connected,
     });
     return;
   }
 
-  console.log('🌐 Connecting socket to:/SocketSlice', URL);
-  console.log('👤 Connecting with userId:/SocketSlice', user._id || user.userId);
+  console.log("🌐 Connecting socket to:/SocketSlice", URL);
+  console.log(
+    "👤 Connecting with userId:/SocketSlice",
+    user._id || user.userId
+  );
 
   socketInstance = io(URL, {
     query: {
       userId: user._id || user.userId,
     },
-    transports: ['websocket'],
+    transports: ["websocket"],
   });
 
-  socketInstance.on('connect', () => {
-    console.log('🟢Socket connected:/SocketSlice', socketInstance.id);
+  socketInstance.on("connect", () => {
+    console.log("🟢Socket connected:/SocketSlice", socketInstance.id);
     dispatch(setSocket(socketInstance));
     dispatch(setConnectionStatus(true));
   });
 
-  socketInstance.emit('openChatWith', {
+  socketInstance.emit("openChatWith", {
     userId: user._id || user.userId,
     chatWithUserId: null, // initially no chat open
   });
 
-  socketInstance.on('connect_error', (err) => {
-    console.error('⚫Socket connection error:/SocketSlice', err.message);
+  socketInstance.on("connect_error", (err) => {
+    console.error("⚫Socket connection error:/SocketSlice", err.message);
     dispatch(setConnectionStatus(false));
   });
 
-  socketInstance.on('disconnect', () => {
-    console.log('🔴Socket disconnected/SoketSlice');
+  socketInstance.on("disconnect", () => {
+    console.log("🔴Socket disconnected/SoketSlice");
     dispatch(setConnectionStatus(false));
   });
 
-  socketInstance.on('getOnlineUsers', (userIds) => {
-    console.log('🔵 Online users received/SocketSlice/ (count):', userIds.length);
-    console.log(' Online users received:', userIds);
+  socketInstance.on("getOnlineUsers", (userIds) => {
+    console.log(
+      "🔵 Online users received/SocketSlice/ (count):",
+      userIds.length
+    );
+    console.log(" Online users received:", userIds);
     dispatch(setOnlineUsers(userIds));
   });
 
-  socketInstance.on('groupMessage', (message) => {
-    console.log('👥 Group message received:/SocketSlice', message);
+  socketInstance.on("unreadCountUpdate", (data) => {
+    console.log("📊 Unread count received:", data);
+    dispatch(setUnreadCount(data));
+  });
+
+  socketInstance.on("groupMessage", (message) => {
+    console.log("👥 Group message received:/SocketSlice", message);
     dispatch(
       newMessageReceived({
         ...message,
-        text: message.text || '',
-        image: message.image || '',
-        file: message.file || '',
-        type: message.type || 'text',
+        text: message.text || "",
+        image: message.image || "",
+        file: message.file || "",
+        type: message.type || "text",
       })
     );
   });
 
-  socketInstance.on('privateMessage', (message) => {
-    console.log('📩 Private message received:/SocketSlice', message);
+  socketInstance.on("privateMessage", (message) => {
+    console.log("📩 Private message received:/SocketSlice", message);
     // dispatch(newMessageReceived(message));
     const currentUserId = user._id || user.userId;
-    const content = Array.isArray(message.content) ? message.content[0] : message.content;
+    const content = Array.isArray(message.content)
+      ? message.content[0]
+      : message.content;
 
     if (message.receiverId === currentUserId) {
       dispatch(
         newMessageReceived({
           ...message,
           content: message.content || [],
-          text: message.text || '',
-          image: message.type === 'image' ? content : '',
-          file: message.type === 'file' ? content : '',
-          type: message.type || 'text',
+          text: message.text || "",
+          image: message.type === "image" ? content : "",
+          file: message.type === "file" ? content : "",
+          type: message.type || "text",
         })
       );
     }
   });
 
   // handle reconnection
-  socketInstance.io.on('reconnect', () => {
-    console.log('🔁 Reconnected to socket server!/SocketSlice');
+  socketInstance.io.on("reconnect", () => {
+    console.log("🔁 Reconnected to socket server!/SocketSlice");
   });
 };
 
@@ -118,18 +136,18 @@ export const markMessagesAsRead =
   ({ senderId, receiverId }) =>
   () => {
     if (socketInstance && socketInstance.connected) {
-      console.log('✅ Emitting markMessagesAsRead to backend', {
+      console.log("✅ Emitting markMessagesAsRead to backend", {
         senderId,
         receiverId,
       });
-      socketInstance.emit('markMessagesAsRead', { senderId, receiverId });
+      socketInstance.emit("markMessagesAsRead", { senderId, receiverId });
     }
   };
 
 //disconnnected SOCKET.IO
 export const disconnectSocket = () => (dispatch) => {
   if (socketInstance) {
-    console.log('🔌Disconnecting socket.../SocketSlice');
+    console.log("🔌Disconnecting socket.../SocketSlice");
     socketInstance.disconnect();
     socketInstance = null;
     dispatch(clearSocket());

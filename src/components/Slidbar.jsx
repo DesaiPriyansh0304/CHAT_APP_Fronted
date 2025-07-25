@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../feature/Slice/Auth/AuthSlice';
-// import { fetchLoginUser } from "../feature/Slice/Auth/LoginUserSlice";
 import { toggleTheme } from '../feature/Slice/Theme/ThemeSlice';
 import { topItems, bottomItems, avatarItems, languages } from './Side panel/Icon';
 import './Side panel/Css/Slidebar.css';
@@ -21,6 +20,7 @@ function Sidebar() {
   const [showLangMenu, setShowLangMenu] = useState(false); //Language
   const [showAvatarMenu, setShowAvatarMenu] = useState(false); //Avatar
 
+  //refresh page in than releted in clike effect on icon
   const [clickEffect, setClickEffect] = useState(() => {
     const currentPath = location.pathname.split('/')[1];
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
@@ -28,6 +28,7 @@ function Sidebar() {
     return match ? match.id : null;
   });
 
+  //tab number store local
   useEffect(() => {
     const currentPath = location.pathname.split('/')[1];
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
@@ -39,10 +40,7 @@ function Sidebar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  // useEffect(() => {
-  //     dispatch(fetchLoginUser());
-  // }, [dispatch]);
-
+  //dark mode set
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -54,6 +52,7 @@ function Sidebar() {
   const menuRef = useRef();
   const langMenuRef = useRef();
 
+  //click event handle
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showAvatarMenu && menuRef.current && !menuRef.current.contains(e.target)) {
@@ -67,6 +66,7 @@ function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAvatarMenu, showLangMenu]);
 
+  //click Effect Css 
   const getButtonClass = (id) => {
     const base =
       'relative p-2 rounded-xl overflow-hidden transition-transform duration-300 transform hover:scale-115 cursor-pointer';
@@ -82,6 +82,7 @@ function Sidebar() {
     }
   };
 
+  {/*tab/page event function*/ }
   const bghandleClick = (id, page) => {
     setClickEffect(id);
     localStorage.setItem('activeTab', id);
@@ -98,6 +99,8 @@ function Sidebar() {
   return (
     <div className="dark:bg-[var(--primary-color)]">
       <div className="relative w-full h-screen flex flex-col items-center justify-between py-4 shadow-md">
+
+
         {/* Logo */}
         <div className="items-center justify-center">
           <img src="/Img/logo.jpg" alt="Logo" />

@@ -5,6 +5,7 @@ import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
+// import { selectChatUnreadCount } from '../../feature/Slice/unreadCountSlice';
 
 function Chats({ selectUser, SetSelectUser }) {
 
@@ -52,7 +53,7 @@ function Chats({ selectUser, SetSelectUser }) {
   const scrollLeft = () => scrollRef.current && (scrollRef.current.scrollLeft -= 100);
   const scrollRight = () => scrollRef.current && (scrollRef.current.scrollLeft += 100);
   const getFullName = (user) => `${user.firstname || ''} ${user.lastname || ''}`.trim();   //User Full Name
-
+  const allUnreadCounts = useSelector((state) => state.unreadCount.chatWiseCount);
   return (
     <>
       <div className="p-2 h-screen w-full">
@@ -165,7 +166,8 @@ function Chats({ selectUser, SetSelectUser }) {
             ) : (
               <div className="h-[40vh] overflow-auto">
                 {combinedChatUsers.map((chatUser) => {
-                  const unreadCount = unseenMessages?.[chatUser._id] || 0;
+                  const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
+                  // const unreadCount = unseenMessages?.[chatUser._id] || 0;
                   return (
                     <div
                       key={chatUser._id}
