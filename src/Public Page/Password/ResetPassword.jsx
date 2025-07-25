@@ -37,13 +37,22 @@ function ResetPassword() {
   // otp expiry time from localStorage or initialize
   useEffect(() => {
     if (!email) return;
+
     const savedExpiry = localStorage.getItem('otpExpiresAt');
+    const expiredFlag = localStorage.getItem('otpExpired');
+
+    if (expiredFlag === 'true') {
+      setExpiryTime(0);
+      return;
+    }
+
     if (savedExpiry) {
       const remaining = Math.floor((Number(savedExpiry) - Date.now()) / 1000);
       if (remaining > 0) {
         setExpiryTime(remaining);
       } else {
         setExpiryTime(0);
+        localStorage.setItem('otpExpired', 'true');
       }
     } else {
       const expiresAt = Date.now() + 180 * 1000;
@@ -55,13 +64,18 @@ function ResetPassword() {
   // Timer countdown
   useEffect(() => {
     if (!email || expiryTime <= 0) return;
+
     const interval = setInterval(() => {
       setExpiryTime((prev) => {
         const newVal = prev - 1;
-        if (newVal <= 0) localStorage.removeItem('otpExpiresAt');
+        if (newVal <= 0) {
+          localStorage.removeItem('otpExpiresAt');
+          localStorage.setItem('otpExpired', 'true');  // ⬅️ Add this
+        }
         return newVal;
       });
     }, 1000);
+
     return () => clearInterval(interval);
   }, [expiryTime, email]);
 
@@ -131,19 +145,24 @@ function ResetPassword() {
     setResending(true);
     try {
       await axios.post(`${import.meta.env.VITE_REACT_APP}/api/otp/resend-otp`, { email });
+
+      // Reset localStorage flags
       const expiresAt = Date.now() + 180 * 1000;
       localStorage.setItem('otpExpiresAt', expiresAt);
+      localStorage.removeItem('otpExpired');
+
       setExpiryTime(180);
       setOtpValues(Array(6).fill(''));
       inputRefs.current[0]?.focus();
       toast.success('OTP resent successfully');
     } catch (error) {
-      console.log('error --->resen-opt/Resentpassword', error);
+      console.log('error --->resend-otp/ResetPassword', error);
       toast.error("Failed to resend OTP");
     } finally {
       setResending(false);
     }
   };
+
 
   {/*resend password api call*/ }
   const handleSubmit = async (e) => {
@@ -361,7 +380,7 @@ function ResetPassword() {
             type="button"
             onClick={handleResendOtp}
             disabled={resending || !email || expiryTime > 0}
-            className={`flex items-center gap-1 text-[#0A85ED] font-semibold ${expiryTime <= 0 ? 'cursor-pointer' : 'cursor-not-allowed'} disabled:opacity-50`}
+            className={`flex items-center gap-1 text-[#078bf7] font-semibold ${expiryTime <= 0 ? 'cursor-pointer' : 'cursor-not-allowed'} `}
           >
             {resending && <FiLoader className="animate-spin" size={16} />}
             {resending ? 'Resending...' : 'Resend code'}
@@ -393,7 +412,7 @@ function ResetPassword() {
               <div>
                 {expiryTime > 0 ? (
                   <div>
-                    <p className="py-3   bg-gradient-to-r from-[#F4F269] via-[#CEE26B] to-[#A8D26D] bg-clip-text text-transparent">
+                    <p className="py-3  mr-[11px] bg-gradient-to-r from-[#F4F269] via-[#CEE26B] to-[#A8D26D] bg-clip-text text-transparent">
                       Expires in: <span className="font-semibold">{formatTime(expiryTime)}</span>
                     </p>
                   </div>
