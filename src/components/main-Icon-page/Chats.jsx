@@ -12,11 +12,12 @@ function Chats({ selectUser, SetSelectUser }) {
   const [search, setSearch] = useState('');            //serch State
   const [debouncedSearch] = useDebounce(search, 400);  //useDebounce
 
+
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
   //getUser Message data
-  const { unseenMessages, status, error } = useSelector((state) => state.getUserMessage);
+  const { status, error } = useSelector((state) => state.getUserMessage);
 
   {/*Invited User Data Slice*/ }
   const {
@@ -58,7 +59,7 @@ function Chats({ selectUser, SetSelectUser }) {
     <>
       <div className="p-2 h-screen w-full">
         {/* Header */}
-        <div className="p-5 text-2xl font-semibold dark:text-[var(--text-color3)]">Chats</div>
+        <div className="p-5 text-3xl font-semibold dark:text-[#f8f9fa]">Chats</div>
 
         {/* Search Box */}
         <div className="mx-3 mb-6 relative">
@@ -66,13 +67,13 @@ function Chats({ selectUser, SetSelectUser }) {
             <input
               type="text"
               placeholder="Search messages or users"
-              className="w-full pl-10 pr-4 py-2 rounded-md bg-[#E4E9F7] text-gray-700 placeholder-gray-500 focus:outline-none"
+              className="w-full pl-10 pr-4 py-2.5 rounded-md bg-[#E4E9F7] text-gray-700 placeholder-gray-500 focus:outline-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div>
-            <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+            <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-600" />
           </div>
         </div>
 
@@ -129,12 +130,13 @@ function Chats({ selectUser, SetSelectUser }) {
                     </div>
                     {/*user name*/}
                     <div>
-                      <p className="font-bold text-sm dark:text-[var(--text-color)] mt-1 truncate">
+                      <p className="font-semibold text-sm dark:text-[#caf0f8] mt-1 truncate">
                         {chatUser.firstname}
                       </p>
                     </div>
 
                   </div>
+
                 </motion.div>
               ))}
           </motion.div>
@@ -158,94 +160,91 @@ function Chats({ selectUser, SetSelectUser }) {
             <p className="text-lg font-semibold dark:text-[var(--text-color3)] mb-4">Recent</p>
           </div>
 
-          <div>
+          <div className='w-full h-[40vh]'>
             {status === 'loading' ? (
               <p className="text-center text-gray-500">Loading...</p>
             ) : error ? (
               <p className="text-center text-red-500">Error: {error}</p>
             ) : (
-              <div className="h-[40vh] overflow-auto">
+              <div className=" overflow-auto">
                 {combinedChatUsers.map((chatUser) => {
+                  //count message
                   const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
-                  // const unreadCount = unseenMessages?.[chatUser._id] || 0;
                   return (
-                    <div
-                      key={chatUser._id}
-                      onClick={() => SetSelectUser(chatUser)}
-                      className={` group  flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
-                      ${chatUser.isTyping
-                          ? 'bg-[#d9e8ff] hover:bg-[#e3ecff]  dark:hover:bg-[#e3ecff] '
-                          : 'hover:bg-[#e3ecff] dark:hover:bg-[#e3ecff]'
-                        }
-                      ${selectUser?._id === chatUser._id ? 'bg-gray-200' : ''}`}
-                    >
-                      {/* Avatar */}
-                      <div className="relative mr-3">
-                        {chatUser.profile_avatar ? (
-                          //Profile Image
-                          <div>
-                            <img
-                              src={chatUser.profile_avatar}
-                              alt={getFullName(chatUser)}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          </div>
-                        ) : (
-                          //First Case
-                          <div className="w-10 h-10 rounded-full text-white bg-gray-400 flex items-center justify-center text-lg font-semibold">
-                            {chatUser.firstname?.[0]?.toUpperCase()}
-                          </div>
-                        )}
-                        {/*online user Green got*/}
-                        {chatUser.online && (
-                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-                        )}
-                      </div>
+                    <div key={chatUser._id}>
+                      <div
+                        onClick={() => SetSelectUser(chatUser)}
+                        className={` group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
+                         ${chatUser.isTyping
+                            ? 'bg-[#d9e8ff] hover:bg-[#e3ecff]  dark:hover:bg-[#e3ecff]'
+                            : 'hover:bg-[#e3ecff] dark:hover:bg-gray-400'
+                          }
+                           ${selectUser?._id === chatUser._id ? 'bg-gray-200' : ''}`}
+                      >
+                        {/* Avatar */}
+                        <div className="relative mr-3">
+                          {chatUser.profile_avatar ? (
+                            //img
+                            <div className='w-10 h-10 rounded-full overflow-hidden'>
+                              <img
+                                src={chatUser.profile_avatar}
+                                alt={getFullName(chatUser)}
+                                className=" w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-11\0 rounded-full overflow-hidden bg-gray-400 flex items-center justify-center">
+                              <span className="text-white text-lg font-semibold">
+                                {chatUser.firstname?.[0]?.toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          {chatUser.online && (
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full"></span>
+                          )}
+                        </div>
 
-                      {/* user data */}
-                      <div className="flex-1">
-
-                        {/*User Name*/}
-                        <div>
+                        {/* User data */}
+                        <div className="flex-1">
                           <p
                             className={`text-sm font-semibold truncate ${selectUser?._id === chatUser._id
                               ? 'text-black hover:text-black'
-                              : 'dark:text-[var(--text-color3)]  group-hover:text-black'
-                              }  `}
+                              : 'dark:text-white group-hover:text-black'
+                              }`}
                           >
                             {getFullName(chatUser)}
                           </p>
-                        </div>
-
-                        {/*User bio*/}
-                        <div>
+                          {/*User bio*/}
                           <p
-                            className={`text-sm ${chatUser.isTyping ? 'text-blue-600 italic' : 'text-gray-500'} dark:text-[var(--text-color)]`}
+                            className={`text-sm   line-clamp-1 break-words 
+                               ${chatUser.isTyping ? 'text-blue-600 italic' : ''} 
+                               ${selectUser?._id === chatUser._id
+                                ? 'text-gray-500 '
+                                : 'dark:text-[#adb5bd]  group-hover:text-white'
+                              }
+                              `}
                           >
-                            {chatUser.bio
-                              ? (() => {
-                                const words = chatUser.bio.trim().split(/\s+/);
-                                return words.length > 7
-                                  ? words.slice(0, 6).join(' ') + '...'
-                                  : chatUser.bio;
-                              })()
-                              : 'No message yet'}
+                            {chatUser.bio || 'No message yet'}
                           </p>
-                        </div>
-                      </div>
 
-                      {/* Unread & Time */}
-                      <div className="text-right min-w-[50px] ml-2">
-                        <p className="text-xs text-gray-400">{chatUser.time || ''}</p>
-                        {unreadCount > 0 && (
-                          <div className="mt-1.5 bg-red-100 text-red-400 w-7 h-5 rounded-full text-xs font-bold flex items-center justify-center mx-auto">
-                            {unreadCount.toString().padStart(2, '0')}
-                          </div>
-                        )}
+                        </div>
+
+                        {/* Unread */}
+                        <div className="text-right min-w-[50px] ml-2">
+                          <p className="text-xs text-gray-400">{chatUser.time || ''}</p>
+                          {unreadCount > 0 && (
+                            <div className="mt-1.5 bg-red-100 text-red-500 w-7 h-5 rounded-full text-xs font-bold flex items-center justify-center mx-auto">
+                              {unreadCount.toString().padStart(2, '0')}
+                            </div>
+                          )}
+                        </div>
+
                       </div>
+                      <hr className="my-0.5 mx-2 border-gray-300 dark:border-gray-500" />
                     </div>
                   );
                 })}
+
               </div>
             )}
           </div>

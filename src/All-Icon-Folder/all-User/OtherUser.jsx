@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
 
 const OtherUser = ({ onChat }) => {
@@ -11,22 +11,22 @@ const OtherUser = ({ onChat }) => {
   const [debouncedSearch] = useDebounce(search, 500);
   const [loading, setLoading] = useState(false);
 
-  const dispatch = useDispatch();
-  const onlineUserIds = useSelector(selectOnlineUsers); // ✅ Online IDs from Redux
+
+  const onlineUserIds = useSelector(selectOnlineUsers);
   const URL = import.meta.env.VITE_REACT_APP;
 
-  // ✅ Fetch users from API
+
   const fetchOtherUsers = async (query = '') => {
     try {
       setLoading(true);
       const token = localStorage.getItem('Authtoken');
 
-      const response = await axios.get(`${URL}/api/auth/dbuser`, {
+      const response = await axios.get(`${URL}/api/auth/userdata/dbuser`, {
         headers: { Authorization: `Bearer ${token}` },
         params: query ? { search: query } : {},
       });
 
-      const formatted = response.data.map((user) => ({
+      const formatted = response.data.data.map((user) => ({
         id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,

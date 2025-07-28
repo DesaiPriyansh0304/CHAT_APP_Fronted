@@ -85,7 +85,7 @@ function Contacts() {
       const verifyToken = async () => {
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_REACT_APP}/api/auth/invitedUsers-verify`,
+            `${import.meta.env.VITE_REACT_APP}/api/auth/invite/invitedUsers-verify`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

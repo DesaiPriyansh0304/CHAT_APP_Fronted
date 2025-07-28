@@ -3,11 +3,12 @@ import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-//Public Router
-import Home from './Pages/Home';
+//divided router
 import PrivateRoute from './Public Page/RouterPage/PrivetRouter';
 import PublicRoute from './Public Page/RouterPage/PublicRouter';
 //Private routes
+import Home from './Pages/Home';
+//Public Router
 import Login from './Public Page/SignIn-SignUP/Login';
 import Register from './Public Page/SignIn-SignUP/Register';
 import OtpVerify from './Public Page/otp verify/OTPVerify';

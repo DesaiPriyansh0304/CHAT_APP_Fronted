@@ -176,7 +176,7 @@ function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_REACT_APP}/api/auth/resetPassword`, {
+      const res = await axios.post(`${import.meta.env.VITE_REACT_APP}/api/auth/password/resetPassword`, {
         email, otp, newPassword,
       });
       toast.success(res.data.message || 'Password reset successful!');
@@ -364,7 +364,7 @@ function ResetPassword() {
                     <Loader2 className="animate-spin" size={16} />
                     <span className='text-[16px]'>Resetting...</span>
                   </div>
-                ) : 'Reset Password'}
+                ) : 'Save and Change'}
               </button>
             </div>
 
@@ -397,11 +397,12 @@ function ResetPassword() {
               navigate(-1);
             }}
               disabled={loading || resending}
-              className="py-3 px-15 rounded-2xl text-[15px]
+              className={`${!email ? 'w-full justify-center' : 'px-15'}
+                  py-3 px-20 rounded-2xl text-[15px]
                 bg-gradient-to-r from-[#343a40] via-[#495057] to-[#6c757d] text-[#f8f9fa]  
                 hover:from-[#495057] hover:via-[#6c757d] hover:to-[#adb5bd]             
                 font-semibold transition cursor-pointer
-                disabled:opacity-40 disabled:cursor-not-allowed"
+                disabled:opacity-40 disabled:cursor-not-allowed`}
             >
               Cancel
             </button>

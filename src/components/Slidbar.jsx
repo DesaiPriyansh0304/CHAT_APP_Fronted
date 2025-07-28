@@ -70,15 +70,15 @@ function Sidebar() {
   const getButtonClass = (id) => {
     const base =
       'relative p-2 rounded-xl overflow-hidden transition-transform duration-300 transform hover:scale-115 cursor-pointer';
-    const common = 'hover:text-blue-600 dark:hover:text-[var(--text-color1)]';
+    const common = 'hover:text-blue-600 dark:hover:text-[#ffe8d6]';
     const isActive = clickEffect === id;
 
     if (isActive) {
       return theme === 'dark'
-        ? `${base} invisible-animated-border text-[var(--text-color1)] ${common}`
-        : `${base} text-blue-600 bg-blue-100 border border-blue-600 ${common}`;
+        ? `${base}  bg-gray-300 border-2 border-[#0D41E1] text-[#022b3a] ${common}`
+        : `${base} text-blue-600 bg-blue-100 border border-blue-400  ${common}`;
     } else {
-      return `${base} text-gray-500 dark:text-[var(--text-color)] ${common}`;
+      return `${base} text-gray-500 dark:text-[#64b5f6] ${common}`;
     }
   };
 
@@ -97,9 +97,8 @@ function Sidebar() {
   const bottomMenuItems = bottomItems(theme, setShowLangMenu, dispatch, toggleTheme);
 
   return (
-    <div className="dark:bg-[var(--primary-color)]">
-      <div className="relative w-full h-screen flex flex-col items-center justify-between py-4 shadow-md">
-
+    <div className="bg-[#f7f7ff] dark:bg-[#0d1b2a]">
+      <div className="relative   w-full h-screen flex flex-col items-center justify-between py-4 shadow-md">
 
         {/* Logo */}
         <div className="items-center justify-center">
@@ -108,11 +107,12 @@ function Sidebar() {
 
         {/* Top Menu */}
         <div>
-          <ul className="flex flex-col gap-4 mt-3">
+          <ul className="flex flex-col gap-3">
             {topItems.map(({ icon, title, page, id }) => (
               <li key={id} className="relative group">
-                <button onClick={() => bghandleClick(id, page)} className={getButtonClass(id)}>
-                  <span className="relative z-10">{icon}</span>
+                <button onClick={() => bghandleClick(id, page)}
+                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}>
+                  <span className="relative z-10 ">{icon}</span>
                 </button>
                 <div className="absolute left-12 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
                   {title}
@@ -121,6 +121,8 @@ function Sidebar() {
             ))}
           </ul>
         </div>
+
+        {/* <hr className="border-t-2 border-blue-600 dark:border-[var(--text-color)] px-[60px]" /> */}
 
         {/* Bottom Menu + Avatar */}
         <div className="flex flex-col items-center relative">
@@ -137,7 +139,7 @@ function Sidebar() {
                     }
                     setShowAvatarMenu(false);
                   }}
-                  className={getButtonClass(id)}
+                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}
                 >
                   {icon}
                 </button>
@@ -179,7 +181,7 @@ function Sidebar() {
                 setShowAvatarMenu((prev) => !prev);
                 setShowLangMenu(false);
               }}
-              className="w-12 h-12 rounded-full border-3 border-gray-300 dark:border-[var(--text-color)] shadow-md transition-transform duration-300 transform hover:scale-125 cursor-pointer"
+              className="w-12 h-12 rounded-full border-3 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md transition-transform duration-300 transform hover:scale-125 cursor-pointer"
             >
               <img
                 src={user?.profile_avatar || 'https://via.placeholder.com/100'}
@@ -219,6 +221,7 @@ function Sidebar() {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

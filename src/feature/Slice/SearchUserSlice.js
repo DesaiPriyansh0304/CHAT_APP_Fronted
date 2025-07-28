@@ -1,20 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
-// ✅ Thunk with search query support
 export const fetchInvitedUsers = createAsyncThunk(
-  'invitedUsers/fetchInvitedUsers',
-  async (searchQuery = '', { rejectWithValue }) => {
+  "invitedUsers/fetchInvitedUsers",
+  async (searchQuery = "", { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('Authtoken');
+      const token = localStorage.getItem("Authtoken");
 
       const response = await fetch(
         `${
           import.meta.env.VITE_REACT_APP
-        }/api/auth/get-inviteduser?search=${encodeURIComponent(searchQuery)}`,
+        }/api/auth/userdata/get-inviteduser?search=${encodeURIComponent(searchQuery)}`,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -23,22 +22,22 @@ export const fetchInvitedUsers = createAsyncThunk(
       const data = await response.json();
 
       if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to fetch invited users');
+        return rejectWithValue(data.message || "Failed to fetch invited users");
       }
 
       return {
-        invitedUsers: data.invitedUsers || [],
-        invitedBy: data.invitedBy || [],
+        invitedUsers: data.data.invitedUsers || [],
+        invitedBy: data.data.invitedBy || [],
       };
     } catch (error) {
-      console.error('fetchInvitedUsers error:', error);
-      return rejectWithValue('Network error');
+      console.error("fetchInvitedUsers error:", error);
+      return rejectWithValue("Network error");
     }
   }
 );
 
 const invitedUsersSlice = createSlice({
-  name: 'invitedUsers',
+  name: "invitedUsers",
   initialState: {
     invitedUsers: [],
     invitedBy: [],

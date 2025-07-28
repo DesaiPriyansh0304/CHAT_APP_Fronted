@@ -2,11 +2,12 @@ import React from 'react';
 import { IoPersonOutline, IoChatboxEllipsesOutline } from 'react-icons/io5';
 import { RiContactsLine, RiGroupLine } from 'react-icons/ri';
 import { SlSettings } from 'react-icons/sl';
-import { MdOutlineLanguage } from 'react-icons/md';
+import { BsGlobe2 } from "react-icons/bs";
 import { LuMoon, LuSun } from 'react-icons/lu';
 import { FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
 import { BsMotherboard } from 'react-icons/bs';
-import { FaRegEdit } from 'react-icons/fa';
+import { LiaUserEditSolid } from "react-icons/lia";
+
 
 {
   /*Top Icon*/
@@ -24,10 +25,10 @@ export const topItems = [
 }
 export const bottomItems = (theme, setShowLangMenu, dispatch, toggleTheme) => [
   { id: 100, icon: <BsMotherboard size={24} />, title: 'AllUser', page: 'alluser' },
-  { id: 101, icon: <FaRegEdit size={26} />, title: 'Edit', page: 'avtarpage' },
+  { id: 101, icon: <LiaUserEditSolid size={28} />, title: 'Edit', page: 'avtarpage' },
   {
     id: 102,
-    icon: <MdOutlineLanguage size={26} />,
+    icon: <BsGlobe2 size={22} />,
     title: 'Language',
     action: () => setShowLangMenu((prev) => !prev),
   },

@@ -7,6 +7,8 @@ function PrivateRoute() {
   const dispatch = useDispatch();
 
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  console.log('✌️loading --->', loading);
+  console.log('✌️isAuthenticated --->', isAuthenticated);
 
   {
     /*Login User Data Api Call*/

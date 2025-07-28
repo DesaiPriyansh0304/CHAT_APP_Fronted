@@ -16,6 +16,7 @@ function ChatContainer({
   selectGroup,
   setSelectGroup,
 }) {
+
   const theme = useSelector((state) => state.theme.mode);
 
   const renderContent = () => {
@@ -73,7 +74,7 @@ function ChatContainer({
   return (
     <>
       <div className={`${theme === 'dark' ? 'dark' : ''}`}>
-        <div className={`min-h-screen bg-[var(--secondary-color)] `}>{renderContent()}</div>
+        <div className={`min-h-screen bg-[var(--secondary-color)] dark:bg-[#343a40] `}>{renderContent()}</div>
       </div>
     </>
   );

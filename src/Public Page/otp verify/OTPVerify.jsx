@@ -135,14 +135,16 @@ function OtpVerify() {
     <div className="min-h-screen flex items-center justify-center bg-[#1F2937] relative">
 
       {/* Close Button */}
-      <button
-        className="absolute top-3 right-3 text-white text-2xl z-10 cursor-pointer
+      <div>
+        <button
+          className="absolute top-3 right-3 text-white text-2xl z-10 cursor-pointer
         disabled:opacity-40 disabled:cursor-not-allowed"
-        onClick={() => navigate(-1)}
-        disabled={isVerifying || resending}
-      >
-        <RxCross2 />
-      </button>
+          onClick={() => navigate(-1)}
+          disabled={isVerifying || resending}
+        >
+          <RxCross2 />
+        </button>
+      </div>
 
       <div className="w-full max-w-md rounded-lg p-8 pt-12">
         <form onSubmit={handleVerify}>
@@ -161,7 +163,7 @@ function OtpVerify() {
           )}
 
           {/* OTP Input Fields */}
-          <div className="flex justify-between gap-2 mb-3 mx-[12px]">
+          <div className="flex justify-between gap-1 mb-3 mx-[20px]">
             {otpValues.map((digit, index) => (
               <input
                 key={index}
@@ -172,7 +174,7 @@ function OtpVerify() {
                 value={digit}
                 onChange={(e) => handleChange(e, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-10 h-12 text-center rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-800 text-white text-lg"
+                className="w-10 h-12 text-center rounded-xl border-2 border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-800 text-white text-lg"
               />
             ))}
           </div>
@@ -184,53 +186,54 @@ function OtpVerify() {
             )}
           </div>
 
-          <hr className="border-t-2 border-[#a0c4ff] dark:border-[var(--text-color)] mt-2 mb-3.5 mx-[12px]" />
+          <hr className=" mt-2 mb-3.5 mx-[16px] border-t-2 border-[#0077b6] " />
+
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] text-white hover:opacity-90 transition p-3 rounded-xl 
+          <div className='mx-[12px]'>
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r text-[18px] from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] text-white hover:opacity-90 transition p-2.5 rounded-xl 
             font-semibold mb-2 cursor-pointer"
-            disabled={isVerifying}
-          >
-            {isVerifying ? 'Verifying...' : 'Registertion'}
-          </button>
+              disabled={isVerifying}
+            >
+              {isVerifying ? 'Verifying...' : 'Verify'}
+            </button>
+          </div>
 
           {/* Resend OTP */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-3">
+            <div>
+              <span className="text-white">Didn't get the code?&nbsp;</span>
+            </div>
             <button
               type="button"
               onClick={handleResendOtp}
               disabled={resending || !email || expiryTime > 0}
-              className="disabled:opacity-50"
+              className={`flex items-center gap-1 text-[#078bf7] font-semibold ${expiryTime <= 0 ? 'cursor-pointer' : 'cursor-not-allowed'} `}
             >
-              <div className="flex flex-row items-center text-center p-2 rounded-xl">
-                <span className="text-white">Didn't get the code? </span>
-                {resending && <FiLoader className="animate-spin inline-block text-blue-400" size={16} />}
-                <div
-                  className={`text-blue-500 hover:text-blue-500 font-semibold ${expiryTime <= 0 ? 'cursor-pointer' : ''
-                    }`}
-                >
-                  {resending ? 'Resending...' : 'Resend code'}
-                </div>
-              </div>
+              {resending && <FiLoader className="animate-spin" size={16} />}
+              {resending ? 'Resending...' : 'Resend code'}
             </button>
           </div>
 
 
           {/* Cancel Button + Timer */}
           <div className={`mt-3 text-sm ${email ? 'flex justify-between' : ''}`}>
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              disabled={isVerifying || resending}
-              className={`${!email ? 'w-full justify-center' : 'px-15'
-                } py-3 rounded-2xl
-                  bg-gradient-to-r from-[#343a40] via-[#495057] to-[#6c757d] text-[#f8f9fa]  
-                          hover:from-[#495057] hover:via-[#6c757d] hover:to-[#adb5bd] 
-                  text-[17px] font-semibold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed`}
-            >
-              Cancel
-            </button>
+
+            <div className={`${!email ? 'mx-[12px]' : ''}`}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                disabled={isVerifying || resending}
+                className={`${!email ? 'w-full justify-center ' : 'px-15'
+                  } py-3 rounded-2xl
+                  bg-gradient-to-r from-[#343a40] via-[#495057] to-[#6c757d] text-[#f8f9fa]  text-[15px] 
+                   hover:from-[#495057] hover:via-[#6c757d] hover:to-[#adb5bd] 
+                   font-semibold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                Cancel
+              </button>
+            </div>
 
             {email && expiryTime > 0 ? (
               <p className="py-2 bg-gradient-to-r from-[#F4F269] via-[#CEE26B] to-[#A8D26D] bg-clip-text text-transparent">

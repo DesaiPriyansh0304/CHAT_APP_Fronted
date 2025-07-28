@@ -53,7 +53,7 @@ function ProfilePage() {
   return (
     <>
       {/*main div*/}
-      <div className="h-screen w-full dark:bg-[var(--)]">
+      <div className="h-screen w-full">
         {/*Header*/}
         <div className="p-2 relative">
 
@@ -61,7 +61,7 @@ function ProfilePage() {
           <div className="flex justify-between">
 
             {/*My Profile*/}
-            <div className="p-5 text-2xl font-semibold dark:text-[var(--text-color3)]">
+            <div className="p-5 text-2xl font-semibold dark:text-white">
               My Profile
             </div>
 
@@ -69,20 +69,20 @@ function ProfilePage() {
             <div className="p-5 relative text-semibold">
               {/*dot menu open icon*/}
               <button onClick={toggleMenu}>
-                <EllipsisVerticalIcon className="h-6 w-6 text-gray-500  dark:text-[var(--text-color)] cursor-pointer" />
+                <EllipsisVerticalIcon className="h-6 w-6 text-gray-500  dark:text-[#caf0f8] cursor-pointer" />
               </button>
 
               {/*menu code*/}
               {isMenuOpen && (
                 <div
-                  className="absolute right-5 top-12 w-40 bg-white dark:bg-[var(--text-color3)] border border-blue-300 rounded-md shadow-md z-10"
+                  className="absolute right-5 top-12 w-40 bg-white rounded-md shadow-md z-10"
                   ref={dotmenuRef}
                 >
                   {/*dot menu */}
                   {dotMenu.map(({ name, id }) => (
                     <div key={id}>
                       {name === 'Another action' && (
-                        <hr className="border-gray-300 dark:border-[var(--text-color)]  mx-2" />
+                        <hr className="border-gray-300  dark:border-blue-300  mx-2" />
                       )}
                       <button
                         onClick={() => setIsMenuOpen(false)}
@@ -105,7 +105,7 @@ function ProfilePage() {
                 <img
                   src={user?.profile_avatar || 'https://via.placeholder.com/100'}
                   alt="Avatar"
-                  className="rounded-full w-24 h-24 border-4 border-white object-cover"
+                  className="rounded-full w-24 h-24 border-4 border-gray-300 object-cover"
                 />
               </div>
 
@@ -119,14 +119,14 @@ function ProfilePage() {
               {/*online user*/}
               <div className="flex items-center space-x-1 mt-1.5">
                 <span className="w-3 h-3 bg-green-400 border-2 border-white rounded-full"></span>
-                <p className="text-md text-gray-700 dark:text-[var(--text-color)] ">Active</p>
+                <p className="text-md text-gray-700 dark:text-[#90e0ef] ">Active</p>
               </div>
 
             </div>
           </div>
         </div>
 
-        <hr className="border-t-2 border-blue-100 dark:border-[var(--text-color)] mt-3.5 mx-2.5" />
+        <hr className="border-t-2 border-blue-100 dark:border-[#64b5f6] mt-3.5 mx-2.5" />
 
         {/*End Section*/}
         <div className="m-4">
@@ -139,26 +139,26 @@ function ProfilePage() {
           <div className="overflow-auto h-[50vh] mx-2">
 
             {/*About section*/}
-            <div className="w-full bg-gray-100 dark:bg-[var(--text-color)] rounded ">
+            <div className="w-full bg-gray-100 dark:bg-[#495057] rounded-md">
               <div
                 className="flex items-center justify-between cursor-pointe  px-4 py-2.5 "
                 onClick={() => handleToggleSection('about')}
               >
                 {/*section name and icon*/}
-                <div className="flex items-center dark:text-[var(--text-color3)] gap-2 ">
-                  <div>
+                <div className="flex items-center dark:text-[#f8f9fa] gap-2 ">
+                  <div className='font-semibold'>
                     <IoPersonOutline />
                   </div>
-                  <span className="text-gray-700 dark:text-[var(--text-color3)]  font-medium">
+                  <span className="text-gray-700 dark:text-[#f8f9fa]  font-medium">
                     About
                   </span>
                 </div>
                 {/*Up and Down Icon*/}
                 <div>
                   {activeSection === 'about' ? (
-                    <ChevronUp className="w-4 h-4 text-gray-600 dark:text-[var(--text-color3)]" />
+                    <ChevronUp className="w-4 h-4 text-gray-600 dark:text-[#f8f9fa]" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-600 dark:text-[var(--text-color3)]" />
+                    <ChevronDown className="w-4 h-4 text-gray-600 dark:text-[#f8f9fa]" />
                   )}
                 </div>
               </div>
@@ -166,8 +166,8 @@ function ProfilePage() {
               {/* About inside section detail*/}
               <div>
                 {activeSection === 'about' && (
-                  <div className="bg-white dark:bg-[var(--text-color3)] ">
-                    <div className="mt-1 px-4 py-2.5 space-y-3 text-sm text-gray-800 h-[36vh] overflow-auto">
+                  <div className="bg-white dark:bg-[#f8f9fa] ">
+                    <div className="mt-0.5 px-4 py-2.5 space-y-3 text-sm text-gray-800 h-[36vh] overflow-auto">
 
                       {/*User Name*/}
                       <div>
@@ -224,27 +224,27 @@ function ProfilePage() {
             </div>
 
             {/*Attached Files Section*/}
-            <div className="w-full  bg-gray-100  dark:bg-[var(--text-color)] mt-2 rounded">
+            <div className="w-full  bg-gray-100  dark:bg-[#495057]  mt-2 rounded">
 
               <div
                 className="flex items-center justify-between cursor-pointer px-4 py-2.5"
                 onClick={() => handleToggleSection('attachfile')}
               >
                 {/*section name and icon*/}
-                <div className="flex items-center dark:text-[var(--text-color3)] gap-2">
-                  <div>
+                <div className="flex items-center dark:text-[#f8f9fa] gap-2">
+                  <div className='font-semibold'>
                     <MdAttachFile />
                   </div>
-                  <span className="text-gray-700 dark:text-[var(--text-color3)] font-medium">
+                  <span className="text-gray-700 dark:text-[#f8f9fa] font-medium">
                     Attached Files
                   </span>
                 </div>
                 {/*Up and Down Icon*/}
                 <div>
                   {activeSection === 'attachfile' ? (
-                    <ChevronUp className="w-4 h-4 dark:text-[var(--text-color3)] text-gray-600" />
+                    <ChevronUp className="w-4 h-4 dark:text-[#f8f9fa] text-gray-600" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 dark:text-[var(--text-color3)] text-gray-600" />
+                    <ChevronDown className="w-4 h-4 dark:text-[#f8f9fa] text-gray-600" />
                   )}
                 </div>
               </div>
@@ -252,7 +252,7 @@ function ProfilePage() {
               {/*Attached Files inside section detail*/}
               <div>
                 {activeSection === 'attachfile' && (
-                  <div className="bg-white dark:bg-[var(--text-color3)]">
+                  <div className="bg-white dark:bg-[#f8f9fa]">
                     <div className="mt-1 px-4 py-2.5 space-y-3 text-sm text-gray-800 max-h-[37vh] overflow-auto">
 
                       {/*User uploader*/}

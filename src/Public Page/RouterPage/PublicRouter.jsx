@@ -7,6 +7,7 @@ const PublicRoute = () => {
     /* Auth Slice */
   }
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  console.log('✌️isAuthenticated --->', isAuthenticated);
 
   if (isAuthenticated === null || isAuthenticated === undefined) {
     return <div>Loading...</div>;

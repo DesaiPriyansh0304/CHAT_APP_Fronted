@@ -9,28 +9,33 @@ export const fetchLoginUser = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      // console.log("ℹ️token --->/LoginUserDataSlice", token);
+      console.log("ℹ️token --->/LoginUserDataSlice", token);
       if (!token) {
-        dispatch(logout()); // optional
+        dispatch(logout());
         return rejectWithValue("Token not found");
       }
 
-      const response = await axios.get(`${URL}/api/auth/check`, {
+      const response = await axios.get(`${URL}/api/auth/userdata/check`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // console.log("✌️response --->", response);
-      // console.log("✌️response.data.user --->", response.data.user);
+      console.log("response --->LoginUserDataSlice", response);
+      console.log(
+        "response.data.user --->LoginUserDataSlice",
+        response.data.user
+      );
 
-      if (response.data.success && response.data.user) {
+      if (response.data && response.data.user) {
         const user = {
           ...response.data.user,
           _id: response.data.user._id || response.data.user.id,
         };
-        console.log("✌️response.data.user._id --->", response.data.user._id);
-        console.log("✌️response.data.user.id --->", response.data.user.id);
+        console.log(
+          "response.data.user._id --->/LoginUserDataSlice",
+          response.data.user._id
+        );
 
         return { user, token };
       } else {
@@ -38,6 +43,7 @@ export const fetchLoginUser = createAsyncThunk(
         return rejectWithValue("Invalid response from server");
       }
     } catch (error) {
+      console.log("error --->LoginUserDataSlice", error);
       dispatch(logout());
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch user"
@@ -46,7 +52,6 @@ export const fetchLoginUser = createAsyncThunk(
   }
 );
 
-/* 🧠 Slice */
 const loginUserSlice = createSlice({
   name: "loginUser",
   initialState: {

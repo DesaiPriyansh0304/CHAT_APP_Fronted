@@ -18,7 +18,7 @@ function ContactAdd({ onClose }) {
       setLoading(true);
       const token = localStorage.getItem('Authtoken');
 
-      const response = await fetch(`${URL}/api/auth/invitedUsers`, {
+      const response = await fetch(`${URL}/api/auth/invite/invitedUsers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

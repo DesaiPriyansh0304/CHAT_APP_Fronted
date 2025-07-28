@@ -51,7 +51,7 @@ function Home() {
           //avtarpage tab
           currentTab === 'avtarpage' ? (
             <div className="h-full grid grid-cols-[6%_94%]">
-              <div className="h-screen">
+              <div className="h-screen ">
                 <Slidbar
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}
@@ -66,7 +66,7 @@ function Home() {
           ) : (
             // Default Layout (Sidebar + ChatContainer + Rightsidebar)
             <div className="h-full grid grid-cols-[6%_25%_69%] ">
-              <div className="h-screen overflow-hidden">
+              <div className="h-screen overflow-hidden   border border-amber-300">
                 <Slidbar
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}
@@ -75,7 +75,7 @@ function Home() {
                 />
               </div>
 
-              <div className="h-screen overflow-hidden">
+              <div className="h-screen overflow-hidden border border-amber-700">
                 <ChatContainer
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}
@@ -86,7 +86,7 @@ function Home() {
                 />
               </div>
 
-              <div className="h-screen">
+              <div className="h-screen border border-red-600">
                 <Rightsidebar
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}

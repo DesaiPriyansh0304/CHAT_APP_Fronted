@@ -94,7 +94,7 @@ function Setting() {
               <div className="flex gap-2 items-center cursor-pointer " onClick={toggleAvailbleMenu}>
                 {/*menu Title*/}
                 <div>
-                  <p className="text-base text-gray-600 dark:text-[var(--text-color)]">Available</p>
+                  <p className="text-base text-gray-600 dark:text-[#90e0ef]">Available</p>
                 </div>
                 {/*menu open*/}
                 <div>
@@ -128,13 +128,13 @@ function Setting() {
           </div>
         </div>
 
-        <hr className="border-t-2 border-gray-200 dark:border-[var(--text-color)]  mt-8" />
+        <hr className="border-t-2 border-gray-200 dark:border-[#64b5f6] mt-8" />
 
         {/*All Sections */}
         <div className="overflow-auto h-[60vh] mx-2">
 
           {/* Personal Info */}
-          <div className="w-full bg-gray-200 dark:bg-[var(--text-color)] rounded">
+          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('personalinfo')}
@@ -160,7 +160,7 @@ function Setting() {
             {/* Personal Info open*/}
             <div>
               {activeSection === 'personalinfo' && (
-                <div className="bg-white dark:bg-[var(--text-color3)]">
+                <div className="bg-white dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     <div className="flex justify-between items-start">
                       {/*user name */}
@@ -221,7 +221,7 @@ function Setting() {
           </div>
 
           {/* Privacy section */}
-          <div className="w-full bg-gray-200  dark:bg-[var(--text-color)] rounded">
+          <div className="w-full bg-gray-200  dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3"
               onClick={() => handleToggleSection('privacy')}
@@ -229,17 +229,17 @@ function Setting() {
               <div className="flex items-center gap-2">
                 {/* Privacy Icon*/}
                 <div>
-                  <MdOutlinePrivacyTip className="w-5 h-5 dark:text-[var(--text-color3)]" />
+                  <MdOutlinePrivacyTip className="w-5 h-5 dark:text-[#f8f9fa]" />
                 </div>
                 {/* Privacy */}
                 <div>
-                  <span className="text-gray-700 dark:text-[var(--text-color3)] font-medium">
+                  <span className="text-gray-700 dark:text-[#f8f9fa] font-medium">
                     Privacy
                   </span>
                 </div>
               </div>
               {/* up And Down Ioon */}
-              <div className="dark:text-[var(--text-color3)]">
+              <div className="dark:text-[#f8f9fa]">
                 {activeSection === 'privacy' ? <ChevronUp /> : <ChevronDown />}
               </div>
             </div>
@@ -247,7 +247,7 @@ function Setting() {
             {/* Privacy sction open*/}
             <div>
               {activeSection === 'privacy' && (
-                <div className="bg-white dark:bg-[var(--text-color3)]">
+                <div className="bg-white dark:bg-[#f8f9fa]">
                   <div className="my-4 mt-2 space-y-3 text-sm text-gray-800 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     {/* Reusable dropdown */}
                     {['profilephoto', 'status', 'groups'].map((key) => (
@@ -329,7 +329,7 @@ function Setting() {
           </div>
 
           {/* Security Section */}
-          <div className="w-full bg-gray-200 dark:bg-[var(--text-color)] rounded">
+          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('security')}
@@ -337,16 +337,16 @@ function Setting() {
               <div className="flex items-center gap-2">
                 {/*Security icon*/}
                 <div>
-                  <MdSecurity className="w-5 h-5 dark:text-[var(--text-color3)]" />
+                  <MdSecurity className="w-5 h-5 dark:text-[#f8f9fa] " />
                 </div>
                 {/*Security name*/}
                 <div>
-                  <span className="text-gray-700 dark:text-[var(--text-color3)] font-medium">
+                  <span className="text-gray-700 dark:text-[#f8f9fa] font-medium">
                     Security
                   </span>
                 </div>
               </div>
-              <div className="dark:text-[var(--text-color3)]">
+              <div className="dark:text-[#f8f9fa]">
                 {activeSection === 'security' ? <ChevronUp /> : <ChevronDown />}
               </div>
             </div>
@@ -354,7 +354,7 @@ function Setting() {
             {/* Security section open */}
             <div>
               {activeSection === 'security' && (
-                <div className="bg-white dark:bg-[var(--text-color3)]">
+                <div className="bg-white dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 mb-4 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     <div className="flex justify-between items-center">
                       {/*Show security*/}
@@ -377,7 +377,7 @@ function Setting() {
           </div>
 
           {/* Help Section */}
-          <div className="w-full bg-gray-200 dark:bg-[var(--text-color)] rounded">
+          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('help')}
@@ -385,15 +385,15 @@ function Setting() {
               <div className="flex items-center gap-2">
                 {/*Help Icon*/}
                 <div>
-                  <TbHelpSquareRounded className="w-5 h-5 dark:text-[var(--text-color3)]" />
+                  <TbHelpSquareRounded className="w-5 h-5 dark:text-[#f8f9fa]" />
                 </div>
                 {/*Help*/}
                 <div>
-                  <span className="text-gray-700 font-medium dark:text-[var(--text-color3)]">Help</span>
+                  <span className="text-gray-700 font-medium dark:text-[#f8f9fa]">Help</span>
                 </div>
               </div>
               {/*UP And Down Icon*/}
-              <div className="dark:text-[var(--text-color3)]">
+              <div className="dark:text-[#f8f9fa]">
                 {activeSection === 'help' ? <ChevronUp /> : <ChevronDown />}
               </div>
             </div>
@@ -401,7 +401,7 @@ function Setting() {
             {/* Help section open*/}
             <div>
               {activeSection === 'help' && (
-                <div className="bg-white">
+                <div className="bg-white dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 mb-4 px-4 py-2.5">
                     {/* FAQs */}
                     <div className="flex gap-1 items-center">

@@ -1,47 +1,40 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
-{
-  /*invitedUsers API Call*/
-}
 export const fetchInvitedUsers = createAsyncThunk(
-  'invitedUsers/fetchInvitedUsers',
-  async (searchQuery = '', { rejectWithValue }) => {
+  "invitedUsers/fetchInvitedUsers",
+  async (searchQuery = "", { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('Authtoken');
-      if (!token) {
-        return rejectWithValue('❌No token found. Please login again./invitedUserSlice');
-      }
-      const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP}/api/auth/get-inviteduser?search=${searchQuery}`,
+      const token = localStorage.getItem("Authtoken");
+      if (!token)
+        return rejectWithValue("❌No token found. Please login again.");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_REACT_APP}/api/auth/userdata/get-inviteduser?search=${searchQuery}`,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      const data = await response.json();
-
-      // console.log("✅response --->/invitedUserSlice", response);
-      if (!response.ok) {
-        return rejectWithValue(data.message || 'Failed to fetch invited users');
-      }
+      const data = await res.json();
+      if (!res.ok)
+        return rejectWithValue(data.message || "Failed to fetch invited users");
 
       return {
-        invitedUsers: data.invitedUsers || [],
-        invitedBy: data.invitedBy || [],
+        invitedUsers: data.data.invitedUsers || [],
+        invitedBy: data.data.invitedBy || [],
       };
-    } catch (error) {
-      console.error('error --->/invitedUserSlice', error);
-      return rejectWithValue('Network error');
+    } catch (err) {
+      console.error(err);
+      return rejectWithValue("Network error");
     }
   }
 );
 
 const invitedUsersSlice = createSlice({
-  name: 'invitedUsers',
+  name: "invitedUsers",
   initialState: {
     invitedUsers: [],
     invitedBy: [],
