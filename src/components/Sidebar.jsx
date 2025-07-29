@@ -12,15 +12,12 @@ function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  //Them Slice
   const theme = useSelector((state) => state.theme.mode);
-  //Login user Slice
   const { userData: user, loading, error } = useSelector((state) => state.loginuser);
 
-  const [showLangMenu, setShowLangMenu] = useState(false); //Language
-  const [showAvatarMenu, setShowAvatarMenu] = useState(false); //Avatar
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
 
-  //refresh page in than releted in clike effect on icon
   const [clickEffect, setClickEffect] = useState(() => {
     const currentPath = location.pathname.split('/')[1];
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
@@ -28,7 +25,6 @@ function Sidebar() {
     return match ? match.id : null;
   });
 
-  //tab number store local
   useEffect(() => {
     const currentPath = location.pathname.split('/')[1];
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
@@ -40,7 +36,6 @@ function Sidebar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
-  //dark mode set
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
@@ -52,7 +47,6 @@ function Sidebar() {
   const menuRef = useRef();
   const langMenuRef = useRef();
 
-  //click event handle
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showAvatarMenu && menuRef.current && !menuRef.current.contains(e.target)) {
@@ -66,23 +60,20 @@ function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAvatarMenu, showLangMenu]);
 
-  //click Effect Css 
   const getButtonClass = (id) => {
-    const base =
-      'relative p-2 rounded-xl overflow-hidden transition-transform duration-300 transform hover:scale-115 cursor-pointer';
+    const base = 'relative p-2 rounded-xl overflow-hidden transition-transform duration-300 transform hover:scale-115 cursor-pointer';
     const common = 'hover:text-blue-600 dark:hover:text-[#ffe8d6]';
     const isActive = clickEffect === id;
 
     if (isActive) {
       return theme === 'dark'
         ? `${base}  bg-gray-300 border-2 border-[#0D41E1] text-[#022b3a] ${common}`
-        : `${base} text-blue-600 bg-blue-100 border border-blue-400  ${common}`;
+        : `${base} text-blue-600 bg-blue-100 border border-blue-400 ${common}`;
     } else {
       return `${base} text-gray-500 dark:text-[#64b5f6] ${common}`;
     }
   };
 
-  {/*tab/page event function*/ }
   const bghandleClick = (id, page) => {
     setClickEffect(id);
     localStorage.setItem('activeTab', id);
@@ -97,35 +88,52 @@ function Sidebar() {
   const bottomMenuItems = bottomItems(theme, setShowLangMenu, dispatch, toggleTheme);
 
   return (
-    <div className="bg-[#f7f7ff] dark:bg-[#0d1b2a]">
-      <div className="relative   w-full h-screen flex flex-col items-center justify-between py-4 shadow-md">
+    <div className="bg-[#f7f7ff] dark:bg-[#0d1b2a] w-full">
+      <div className="relative w-full h-full md:h-screen md:flex md:flex-col items-center justify-between md:py-4 py-2 shadow-md">
 
         {/* Logo */}
-        <div className="items-center justify-center">
+        <div className="hidden md:flex items-center justify-center">
           <img src="/Img/logo.jpg" alt="Logo" />
         </div>
 
-        {/* Top Menu */}
-        <div>
-          <ul className="flex flex-col gap-3">
+        {/* Top Menu (mobile row view) */}
+        <div className="flex md:flex-col flex-row items-center justify-center md:gap-3 gap-2 px-2">
+          <ul className="flex md:flex-col flex-row items-center gap-2">
             {topItems.map(({ icon, title, page, id }) => (
               <li key={id} className="relative group">
-                <button onClick={() => bghandleClick(id, page)}
-                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}>
-                  <span className="relative z-10 ">{icon}</span>
+                <button
+                  onClick={() => bghandleClick(id, page)}
+                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}
+                >
+                  <span className="relative z-10">{icon}</span>
                 </button>
                 <div className="absolute left-12 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
                   {title}
                 </div>
               </li>
             ))}
+
+            {/* 👤 Avatar for small screen */}
+            <li className="relative md:hidden ml-2">
+              <button
+                onClick={() => {
+                  setShowAvatarMenu((prev) => !prev);
+                  setShowLangMenu(false);
+                }}
+                className="w-9 h-9 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md transition-transform duration-300 transform hover:scale-125 cursor-pointer"
+              >
+                <img
+                  src={user?.profile_avatar || 'https://via.placeholder.com/100'}
+                  alt="User"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </button>
+            </li>
           </ul>
         </div>
 
-        {/* <hr className="border-t-2 border-blue-600 dark:border-[var(--text-color)] px-[60px]" /> */}
-
-        {/* Bottom Menu + Avatar */}
-        <div className="flex flex-col items-center relative">
+        {/* Bottom Menu (Desktop) */}
+        <div className="hidden md:flex flex-col items-center justify-between relative h-full">
           <ul className="flex flex-col gap-3">
             {bottomMenuItems.map(({ id, icon, title, action, page }) => (
               <li key={id} className="relative group dark:text-[var(--text-color)]">
@@ -150,7 +158,7 @@ function Sidebar() {
             ))}
           </ul>
 
-          {/* Language Menu */}
+          {/* Language dropdown */}
           {showLangMenu && (
             <div
               ref={langMenuRef}
@@ -173,54 +181,39 @@ function Sidebar() {
               </ul>
             </div>
           )}
-
-          {/* Avatar */}
-          <div className="mt-8 relative">
-            <button
-              onClick={() => {
-                setShowAvatarMenu((prev) => !prev);
-                setShowLangMenu(false);
-              }}
-              className="w-12 h-12 rounded-full border-3 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md transition-transform duration-300 transform hover:scale-125 cursor-pointer"
-            >
-              <img
-                src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                alt="User"
-                className="w-full h-full object-cover rounded-full"
-              />
-            </button>
-
-            {showAvatarMenu && (
-              <div
-                className="absolute left-14 bottom-0 w-35 bg-white border border-blue-300 rounded-md shadow-lg z-50"
-                ref={menuRef}
-              >
-                <ul className="p-2">
-                  {avatarItems.map(({ icon, title, id, page }) => (
-                    <li key={id} className="flex flex-col">
-                      {title === 'Logout' && <hr className="border-gray-300 my-0" />}
-                      <div
-                        className="flex items-center gap-6 p-2 cursor-pointer hover:bg-gray-100 text-sm text-gray-700"
-                        onClick={() => {
-                          if (title === 'Logout') {
-                            dispatch(logout());
-                            navigate('/login');
-                          } else if (page) {
-                            navigate(`/${page}`);
-                          }
-                          setShowAvatarMenu(false);
-                        }}
-                      >
-                        <div className="text-blue-500">{icon}</div>
-                        <div>{title}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
         </div>
+
+        {/* Avatar dropdown for all views */}
+        {showAvatarMenu && (
+          <div
+            ref={menuRef}
+            className="absolute bottom-full mb-4 right-0 md:left-14 md:right-auto w-44 bg-white border border-blue-300 rounded-md shadow-lg z-50"
+          >
+            <ul className="p-2">
+              {avatarItems.map(({ icon, title, id, page }) => (
+                <li key={id} className="flex flex-col">
+                  {title === 'Logout' && <hr className="border-gray-300 my-0" />}
+                  <div
+                    className="flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-100 text-sm text-gray-700"
+                    onClick={() => {
+                      if (title === 'Logout') {
+                        dispatch(logout());
+                        navigate('/login');
+                      } else if (page) {
+                        navigate(`/${page}`);
+                      }
+                      setShowAvatarMenu(false);
+                    }}
+                  >
+                    <div className="text-blue-500">{icon}</div>
+                    <div>{title}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
 
       </div>
     </div>
