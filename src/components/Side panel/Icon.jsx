@@ -9,49 +9,44 @@ import { BsMotherboard } from 'react-icons/bs';
 import { LiaUserEditSolid } from "react-icons/lia";
 
 
-{
-  /*Top Icon*/
-}
+//Top Icon
 export const topItems = [
-  { id: 0, icon: <IoPersonOutline size={26} />, title: 'Profile', page: 'profile' },
-  { id: 1, icon: <IoChatboxEllipsesOutline size={27} />, title: 'Chats', page: 'chats' },
-  { id: 2, icon: <RiGroupLine size={24} />, title: 'Groups', page: 'group' },
-  { id: 3, icon: <RiContactsLine size={24} />, title: 'Contacts', page: 'contact' },
-  { id: 4, icon: <SlSettings size={26} />, title: 'Settings', page: 'setting' },
+  { id: 0, icon: <IoPersonOutline size={26} />, title: 'Profile', page: 'profile', lable: "Profile" },
+  { id: 1, icon: <IoChatboxEllipsesOutline size={27} />, title: 'Chats', page: 'chats', lable: "Chats" },
+  { id: 2, icon: <RiGroupLine size={24} />, title: 'Groups', page: 'group', lable: "Groups" },
+  { id: 3, icon: <RiContactsLine size={24} />, title: 'Contacts', page: 'contact', lable: "Contacts" },
+  { id: 4, icon: <SlSettings size={26} />, title: 'Settings', page: 'setting', lable: "Settings" },
 ];
 
-{
-  /*Bottom Icon*/
-}
+
+// Bottom Icon
 export const bottomItems = (theme, setShowLangMenu, dispatch, toggleTheme) => [
-  { id: 100, icon: <BsMotherboard size={24} />, title: 'AllUser', page: 'alluser' },
-  { id: 101, icon: <LiaUserEditSolid size={28} />, title: 'Edit', page: 'avtarpage' },
+  { id: 100, icon: <BsMotherboard size={24} />, title: 'AllUser', page: 'alluser', lable: "All User" },
+  { id: 101, icon: <LiaUserEditSolid size={28} />, title: 'Edit', page: 'avtarpage', lable: "Edit Profile" },
   {
     id: 102,
     icon: <BsGlobe2 size={22} />,
     title: 'Language',
     action: () => setShowLangMenu((prev) => !prev),
+    lable: "Language"
   },
   {
     id: 103,
     icon: theme === 'dark' ? <LuSun size={24} /> : <LuMoon size={24} />,
     title: theme === 'dark' ? 'Light Mode' : 'Dark Mode',
     action: () => dispatch(toggleTheme()),
+    lable: "Dark/Light Mode"
   },
 ];
 
-{
-  /*Avatar Icon menu*/
-}
+// Avatar Icon menu
 export const avatarItems = [
   { id: 0, icon: <FiUser />, title: 'Profile', page: 'profile' },
   { id: 1, icon: <FiSettings />, title: 'Settings', page: 'setting' },
   { id: 2, icon: <FiLogOut />, title: 'Logout' },
 ];
 
-{
-  /*Language list*/
-}
+// Language list
 export const languages = [
   { code: 'en', label: 'English', flag: 'gb' },
   { code: 'hi', label: 'Hindi', flag: 'in' },
