@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { io } from "socket.io-client";
 import { setOnlineUsers } from "../Socket/OnlineuserSlice";
 import { newMessageReceived } from "../ChatSlice";
-import { setUnreadCount } from "../unreadCountSlice";
+import { setUnreadCount } from "../Socket/unreadCountSlice";
 
 const URL = import.meta.env.VITE_REACT_APP;
 console.log("✌️URL --->", URL);

@@ -80,7 +80,7 @@ function Login() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 h-screen bg-white overflow-hidden">
+    <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-white">
       {/* Left Image */}
       <div className="relative hidden md:block">
         <img
@@ -88,24 +88,24 @@ function Login() {
           alt="Login"
           className="object-cover w-full h-full"
         />
-        <div className="absolute bottom-8 left-8 text-white text-2xl font-light">
-          Update your app, not your users’ patience.
+        <div className="absolute bottom-8 left-8 text-white text-xl lg:text-2xl font-light max-w-md">
+          Update your app, not your users' patience.
         </div>
       </div>
 
       {/* Right Form */}
-      <div className="h-screen flex flex-col justify-center items-center bg-white">
-        <div className="w-[450px] border border-gray-200 p-6 rounded-xl shadow-lg">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-8 md:px-6">
+        <div className="w-full max-w-md mx-auto border border-gray-200 p-4 sm:p-6 rounded-xl shadow-lg">
           {/*title*/}
           <div className="flex flex-col items-center justify-center gap-2 text-gray-800 mb-6">
-            <p className="text-3xl font-bold mb-1">Sign In</p>
-            <span className="text-sm text-gray-600">Welcome back! Please enter your details</span>
+            <p className="text-2xl sm:text-3xl font-bold mb-1">Sign In</p>
+            <span className="text-sm text-gray-600 text-center">Welcome back! Please enter your details</span>
           </div>
 
           {/* API error */}
-          <div className="mx-3">
+          <div className="mx-2 sm:mx-3">
             {error.form && (
-              <p className="mb-4 text-center text-red-400 bg-red-50 rounded-2xl border border-red-600 p-3">
+              <p className="mb-4 text-center text-red-400 bg-red-50 rounded-2xl border border-red-600 p-3 text-sm">
                 {error.form}
               </p>
             )}
@@ -114,72 +114,72 @@ function Login() {
           {/*form data*/}
           <form onSubmit={handleSubmit}>
             {/* Email */}
-            <div className="mb-4 mx-3">
-              <label htmlFor="email" className="text-black font-semibold">Email</label>
+            <div className="mb-4 mx-2 sm:mx-3">
+              <label htmlFor="email" className="text-black font-semibold text-sm sm:text-base">Email</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                  <FiMail className='mt-[6px]' />
+                <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  <FiMail className='mt-[6px] text-sm sm:text-base' />
                 </span>
                 <input
                   type="email"
                   name="email"
                   id="email"
                   placeholder="Enter your email"
-                  className="w-full p-3 pl-10 mt-1 rounded-2xl bg-[#E5E7EB] text-black  border border-gray-300
-                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                  className="w-full p-3 pl-9 sm:pl-10 mt-1 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.email}
                   onChange={handleChange}
                   disabled={isLoading}
                 />
               </div>
-              {error.email && <p className="mt-1 text-sm text-red-500">{error.email}</p>}
+              {error.email && <p className="mt-1 text-xs sm:text-sm text-red-500">{error.email}</p>}
             </div>
 
             {/* Password */}
-            <div className="mb-4 mx-3">
-              <label htmlFor="password" className="text-black font-semibold">Password</label>
+            <div className="mb-4 mx-2 sm:mx-3">
+              <label htmlFor="password" className="text-black font-semibold text-sm sm:text-base">Password</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                  <LuLockKeyhole className='mt-[6px]' />
+                <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  <LuLockKeyhole className='mt-[6px] text-sm sm:text-base' />
                 </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   id="password"
                   placeholder="Enter your password"
-                  className="w-full p-3 pl-10 pr-10 mt-1 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
-                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                  className="w-full p-3 pl-9 sm:pl-10 pr-10 mt-1 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.password}
                   onChange={handleChange}
                   disabled={isLoading}
                 />
                 <span
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-xl text-gray-400"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 cursor-pointer text-lg sm:text-xl text-gray-400"
                 >
                   {showPassword ? <FaEyeSlash className='mt-[6px]' /> : <FaEye className='mt-[6px]' />}
                 </span>
               </div>
-              {error.password && <p className="mt-1 text-sm text-red-500">{error.password}</p>}
+              {error.password && <p className="mt-1 text-xs sm:text-sm text-red-500">{error.password}</p>}
             </div>
 
             {/* Forgot Password */}
-            <div className="flex justify-end mb-6 text-sm">
+            <div className="flex justify-end mb-6 text-xs sm:text-sm">
               <Link
                 to="/forget-password"
                 state={{ email: userLogin.email }}
-                className="mx-3 bg-gradient-to-r from-[#09A6F3] to-[#0C63E7] text-transparent bg-clip-text font-semibold hover:underline"
+                className="mx-2 sm:mx-3 bg-gradient-to-r from-[#09A6F3] to-[#0C63E7] text-transparent bg-clip-text font-semibold hover:underline"
               >
                 Forgot password?
               </Link>
             </div>
 
             {/* Submit */}
-            <div className="mx-3">
+            <div className="mx-2 sm:mx-3">
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full p-3 rounded-2xl text-white font-semibold ${isLoading
+                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading
                   ? 'bg-[#3799FA] cursor-not-allowed'
                   : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
                   }`}
@@ -189,23 +189,23 @@ function Login() {
             </div>
 
             {/* Divider hr */}
-            <div className="flex items-center my-6 text-sm mx-3">
+            <div className="flex items-center my-6 text-xs sm:text-sm mx-2 sm:mx-3">
               <div className="flex-grow border-t border-[#0D41E1]"></div>
-              <span className="px-3 bg-gradient-to-r from-[#1E90FF] to-[#3799FA] bg-clip-text text-transparent">
+              <span className="px-2 sm:px-3 bg-gradient-to-r from-[#1E90FF] to-[#3799FA] bg-clip-text text-transparent whitespace-nowrap">
                 Or login with
               </span>
               <div className="flex-grow border-t border-[#0D41E1]"></div>
             </div>
 
             {/* Social Login */}
-            <div className="flex justify-between mx-3 gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row justify-between mx-2 sm:mx-3 gap-3 sm:gap-4 mt-2">
               <button
                 type="button"
-                className="w-60 flex items-center justify-center gap-3 px-9 py-2 border border-gray-300 rounded cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded cursor-pointer text-sm sm:text-base hover:bg-gray-50 transition-colors"
               >
                 <img
                   src="https://www.svgrepo.com/show/355037/google.svg"
-                  className="h-4"
+                  className="h-3 sm:h-4"
                   alt="Google"
                 />
                 Google
@@ -213,11 +213,11 @@ function Login() {
 
               <button
                 type="button"
-                className="w-60 flex items-center justify-center gap-3 px-9 py-2 border border-gray-300 rounded cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded cursor-pointer text-sm sm:text-base hover:bg-gray-50 transition-colors"
               >
                 <img
                   src="https://www.svgrepo.com/show/512317/github-142.svg"
-                  className="h-4"
+                  className="h-3 sm:h-4"
                   alt="GitHub"
                 />
                 GitHub
@@ -228,9 +228,9 @@ function Login() {
         </div>
 
         {/*register link*/}
-        <div>
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don’t have an account?{' '}
+        <div className="mt-4 sm:mt-6 px-4">
+          <p className="text-center text-xs sm:text-sm text-gray-500">
+            Don't have an account?{' '}
             <Link to="/register" className="text-[#0C63E7] font-semibold hover:underline">
               SignUp
             </Link>
@@ -238,10 +238,13 @@ function Login() {
         </div>
 
         {/*Privacy and Terms */}
-        <div className="mt-6 text-xs text-center text-gray-500">
-          © 2025 Releasium Inc. All rights reserved. &nbsp;|&nbsp;
-          <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Privacy Policy</Link> &nbsp;|&nbsp;
-          <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Terms & Conditions</Link>
+        <div className="mt-4 sm:mt-6 text-xs text-center text-gray-500 px-4 leading-relaxed">
+          <div className="mb-1">© 2025 Releasium Inc. All rights reserved.</div>
+          <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+            <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Privacy Policy</Link>
+            <span className="hidden sm:inline">|</span>
+            <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Terms & Conditions</Link>
+          </div>
         </div>
 
       </div>

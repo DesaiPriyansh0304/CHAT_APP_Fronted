@@ -9,7 +9,7 @@ const PublicRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   console.log('✌️isAuthenticated --->', isAuthenticated);
 
-  if (isAuthenticated === null || isAuthenticated === undefined) {
+  if (isAuthenticated) {
     return <div>Loading...</div>;
   }
   if (isAuthenticated) {

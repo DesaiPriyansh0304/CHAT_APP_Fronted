@@ -27,7 +27,7 @@ import filteredInvitedUsersReducer from "./Invited-User/FilteredInvitedUsers";
 
 // Theme
 import themeReducer from "./Theme/ThemeSlice";
-import unreadCountReducer from "../Slice/unreadCountSlice";
+import unreadCountReducer from "./Socket/unreadCountSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
