@@ -1,3 +1,4 @@
+// Sidebar.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +12,6 @@ function Sidebar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
   const theme = useSelector((state) => state.theme.mode);
   const { userData: user, loading, error } = useSelector((state) => state.loginuser);
 
@@ -34,7 +34,7 @@ function Sidebar() {
       localStorage.setItem('activeTab', match.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+  }, [location, theme]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -62,15 +62,14 @@ function Sidebar() {
 
   const getButtonClass = (id) => {
     const base = 'relative p-2 rounded-xl overflow-hidden transition-transform duration-300 transform hover:scale-115 cursor-pointer';
-    const common = 'hover:text-blue-600 dark:hover:text-[#ffe8d6]';
+    const common = 'hover:text-blue-600 dark:hover:text-[var(--text-color1)]';
     const isActive = clickEffect === id;
-
     if (isActive) {
       return theme === 'dark'
-        ? `${base}  bg-gray-300 border-2 border-[#0D41E1] text-[#022b3a] ${common}`
-        : `${base} text-blue-600 bg-blue-100 border border-blue-400 ${common}`;
+        ? `${base} invisible-animated-border text-[var(--text-color1)] ${common}`
+        : `${base} text-blue-600 bg-blue-100 border border-blue-600 ${common}`;
     } else {
-      return `${base} text-gray-500 dark:text-[#64b5f6] ${common}`;
+      return `${base} text-gray-500 dark:text-[var(--text-color)] ${common}`;
     }
   };
 
@@ -88,92 +87,67 @@ function Sidebar() {
   const bottomMenuItems = bottomItems(theme, setShowLangMenu, dispatch, toggleTheme);
 
   return (
-    <div className="bg-[#f7f7ff] dark:bg-[#0d1b2a] w-full">
-      <div className="relative w-full h-full md:h-screen md:flex md:flex-col items-center justify-between md:py-4 py-2 shadow-md">
+    <div className="bg-[#f7f7ff] dark:bg-[var(--primary-color)] w-full">
+      <div className="relative w-full h-full md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center shadow-md">
 
-        {/* Logo */}
-        <div className="hidden md:flex items-center justify-center">
+        {/* Logo (Only on Desktop) */}
+        <div className="hidden md:flex justify-center">
           <img src="/Img/logo.jpg" alt="Logo" />
         </div>
 
-        {/* Top Menu (mobile row view) */}
-        <div className="flex md:flex-col flex-row items-center justify-center md:gap-3 gap-2 px-2">
-          <ul className="flex md:flex-col flex-row items-center gap-2">
-            {topItems.map(({ icon, title, page, id }) => (
-              <li key={id} className="relative group">
-                <button
-                  onClick={() => bghandleClick(id, page)}
-                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}
-                >
-                  <span className="relative z-10">{icon}</span>
-                </button>
-                <div className="absolute left-12 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
-                  {title}
-                </div>
-              </li>
-            ))}
-
-            {/* 👤 Avatar for small screen */}
-            <li className="relative md:hidden ml-2">
-              <button
-                onClick={() => {
-                  setShowAvatarMenu((prev) => !prev);
-                  setShowLangMenu(false);
-                }}
-                className="w-9 h-9 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md transition-transform duration-300 transform hover:scale-125 cursor-pointer"
-              >
-                <img
-                  src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                  alt="User"
-                  className="w-full h-full object-cover rounded-full"
-                />
+        {/* Top Menu */}
+        <ul className="flex md:flex-col flex-row items-center md:gap-4 gap-2 mt-2">
+          {topItems.map(({ icon, title, page, id }) => (
+            <li key={id} className="relative group">
+              <button onClick={() => bghandleClick(id, page)} className={getButtonClass(id)}>
+                {icon}
               </button>
+              <div className="absolute left-12 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
+                {title}
+              </div>
             </li>
-          </ul>
-        </div>
+          ))}
 
-        {/* Bottom Menu (Desktop) */}
-        <div className="hidden md:flex flex-col items-center justify-between relative h-full">
+          {/* Avatar on Mobile */}
+          <li className="relative md:hidden ml-2">
+            <button onClick={() => { setShowAvatarMenu(prev => !prev); setShowLangMenu(false); }}
+              className="w-9 h-9 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform">
+              <img src={user?.profile_avatar || 'https://via.placeholder.com/100'} alt="User" className="w-full h-full object-cover rounded-full" />
+            </button>
+          </li>
+        </ul>
+
+        {/* Bottom Menu (Desktop Only) */}
+        <div className="hidden md:flex flex-col items-center relative mt-auto">
           <ul className="flex flex-col gap-3">
             {bottomMenuItems.map(({ id, icon, title, action, page }) => (
-              <li key={id} className="relative group dark:text-[var(--text-color)]">
-                <button
-                  onClick={() => {
-                    if (action) action();
-                    else if (page) {
-                      navigate(`/${page}`);
-                      setClickEffect(id);
-                      localStorage.setItem('activeTab', id);
-                    }
-                    setShowAvatarMenu(false);
-                  }}
-                  className={`${getButtonClass(id)} px-[11px] py-[11px]`}
-                >
+              <li key={id} className="relative group">
+                <button onClick={() => {
+                  if (action) action();
+                  else if (page) {
+                    navigate(`/${page}`);
+                    setClickEffect(id);
+                    localStorage.setItem('activeTab', id);
+                  }
+                  setShowAvatarMenu(false);
+                }} className={getButtonClass(id)}>
                   {icon}
                 </button>
-                <div className="absolute left-12 top-1/2 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
+                <div className="absolute left-12 top-1/2 -translate-y-1/2 z-10 invisible group-hover:visible opacity-0 group-hover:opacity-100 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-md transition-opacity duration-300">
                   {title}
                 </div>
               </li>
             ))}
           </ul>
 
-          {/* Language dropdown */}
+          {/* Language Menu */}
           {showLangMenu && (
-            <div
-              ref={langMenuRef}
-              className="absolute bottom-24 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
-            >
+            <div ref={langMenuRef}
+              className="absolute bottom-24 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700">
               <ul className="p-2">
                 {languages.map((lang) => (
-                  <li
-                    key={lang.code}
-                    onClick={() => {
-                      console.log('Selected:', lang);
-                      setShowLangMenu(false);
-                    }}
-                    className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 rounded-md"
-                  >
+                  <li key={lang.code} onClick={() => { setShowLangMenu(false); }}
+                    className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 rounded-md">
                     <span className={`fi fi-${lang.flag} w-5 h-5`}></span>
                     <span>{lang.label}</span>
                   </li>
@@ -181,39 +155,39 @@ function Sidebar() {
               </ul>
             </div>
           )}
-        </div>
 
-        {/* Avatar dropdown for all views */}
-        {showAvatarMenu && (
-          <div
-            ref={menuRef}
-            className="absolute bottom-full mb-4 right-0 md:left-14 md:right-auto w-44 bg-white border border-blue-300 rounded-md shadow-lg z-50"
-          >
-            <ul className="p-2">
-              {avatarItems.map(({ icon, title, id, page }) => (
-                <li key={id} className="flex flex-col">
-                  {title === 'Logout' && <hr className="border-gray-300 my-0" />}
-                  <div
-                    className="flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-100 text-sm text-gray-700"
-                    onClick={() => {
-                      if (title === 'Logout') {
-                        dispatch(logout());
-                        navigate('/login');
-                      } else if (page) {
-                        navigate(`/${page}`);
-                      }
-                      setShowAvatarMenu(false);
-                    }}
-                  >
-                    <div className="text-blue-500">{icon}</div>
-                    <div>{title}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+          {/* Avatar Dropdown */}
+          <div className="mt-8 relative">
+            <button onClick={() => { setShowAvatarMenu(prev => !prev); setShowLangMenu(false); }}
+              className="w-12 h-12 rounded-full border-2 border-gray-300 dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform">
+              <img src={user?.profile_avatar || 'https://via.placeholder.com/100'} alt="User" className="w-full h-full object-cover rounded-full" />
+            </button>
+
+            {showAvatarMenu && (
+              <div className="absolute left-14 bottom-0 w-44 bg-white border border-blue-300 rounded-md shadow-lg z-50" ref={menuRef}>
+                <ul className="p-2">
+                  {avatarItems.map(({ icon, title, id, page }) => (
+                    <li key={id} className="flex flex-col">
+                      {title === 'Logout' && <hr className="border-gray-300 my-0" />}
+                      <div onClick={() => {
+                        if (title === 'Logout') {
+                          dispatch(logout());
+                          navigate('/login');
+                        } else if (page) {
+                          navigate(`/${page}`);
+                        }
+                        setShowAvatarMenu(false);
+                      }} className="flex items-center gap-6 p-2 cursor-pointer hover:bg-gray-100 text-sm text-gray-700">
+                        <div className="text-blue-500">{icon}</div>
+                        <div>{title}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        )}
-
+        </div>
 
       </div>
     </div>
