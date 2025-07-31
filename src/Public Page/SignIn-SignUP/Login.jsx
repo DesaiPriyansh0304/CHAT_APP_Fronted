@@ -8,17 +8,19 @@ import * as Yup from 'yup';
 import { FiMail } from 'react-icons/fi';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { LuLockKeyhole } from 'react-icons/lu';
+import { useGoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const [userLogin, setUserLogin] = useState({ email: '', password: '' });
   const [error, setError] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  {/*validation in from*/ }
+  // Validation schema
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .matches(/\S+@\S+\.\S+/, 'Email format is invalid')
@@ -28,19 +30,19 @@ function Login() {
       .required('Password is required'),
   });
 
-  {/*from data handle*/ }
+  // Form data handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserLogin((prev) => ({ ...prev, [name]: value }));
   };
 
-  {/*Yap validation check and api call*/ }
+  // Regular form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError({});
     setIsLoading(true);
 
-    //First: Yup validation
+    // First: Yup validation
     try {
       await LoginSchema.validate(userLogin, { abortEarly: false });
     } catch (err) {
@@ -50,10 +52,10 @@ function Login() {
       });
       setError(validationErrors);
       setIsLoading(false);
-      return; // Stop here if validation fails
+      return;
     }
 
-    //Second: Call API
+    // Second: Call API
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP}/api/auth/signin`,
@@ -79,6 +81,58 @@ function Login() {
     }
   };
 
+  // Google OAuth Success Handler
+  const handleGoogleSuccess = async (authResult) => {
+    try {
+      setIsGoogleLoading(true);
+      console.log('Google Auth Result:', authResult);
+
+      if (authResult?.code) {
+        // Send authorization code to backend
+        const response = await axios.post(
+          `${import.meta.env.VITE_REACT_APP}/api/auth/google`,
+          { code: authResult.code }
+        );
+
+        const { success, token, userData } = response.data;
+
+        if (success && token) {
+          dispatch(addToken({ token }));
+          toast.success(`Welcome ${userData.firstname}! Google Login Successful`);
+          navigate('/');
+        } else {
+          throw new Error('Invalid Google login response');
+        }
+      }
+    } catch (error) {
+      console.error('Google Login Error:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Google login failed. Please try again.';
+
+      setError({ form: errorMessage });
+      toast.error('Google login unsuccessful');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  // Google OAuth Error Handler
+  const handleGoogleError = (error) => {
+    console.error('Google OAuth Error:', error);
+    setError({ form: 'Google login failed. Please try again.' });
+    toast.error('Google login failed');
+    setIsGoogleLoading(false);
+  };
+
+  // Google Login Hook
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+    flow: 'auth-code',
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-white">
       {/* Left Image */}
@@ -96,7 +150,7 @@ function Login() {
       {/* Right Form */}
       <div className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-8 md:px-6">
         <div className="w-full max-w-md mx-auto border border-gray-200 p-4 sm:p-6 rounded-xl shadow-lg">
-          {/*title*/}
+          {/* Title */}
           <div className="flex flex-col items-center justify-center gap-2 text-gray-800 mb-6">
             <p className="text-2xl sm:text-3xl font-bold mb-1">Sign In</p>
             <span className="text-sm text-gray-600 text-center">Welcome back! Please enter your details</span>
@@ -111,7 +165,7 @@ function Login() {
             )}
           </div>
 
-          {/*form data*/}
+          {/* Form data */}
           <form onSubmit={handleSubmit}>
             {/* Email */}
             <div className="mb-4 mx-2 sm:mx-3">
@@ -129,7 +183,7 @@ function Login() {
                   focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.email}
                   onChange={handleChange}
-                  disabled={isLoading}
+                  disabled={isLoading || isGoogleLoading}
                 />
               </div>
               {error.email && <p className="mt-1 text-xs sm:text-sm text-red-500">{error.email}</p>}
@@ -151,7 +205,7 @@ function Login() {
                   focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.password}
                   onChange={handleChange}
-                  disabled={isLoading}
+                  disabled={isLoading || isGoogleLoading}
                 />
                 <span
                   onClick={() => setShowPassword(!showPassword)}
@@ -178,10 +232,10 @@ function Login() {
             <div className="mx-2 sm:mx-3">
               <button
                 type="submit"
-                disabled={isLoading}
-                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading
-                  ? 'bg-[#3799FA] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
+                disabled={isLoading || isGoogleLoading}
+                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading || isGoogleLoading
+                    ? 'bg-[#3799FA] cursor-not-allowed'
+                    : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
                   }`}
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
@@ -201,19 +255,25 @@ function Login() {
             <div className="flex flex-col sm:flex-row justify-between mx-2 sm:mx-3 gap-3 sm:gap-4 mt-2">
               <button
                 type="button"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded cursor-pointer text-sm sm:text-base hover:bg-gray-50 transition-colors"
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded text-sm sm:text-base transition-colors ${isGoogleLoading || isLoading
+                    ? 'cursor-not-allowed opacity-50'
+                    : 'cursor-pointer hover:bg-gray-50'
+                  }`}
+                onClick={() => googleLogin()}
+                disabled={isGoogleLoading || isLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/355037/google.svg"
                   className="h-3 sm:h-4"
                   alt="Google"
                 />
-                Google
+                {isGoogleLoading ? 'Signing In...' : 'Google'}
               </button>
 
               <button
                 type="button"
                 className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded cursor-pointer text-sm sm:text-base hover:bg-gray-50 transition-colors"
+                disabled={isGoogleLoading || isLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/512317/github-142.svg"
@@ -223,11 +283,10 @@ function Login() {
                 GitHub
               </button>
             </div>
-
           </form>
         </div>
 
-        {/*register link*/}
+        {/* Register link */}
         <div className="mt-4 sm:mt-6 px-4">
           <p className="text-center text-xs sm:text-sm text-gray-500">
             Don't have an account?{' '}
@@ -237,7 +296,7 @@ function Login() {
           </p>
         </div>
 
-        {/*Privacy and Terms */}
+        {/* Privacy and Terms */}
         <div className="mt-4 sm:mt-6 text-xs text-center text-gray-500 px-4 leading-relaxed">
           <div className="mb-1">© 2025 Releasium Inc. All rights reserved.</div>
           <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
@@ -246,7 +305,6 @@ function Login() {
             <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Terms & Conditions</Link>
           </div>
         </div>
-
       </div>
     </div>
   );

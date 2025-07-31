@@ -33,6 +33,8 @@ function AppRouter() {
         }
     }, [theme]);
 
+
+
     return (
         <>
             <div>
