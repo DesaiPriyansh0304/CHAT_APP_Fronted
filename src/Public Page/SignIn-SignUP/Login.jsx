@@ -234,8 +234,8 @@ function Login() {
                 type="submit"
                 disabled={isLoading || isGoogleLoading}
                 className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading || isGoogleLoading
-                    ? 'bg-[#3799FA] cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
+                  ? 'bg-[#3799FA] cursor-not-allowed'
+                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
                   }`}
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
@@ -256,8 +256,8 @@ function Login() {
               <button
                 type="button"
                 className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded text-sm sm:text-base transition-colors ${isGoogleLoading || isLoading
-                    ? 'cursor-not-allowed opacity-50'
-                    : 'cursor-pointer hover:bg-gray-50'
+                  ? 'cursor-not-allowed opacity-50'
+                  : 'cursor-pointer hover:bg-gray-50'
                   }`}
                 onClick={() => googleLogin()}
                 disabled={isGoogleLoading || isLoading}
