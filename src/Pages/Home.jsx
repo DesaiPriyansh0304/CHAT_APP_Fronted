@@ -19,7 +19,6 @@ function Home() {
   const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);  //reposive open in sidebar
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);            // Detect mobile screen
 
-
   //resize screen check
   useEffect(() => {
     const handleResize = () => {
@@ -29,7 +28,6 @@ function Home() {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
 
   //user data
   const handleUserSelect = (user) => {
@@ -43,6 +41,11 @@ function Home() {
     setSelectGroup(group);
     setSelectedUser(null);
     if (isMobile) setShowMobileRightSidebar(true); // Only on mobile
+  };
+
+  // Handle mobile back navigation
+  const handleMobileBack = () => {
+    setShowMobileRightSidebar(false);
   };
 
   return (
@@ -107,7 +110,7 @@ function Home() {
             )}
 
             {/* Chat Container */}
-            <div className=" h-full w-full order-1 md:order-2 overflow-hidden flex-1">
+            <div className="h-full w-full order-1 md:order-2 overflow-hidden flex-1">
               <ChatContainer
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
@@ -119,34 +122,30 @@ function Home() {
             </div>
 
             {/* RightSidebar */}
-            <div className="h-full w-full order-2 md:order-3  overflow-hidden  hidden md:block">
+            <div className="h-full w-full order-2 md:order-3 overflow-hidden hidden md:block">
               <Rightsidebar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
                 userchat={userchat}
                 selectGroup={selectGroup}
                 setSelectGroup={handleGroupSelect}
+                isMobile={isMobile}
+                onMobileBack={handleMobileBack}
               />
             </div>
 
             {/* RightSidebar - Mobile Overlay */}
             {showMobileRightSidebar && isMobile && (
-              <div className="fixed inset-0 z-50  md:hidden overflow-y-auto ">
+              <div className="fixed inset-0 z-50 md:hidden overflow-y-auto bg-white">
                 <Rightsidebar
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}
                   userchat={userchat}
                   selectGroup={selectGroup}
                   setSelectGroup={handleGroupSelect}
+                  isMobile={isMobile}
+                  onMobileBack={handleMobileBack}
                 />
-                <div className="text-center py-2">
-                  <button
-                    className="px-4 py-1 bg-red-500 text-white rounded"
-                    onClick={() => setShowMobileRightSidebar(false)}
-                  >
-                    Close
-                  </button>
-                </div>
               </div>
             )}
 

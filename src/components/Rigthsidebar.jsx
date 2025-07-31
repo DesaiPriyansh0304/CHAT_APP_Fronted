@@ -60,7 +60,7 @@ const buildGroupMessagePayload = ({
   type: image.length ? 'image' : file.length ? 'file' : 'text',
 });
 
-const Rightsidebar = ({ selectUser, selectGroup }) => {
+const Rightsidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   const dispatch = useDispatch();
   const { userData: user } = useSelector((state) => state.loginuser);
   const { messages, loadingHistory, currentPage, totalPages, sender, receiver, groupUsers } =
@@ -68,10 +68,6 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
   const { socket, isConnected } = useSelector((state) => state.socket);
 
   const currentChatId = selectUser?._id || selectGroup?._id;
-
-  // const unreadCount = useSelector(
-  //   (state) => state.unreadCount.chatWiseCount[currentChatId] || 0
-  // );
 
   const [message, setMessage] = useState('');
   const [typing, setTyping] = useState(false);
@@ -387,6 +383,8 @@ const Rightsidebar = ({ selectUser, selectGroup }) => {
           setShowProfilePanel={setShowProfilePanel}
           showProfilePanel={showProfilePanel}
           isTyping={isTyping}
+          isMobile={isMobile}
+          onMobileBack={onMobileBack}
         />
 
         <div className="flex-1 overflow-y-auto">

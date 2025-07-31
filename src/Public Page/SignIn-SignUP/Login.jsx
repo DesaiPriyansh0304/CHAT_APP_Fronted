@@ -235,7 +235,7 @@ function Login() {
                 disabled={isLoading || isGoogleLoading}
                 className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading || isGoogleLoading
                   ? 'bg-[#3799FA] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]'
+                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3] cursor-pointer'
                   }`}
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
@@ -252,37 +252,56 @@ function Login() {
             </div>
 
             {/* Social Login */}
-            <div className="flex flex-col sm:flex-row justify-between mx-2 sm:mx-3 gap-3 sm:gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row mx-2 sm:mx-3 gap-3 sm:gap-4 mt-2">
+              {/* Google Button */}
               <button
                 type="button"
-                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded text-sm sm:text-base transition-colors ${isGoogleLoading || isLoading
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors ${isGoogleLoading || isLoading
                   ? 'cursor-not-allowed opacity-50'
-                  : 'cursor-pointer hover:bg-gray-50'
+                  : 'cursor-pointer hover:bg-gray-100'
                   }`}
-                onClick={() => googleLogin()}
+                onClick={googleLogin}
                 disabled={isGoogleLoading || isLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/355037/google.svg"
-                  className="h-3 sm:h-4"
+                  className="h-4 sm:h-5"
                   alt="Google"
                 />
                 {isGoogleLoading ? 'Signing In...' : 'Google'}
               </button>
 
+              {/* LinkedIn Button */}
               <button
                 type="button"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-9 py-2 border border-gray-300 rounded cursor-pointer text-sm sm:text-base hover:bg-gray-50 transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                disabled={isGoogleLoading || isLoading}
+              >
+                <img
+                  src="https://www.svgrepo.com/show/448234/linkedin.svg"
+                  className="h-4 sm:h-5"
+                  alt=" LinkedIn"
+                />
+                LinkedIn
+              </button>
+
+
+
+              {/* GitHub Button */}
+              <button
+                type="button"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled={isGoogleLoading || isLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/512317/github-142.svg"
-                  className="h-3 sm:h-4"
+                  className="h-4 sm:h-5"
                   alt="GitHub"
                 />
                 GitHub
               </button>
             </div>
+
           </form>
         </div>
 
@@ -297,11 +316,11 @@ function Login() {
         </div>
 
         {/* Privacy and Terms */}
-        <div className="mt-4 sm:mt-6 text-xs text-center text-gray-500 px-4 leading-relaxed">
+        <div className="mt-4 sm:mt-6 text-xs text-center text-gray-500 px-4  leading-relaxed">
           <div className="mb-1">© 2025 Releasium Inc. All rights reserved.</div>
-          <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-2">
             <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Privacy Policy</Link>
-            <span className="hidden sm:inline">|</span>
+            <span className="hidden sm:inline">||</span>
             <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Terms & Conditions</Link>
           </div>
         </div>
