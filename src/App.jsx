@@ -5,9 +5,17 @@ import AppRouter from '../Router/AppRouter';
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
 function App() {
+  // Get client ID from environment variable
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  if (!googleClientId) {
+    console.error('Google Client ID not found in environment variables');
+    return <div>Configuration Error: Missing Google Client ID</div>;
+  }
+
   return (
     <>
-      <GoogleOAuthProvider clientId="661327388232-u078e0hg2je11uj5vb4h9t55jp8ti0eo.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId={googleClientId}>
         <AppRouter />
       </GoogleOAuthProvider>
     </>
