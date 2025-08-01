@@ -17,11 +17,11 @@ import ForgetPassword from '../src/Public Page/Password/forgetpassword';
 import ResetPassword from '../src/Public Page/Password/ResetPassword';
 
 import { Toaster } from 'react-hot-toast';
+import Contact from '../src/Pages/Contact';
+
 
 // GitHub Callback Component
 const GitHubCallback = () => {
-    // This component will handle the redirect
-    // Login component will handle the actual callback logic
     return <Login />;
 };
 
@@ -59,7 +59,10 @@ function AppRouter() {
                         <Route path="/otp-verify" element={<OtpVerify />} />             {/*otp-verify router*/}
                         <Route path="/forget-password" element={<ForgetPassword />} />   {/*forget-password router*/}
                         <Route path="/reset-password" element={<ResetPassword />} />     {/*reset-password router*/}
-                        <Route path="/github/callback" element={<GitHubCallback />} />   {/*GitHub OAuth callback router*/}
+                        <Route path="/github/callback" element={<GitHubCallback />} />
+                    </Route>
+                    <Route>
+                        <Route path="/contact" element={<Contact />} />   {/*GitHub OAuth callback router*/}
                     </Route>
                 </Routes>
 

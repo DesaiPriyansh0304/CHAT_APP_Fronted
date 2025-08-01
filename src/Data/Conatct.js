@@ -1,0 +1,92 @@
+export const data = [
+  {
+    name: "Aarav Patel",
+    email: "aarav.patel@example.com",
+    avatar: "https://i.pravatar.cc/150?img=1",
+    chatAppSubject: "Great UI experience",
+  },
+  {
+    name: "Ishita Shah",
+    email: "ishita.shah@example.com",
+    avatar: "https://i.pravatar.cc/150?img=2",
+    chatAppSubject: "Love the design!",
+  },
+  {
+    name: "Rohan Mehta",
+    email: "rohan.mehta@example.com",
+    avatar: "https://i.pravatar.cc/150?img=3",
+    chatAppSubject: "Could be faster",
+  },
+  {
+    name: "Kavya Desai",
+    email: "kavya.desai@example.com",
+    avatar: "https://i.pravatar.cc/150?img=4",
+    chatAppSubject: "Good concept",
+  },
+  {
+    name: "Dev Joshi",
+    email: "dev.joshi@example.com",
+    avatar: "https://i.pravatar.cc/150?img=5",
+    chatAppSubject: "Needs more features",
+  },
+  {
+    name: "Priya Bhatt",
+    email: "priya.bhatt@example.com",
+    avatar: "https://i.pravatar.cc/150?img=6",
+    chatAppSubject: "Excellent performance",
+  },
+  {
+    name: "Anaya Trivedi",
+    email: "anaya.trivedi@example.com",
+    avatar: "https://i.pravatar.cc/150?img=7",
+    chatAppSubject: "Super responsive",
+  },
+  {
+    name: "Rudra Sharma",
+    email: "rudra.sharma@example.com",
+    avatar: "https://i.pravatar.cc/150?img=8",
+    chatAppSubject: "Found a bug",
+  },
+  {
+    name: "Meera Kapadia",
+    email: "meera.kapadia@example.com",
+    avatar: "https://i.pravatar.cc/150?img=9",
+    chatAppSubject: "Easy to use",
+  },
+  {
+    name: "Yashvi Dave",
+    email: "yashvi.dave@example.com",
+    avatar: "https://i.pravatar.cc/150?img=10",
+    chatAppSubject: "Smooth animations",
+  },
+  {
+    name: "Parth Rana",
+    email: "parth.rana@example.com",
+    avatar: "https://i.pravatar.cc/150?img=11",
+    chatAppSubject: "Nice layout",
+  },
+  {
+    name: "Simran Soni",
+    email: "simran.soni@example.com",
+    avatar: "https://i.pravatar.cc/150?img=12",
+    chatAppSubject: "Dark mode is cool",
+  },
+  {
+    name: "Krish Thakkar",
+    email: "krish.thakkar@example.com",
+    avatar: "https://i.pravatar.cc/150?img=13",
+    chatAppSubject: "Login is seamless",
+  },
+  {
+    name: "Dhruvi Shah",
+    email: "dhruvi.shah@example.com",
+    avatar: "https://i.pravatar.cc/150?img=14",
+    chatAppSubject: "Nice avatar menu",
+  },
+  {
+    name: "Vivaan Chauhan",
+    email: "vivaan.chauhan@example.com",
+    avatar: "https://i.pravatar.cc/150?img=15",
+    chatAppSubject: "Sidebar looks professional",
+  },
+];
