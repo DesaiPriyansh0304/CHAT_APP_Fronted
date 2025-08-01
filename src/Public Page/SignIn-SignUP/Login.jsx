@@ -22,13 +22,18 @@ function Login() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
 
-  // GitHub OAuth configuration
+  // GitHub OAuth configuration - Dynamic based on environment
   const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
-  const REDIRECT_URI =
-    import.meta.env.MODE === 'development'
-      ? 'http://localhost:5173/github/callback'
-      : 'https://chat-vibe-talk.vercel.app/github/callback';
 
+  // Get current domain for redirect URI
+  const getCurrentDomain = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.origin;
+    }
+    return 'http://localhost:5173'; // fallback
+  };
+
+  const REDIRECT_URI = `${getCurrentDomain()}/github/callback`;
   const GITHUB_OAUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=user:email`;
 
   // Validation schema
@@ -63,11 +68,15 @@ function Login() {
     try {
       setIsGithubLoading(true);
       console.log('GitHub Auth Code:', code);
+      console.log('Redirect URI used:', REDIRECT_URI);
 
       // Send authorization code to backend
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP}/api/auth/github`,
-        { code }
+        {
+          code,
+          redirect_uri: REDIRECT_URI // Send redirect URI to backend for verification
+        }
       );
 
       const { success, token, userData } = response.data;
@@ -203,6 +212,9 @@ function Login() {
       toast.error('GitHub Client ID not configured');
       return;
     }
+
+    console.log('GitHub OAuth URL:', GITHUB_OAUTH_URL);
+    console.log('Redirect URI:', REDIRECT_URI);
 
     setIsGithubLoading(true);
     // Redirect to GitHub OAuth
