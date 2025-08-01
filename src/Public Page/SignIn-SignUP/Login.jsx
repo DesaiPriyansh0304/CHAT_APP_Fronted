@@ -24,7 +24,12 @@ function Login() {
 
   // GitHub OAuth configuration
   const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
-  const GITHUB_OAUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent('http://localhost:5173/github/callback')}&scope=user:email`;
+  const REDIRECT_URI =
+    import.meta.env.MODE === 'development'
+      ? 'http://localhost:5173/github/callback'
+      : 'https://chat-vibe-talk.vercel.app/github/callback';
+
+  const GITHUB_OAUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=user:email`;
 
   // Validation schema
   const LoginSchema = Yup.object().shape({
