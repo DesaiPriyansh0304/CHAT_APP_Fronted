@@ -15,9 +15,9 @@ function Home() {
 
   const [selectedUser, setSelectedUser] = useState(null);                       //Select User
   const [selectGroup, setSelectGroup] = useState(null);                         //Select Group
-  const [userchat, setUserChat] = useState('1');                                //usrr chat
+  const [userchat, setUserChat] = useState('1');                                //user chat
   const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);  //reposive open in sidebar
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);            // Detect mobile screen
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);            //Detect mobile screen
 
   //resize screen check
   useEffect(() => {
@@ -58,7 +58,7 @@ function Home() {
           <div className="h-full w-full grid grid-cols-[6%_94%]">
 
             {/* Sidebar */}
-            <div className="h-full w-full overflow-visible">
+            <div className="h-full w-full overflow-hidden">
               <Sidebar
                 selectUser={selectedUser}
                 setSelectedUser={handleUserSelect}
@@ -68,7 +68,7 @@ function Home() {
             </div>
 
             {/* AllUser Page */}
-            <div className="h-full w-full overflow-hidden">
+            <div className="h-full w-full overflow-visible">
               <AllUser />
             </div>
 

@@ -141,115 +141,28 @@ function Sidebar() {
   const bottomMenuItems = bottomItems(theme, setShowLangMenu, dispatch, toggleTheme);
 
   return (
-    <div className="bg-[#f7f7ff] dark:bg-[var(--primary-color)] w-full">
-      <div className="relative w-full h-full md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center shadow-md">
+    <>
+      <div className="bg-[#f7f7ff] dark:bg-[var(--primary-color)] w-full">
+        <div className="relative w-full h-full md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center shadow-md">
 
-        {/* Logo (Only on Desktop) */}
-        <div className="hidden md:flex justify-center">
-          <img src="/Img/logo.jpg" alt="Logo" />
-        </div>
-
-        {/* Top Menu */}
-        <ul className={`flex ${isMobile ? 'flex-row gap-4 mb-2 mt-1' : 'flex-col gap-4 mt-6'} items-center`}>
-          {topItems.map(({ icon, lable, page, id }) => (
-            <li key={id} className="relative">
-              <Tooltip
-                text={lable}
-                position="right"
-                show={hoveredItem === `top-${id}` && !isMobile}
-              >
-                <button
-                  onClick={() => handleTabClick(id, page)}
-                  className={getButtonClass(id)}
-                  onMouseEnter={() => setHoveredItem(`top-${id}`)}
-                  onMouseLeave={() => setHoveredItem(null)}
-                >
-                  {icon}
-                </button>
-              </Tooltip>
-            </li>
-          ))}
-
-          {/* Avatar on Mobile */}
-          {isMobile && (
-            <li className="relative ml-2">
-              <button
-                onClick={() => {
-                  console.log('Avatar clicked, current state:', showAvatarMenu); // Debug log
-                  setShowAvatarMenu(prev => !prev);
-                  setShowLangMenu(false);
-                  setHoveredItem(null);
-                }}
-                className="w-11 h-11 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform"
-              >
-                <img
-                  src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                  alt="User"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </button>
-            </li>
-          )}
-        </ul>
-
-        {/* Mobile Avatar Menu - Positioned outside the ul to avoid overflow issues */}
-        {isMobile && showAvatarMenu && (
-          <div
-            className="fixed top-110 right-4 w-48 bg-white border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
-            ref={menuRef}
-          >
-            <ul className="p-1.5">
-              {avatarItems.map(({ icon, title, id, page }) => (
-                <li key={id} className="flex flex-col">
-                  {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
-                  <div
-                    onClick={() => {
-                      if (title === 'Logout') {
-                        dispatch(logout());
-                        navigate('/login');
-                      } else if (page) {
-                        navigate(`/${page}`);
-                      }
-                      setShowAvatarMenu(false);
-                    }}
-                    className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
-                  >
-                    <div className="text-blue-500 text-[15px]">{icon}</div>
-                    <div className="text-base">{title}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+          {/* Logo (Only on Desktop) */}
+          <div className="hidden md:flex justify-center">
+            <img src="/Img/logo.jpg" alt="Logo" />
           </div>
-        )}
 
-        {/* Top Menu */}
-        <ul className={`flex ${isMobile ? 'flex-row gap-4 mb-2 mt-1' : 'flex-col gap-4 mt-6'} items-center`}>
-        </ul>
-
-        {/* Bottom Menu (Desktop Only) */}
-        <div className="hidden md:flex flex-col items-center relative mt-auto">
-          <ul className="flex flex-col items-center gap-3 mt-4">
-            {bottomMenuItems.map(({ id, icon, lable, action, page }) => (
+          {/* Top Menu */}
+          <ul className={`flex ${isMobile ? 'flex-row gap-4 mb-2 mt-1' : 'flex-col gap-4 mt-6'} items-center`}>
+            {topItems.map(({ icon, lable, page, id }) => (
               <li key={id} className="relative">
                 <Tooltip
                   text={lable}
                   position="right"
-                  show={hoveredItem === `bottom-${id}`}
+                  show={hoveredItem === `top-${id}` && !isMobile}
                 >
                   <button
-                    onClick={() => {
-                      if (action) action();
-                      else if (page) {
-                        navigate(`/${page}`);
-                        setClickEffect(id);
-                        localStorage.setItem('activeTab', id);
-                      }
-                      setShowAvatarMenu(false);
-                      setHoveredItem(null);
-                    }}
+                    onClick={() => handleTabClick(id, page)}
                     className={getButtonClass(id)}
-                    onMouseEnter={() => setHoveredItem(`bottom-${id}`)}
+                    onMouseEnter={() => setHoveredItem(`top-${id}`)}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
                     {icon}
@@ -257,83 +170,173 @@ function Sidebar() {
                 </Tooltip>
               </li>
             ))}
+
+            {/* Avatar on Mobile */}
+            {isMobile && (
+              <li className="relative ml-2">
+                <button
+                  onClick={() => {
+                    console.log('Avatar clicked, current state:', showAvatarMenu); // Debug log
+                    setShowAvatarMenu(prev => !prev);
+                    setShowLangMenu(false);
+                    setHoveredItem(null);
+                  }}
+                  className="w-11 h-11 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform"
+                >
+                  <img
+                    src={user?.profile_avatar || 'https://via.placeholder.com/100'}
+                    alt="User"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </button>
+              </li>
+            )}
           </ul>
 
-          {/* Language Menu */}
-          {showLangMenu && (
+          {/* Mobile Avatar Menu - Positioned outside the ul to avoid overflow issues */}
+          {isMobile && showAvatarMenu && (
             <div
-              ref={langMenuRef}
-              className="absolute bottom-24 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
+              className="fixed top-20 right-4 w-48 bg-white border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
+              ref={menuRef}
             >
-              <ul className="p-2">
-                {languages.map((lang) => (
-                  <li
-                    key={lang.code}
-                    onClick={() => setShowLangMenu(false)}
-                    className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 rounded-md transition-colors"
-                  >
-                    <span className={`fi fi-${lang.flag} w-5 h-5`}></span>
-                    <span>{lang.label}</span>
+              <ul className="p-1.5">
+                {avatarItems.map(({ icon, title, id, page }) => (
+                  <li key={id} className="flex flex-col">
+                    {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
+                    <div
+                      onClick={() => {
+                        if (title === 'Logout') {
+                          dispatch(logout());
+                          navigate('/login');
+                        } else if (page) {
+                          navigate(`/${page}`);
+                        }
+                        setShowAvatarMenu(false);
+                      }}
+                      className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                    >
+                      <div className="text-blue-500 text-[15px]">{icon}</div>
+                      <div className="text-base">{title}</div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          {/* Desktop Avatar Dropdown */}
-          <div className="mt-4 relative">
-            <div>
-              <button
-                onClick={() => {
-                  setShowAvatarMenu(prev => !prev);
-                  setShowLangMenu(false);
-                  setHoveredItem(null);
-                }}
-                className="w-12 h-12 rounded-full border-3 border-gray-300 dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform cursor-pointer"
-                onMouseEnter={() => setHoveredItem('avatar')}
-                onMouseLeave={() => setHoveredItem(null)}
-              >
-                <img
-                  src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                  alt="User"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </button>
-            </div>
+          {/* Top Menu */}
+          <ul className={`flex ${isMobile ? 'flex-row gap-4 mb-2 mt-1' : 'flex-col gap-4 mt-6'} items-center`}>
+          </ul>
 
-            {showAvatarMenu && (
+          {/* Bottom Menu (Desktop Only) */}
+          <div className="hidden md:flex flex-col items-center relative mt-auto">
+            <ul className="flex flex-col items-center gap-3 mt-4">
+              {bottomMenuItems.map(({ id, icon, lable, action, page }) => (
+                <li key={id} className="relative">
+                  <Tooltip
+                    text={lable}
+                    position="right"
+                    show={hoveredItem === `bottom-${id}`}
+                  >
+                    <button
+                      onClick={() => {
+                        if (action) action();
+                        else if (page) {
+                          navigate(`/${page}`);
+                          setClickEffect(id);
+                          localStorage.setItem('activeTab', id);
+                        }
+                        setShowAvatarMenu(false);
+                        setHoveredItem(null);
+                      }}
+                      className={getButtonClass(id)}
+                      onMouseEnter={() => setHoveredItem(`bottom-${id}`)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                    >
+                      {icon}
+                    </button>
+                  </Tooltip>
+                </li>
+              ))}
+            </ul>
+
+            {/* Language Menu */}
+            {showLangMenu && (
               <div
-                className="absolute left-14 bottom-0 w-40 bg-white border border-blue-300 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-600"
-                ref={menuRef}
+                ref={langMenuRef}
+                className="absolute bottom-24 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
               >
-                <ul className="p-1.5">
-                  {avatarItems.map(({ icon, title, id, page }) => (
-                    <li key={id} className="flex flex-col">
-                      {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
-                      <div
-                        onClick={() => {
-                          if (title === 'Logout') {
-                            dispatch(logout());
-                            navigate('/login');
-                          } else if (page) {
-                            navigate(`/${page}`);
-                          }
-                          setShowAvatarMenu(false);
-                        }}
-                        className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
-                      >
-                        <div className="text-blue-500 text-[15px]">{icon}</div>
-                        <div className="text-base">{title}</div>
-                      </div>
+                <ul className="p-2">
+                  {languages.map((lang) => (
+                    <li
+                      key={lang.code}
+                      onClick={() => setShowLangMenu(false)}
+                      className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                    >
+                      <span className={`fi fi-${lang.flag} w-5 h-5`}></span>
+                      <span>{lang.label}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
+
+            {/* Desktop Avatar Dropdown */}
+            <div className="mt-4 relative">
+              <div>
+                <button
+                  onClick={() => {
+                    setShowAvatarMenu(prev => !prev);
+                    setShowLangMenu(false);
+                    setHoveredItem(null);
+                  }}
+                  className="w-12 h-12 rounded-full border-3 border-gray-300 dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform cursor-pointer"
+                  onMouseEnter={() => setHoveredItem('avatar')}
+                  onMouseLeave={() => setHoveredItem(null)}
+                >
+                  <img
+                    src={user?.profile_avatar || 'https://via.placeholder.com/100'}
+                    alt="User"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </button>
+              </div>
+
+              {showAvatarMenu && (
+                <div
+                  className="absolute left-14 bottom-0 w-40 bg-white border border-blue-300 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-600"
+                  ref={menuRef}
+                >
+                  <ul className="p-1.5">
+                    {avatarItems.map(({ icon, title, id, page }) => (
+                      <li key={id} className="flex flex-col">
+                        {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
+                        <div
+                          onClick={() => {
+                            console.log('Avatar clicked, current state:', showAvatarMenu);
+                            if (title === 'Logout') {
+                              dispatch(logout());
+                              navigate('/login');
+                            } else if (page) {
+                              navigate(`/${page}`);
+                            }
+                            setShowAvatarMenu(false);
+                          }}
+                          className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                        >
+                          <div className="text-blue-500 text-[15px]">{icon}</div>
+                          <div className="text-base">{title}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

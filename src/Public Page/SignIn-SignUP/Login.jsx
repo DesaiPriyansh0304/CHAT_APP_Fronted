@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { addToken } from '../../feature/Slice/Auth/AuthSlice';
 import * as Yup from 'yup';
 import { FiMail } from 'react-icons/fi';
@@ -16,9 +16,15 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+
+  // GitHub OAuth configuration
+  const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
+  const GITHUB_OAUTH_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent('http://localhost:5173/github/callback')}&scope=user:email`;
 
   // Validation schema
   const LoginSchema = Yup.object().shape({
@@ -29,6 +35,59 @@ function Login() {
       .min(6, 'Password must be at least 6 characters')
       .required('Password is required'),
   });
+
+  // Handle GitHub callback
+  useEffect(() => {
+    const code = searchParams.get('code');
+    const error = searchParams.get('error');
+
+    if (error) {
+      console.error('GitHub OAuth Error:', error);
+      toast.error('GitHub login was cancelled or failed');
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    if (code) {
+      handleGithubCallback(code);
+    }
+  }, [searchParams]);
+
+  // GitHub callback handler
+  const handleGithubCallback = async (code) => {
+    try {
+      setIsGithubLoading(true);
+      console.log('GitHub Auth Code:', code);
+
+      // Send authorization code to backend
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP}/api/auth/github`,
+        { code }
+      );
+
+      const { success, token, userData } = response.data;
+
+      if (success && token) {
+        dispatch(addToken({ token }));
+        toast.success(`Welcome ${userData.firstname}! GitHub Login Successful`);
+        navigate('/', { replace: true });
+      } else {
+        throw new Error('Invalid GitHub login response');
+      }
+    } catch (error) {
+      console.error('GitHub Login Error:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'GitHub login failed. Please try again.';
+
+      setError({ form: errorMessage });
+      toast.error('GitHub login unsuccessful');
+      navigate('/login', { replace: true });
+    } finally {
+      setIsGithubLoading(false);
+    }
+  };
 
   // Form data handler
   const handleChange = (e) => {
@@ -133,6 +192,18 @@ function Login() {
     flow: 'auth-code',
   });
 
+  // GitHub login handler
+  const handleGithubLogin = () => {
+    if (!GITHUB_CLIENT_ID) {
+      toast.error('GitHub Client ID not configured');
+      return;
+    }
+
+    setIsGithubLoading(true);
+    // Redirect to GitHub OAuth
+    window.location.href = GITHUB_OAUTH_URL;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen bg-white">
       {/* Left Image */}
@@ -165,6 +236,13 @@ function Login() {
             )}
           </div>
 
+          {/* Loading state for GitHub callback */}
+          {isGithubLoading && (
+            <div className="mb-4 text-center text-blue-600 bg-blue-50 rounded-2xl border border-blue-300 p-3 text-sm">
+              Processing GitHub login...
+            </div>
+          )}
+
           {/* Form data */}
           <form onSubmit={handleSubmit}>
             {/* Email */}
@@ -183,7 +261,7 @@ function Login() {
                   focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.email}
                   onChange={handleChange}
-                  disabled={isLoading || isGoogleLoading}
+                  disabled={isLoading || isGoogleLoading || isGithubLoading}
                 />
               </div>
               {error.email && <p className="mt-1 text-xs sm:text-sm text-red-500">{error.email}</p>}
@@ -205,7 +283,7 @@ function Login() {
                   focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   value={userLogin.password}
                   onChange={handleChange}
-                  disabled={isLoading || isGoogleLoading}
+                  disabled={isLoading || isGoogleLoading || isGithubLoading}
                 />
                 <span
                   onClick={() => setShowPassword(!showPassword)}
@@ -232,8 +310,8 @@ function Login() {
             <div className="mx-2 sm:mx-3">
               <button
                 type="submit"
-                disabled={isLoading || isGoogleLoading}
-                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading || isGoogleLoading
+                disabled={isLoading || isGoogleLoading || isGithubLoading}
+                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading || isGoogleLoading || isGithubLoading
                   ? 'bg-[#3799FA] cursor-not-allowed'
                   : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3] cursor-pointer'
                   }`}
@@ -252,16 +330,16 @@ function Login() {
             </div>
 
             {/* Social Login */}
-            <div className="flex flex-col sm:flex-row mx-2 sm:mx-3 gap-3 sm:gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row mx-2 justify-between sm:mx-3 gap-3 sm:gap-4 mt-2">
               {/* Google Button */}
               <button
                 type="button"
-                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors ${isGoogleLoading || isLoading
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors ${isGoogleLoading || isLoading || isGithubLoading
                   ? 'cursor-not-allowed opacity-50'
                   : 'cursor-pointer hover:bg-gray-100'
                   }`}
                 onClick={googleLogin}
-                disabled={isGoogleLoading || isLoading}
+                disabled={isGoogleLoading || isLoading || isGithubLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/355037/google.svg"
@@ -271,34 +349,22 @@ function Login() {
                 {isGoogleLoading ? 'Signing In...' : 'Google'}
               </button>
 
-              {/* LinkedIn Button */}
-              <button
-                type="button"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                disabled={isGoogleLoading || isLoading}
-              >
-                <img
-                  src="https://www.svgrepo.com/show/448234/linkedin.svg"
-                  className="h-4 sm:h-5"
-                  alt=" LinkedIn"
-                />
-                LinkedIn
-              </button>
-
-
-
               {/* GitHub Button */}
               <button
                 type="button"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                disabled={isGoogleLoading || isLoading}
+                className={`w-full sm:w-auto flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium transition-colors ${isGithubLoading || isLoading || isGoogleLoading
+                  ? 'cursor-not-allowed opacity-50'
+                  : 'cursor-pointer hover:bg-gray-100'
+                  }`}
+                onClick={handleGithubLogin}
+                disabled={isGithubLoading || isLoading || isGoogleLoading}
               >
                 <img
                   src="https://www.svgrepo.com/show/512317/github-142.svg"
                   className="h-4 sm:h-5"
                   alt="GitHub"
                 />
-                GitHub
+                {isGithubLoading ? 'Signing In...' : 'GitHub'}
               </button>
             </div>
 
