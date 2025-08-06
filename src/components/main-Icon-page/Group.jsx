@@ -16,7 +16,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
 
   const { groups, loading, error, hasFetched } = useSelector((state) => state.userGroups);
   {/*login userdata Slice*/ }
-  const { userData } = useSelector((state) => state.loginuser);
+  const { userData } = useSelector((state) => state.loginUser);
   const loginUserId = userData?._id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);                   // Create Grop modal
@@ -143,7 +143,10 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
           <div className="mt-6">
             <ul className="flex flex-col gap-4">
               {loading ? (
-                <p>Loading groups...</p>
+                <div className="flex justify-center items-center py-8">
+                  <div className="w-5 h-5 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2 text-blue-400">Loading groups...</span>
+                </div>
               ) : error ? (
                 <p className="text-red-500">{error}</p>
               ) : filteredGroups.length === 0 ? (

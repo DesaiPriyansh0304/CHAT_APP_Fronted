@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const onlineUsersSlice = createSlice({
-  name: 'onlineUsers',
+  name: "onlineUsers",
   initialState: {
     users: [],
     lastUpdated: null,
@@ -19,8 +19,10 @@ const onlineUsersSlice = createSlice({
 });
 
 export const { setOnlineUsers, clearOnlineUsers } = onlineUsersSlice.actions;
+console.log("✌️setOnlineUsers --->", setOnlineUsers);
 
 export const selectOnlineUsers = (state) => state.onlineUsers.users;
+
 export const selectLastUpdated = (state) => state.onlineUsers.lastUpdated;
 
 export default onlineUsersSlice.reducer;

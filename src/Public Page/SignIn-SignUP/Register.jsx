@@ -28,17 +28,27 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+
+
   const RegisterSchema = Yup.object().shape({
-    firstname: Yup.string().min(3, 'First name must be at least 3 characters').required('First name is required'),
-    lastname: Yup.string().min(3, 'Last name must be at least 3 characters').required('Last name is required'),
-    email: Yup.string().matches(/\S+@\S+\.\S+/, 'Invalid email').required('Email is required'),
-    mobile: Yup.string().matches(/^\d{10}$/, 'Mobile must be 10 digits').required('Mobile is required'),
-    dob: Yup.string().required('Date of birth is required'),
-    gender: Yup.string().required('Gender is required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-    confirmpassword: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Passwords must match')
-      .required('Confirm password is required'),
+    firstname: Yup.string().min(2).max(30).required("First name is required"),
+    lastname: Yup.string().min(2).max(30).required("Last name is required"),
+    email: Yup.string()
+      .matches(/\S+@\S+\.\S+/, 'Email format is invalid')
+      .required('Email is required'),
+    mobile: Yup.string()
+      .matches(/^\d{10}$/, "Invalid mobile number")
+      .required("Mobile is required"),
+    dob: Yup.date()
+      .max(new Date(), "Date of birth must be in the past")
+      .required("DOB is required"),
+    gender: Yup.string().oneOf(["male", "female", "other"]).required("Gender is required"),
+    password: Yup.string()
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/,
+        "Password must have at least 6 characters, including uppercase, lowercase, and a number"
+      )
+      .required("Password is required"),
   });
 
   const handleChange = (e) => {

@@ -24,7 +24,18 @@
   --text-color: #00adb5;
   --text-gradient: linear-gradient(to right, #00adb5, #3cd3ad);
   --text-color3: #f1efec;
+
+  /* Sidebar colors for dark theme */
+  --sidebar-bg: #36404A;
+  --sidebar-text: #e0e0e0;
+
+  /* Chatcontainer colors for dark theme */
+  --chatcontainer-bg: #303841;
+  --Chatcontainer-text: #EFF2F7;
 }
+
+
+
 
 /* * {
     font-family: "Sedan SC", serif;

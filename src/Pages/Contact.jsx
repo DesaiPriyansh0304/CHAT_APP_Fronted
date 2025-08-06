@@ -74,7 +74,8 @@ export default function ContactPage() {
                                     <div className="group">
                                         <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+
+                                            <User className="absolute mt-[5px]'> left-3 top-3 h-5 w-5 text-slate-400" />
                                             <input
                                                 type="text"
                                                 name="name"
@@ -88,9 +89,11 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="group">
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                                        <label className="block  text-sm font-medium text-slate-700 mb-2">Email Address</label>
                                         <div className="relative">
-                                            <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+
+                                            <Mail className="absolute mt-[5px] left-3 top-3 h-5 w-5 text-slate-400" />
+
                                             <input
                                                 type="email"
                                                 name="email"
@@ -150,9 +153,9 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className='bg-white rounded-3xl flex gap-3.5 shadow-xl p-8 hover-scale animate-slide-left border border-slate-100 mt-3.5 h-[243px]'>
+                        <div className='bg-white rounded-3xl flex gap-5.5 shadow-xl p-8 hover-scale animate-slide-left border border-slate-100 mt-3.5 h-[243px]'>
 
-                            <div className=' bg-red-200 w-[190px]  '>
+                            <div className=' bg-red-200 w-[240px]  '>
                                 <div className='flex'>
                                     <div className='bg-black rounded-full h-12 w-12 m-2'>
                                         <img src="#" alt="rgreg" />
@@ -166,7 +169,7 @@ export default function ContactPage() {
                                     RIview
                                 </div>
                             </div>
-                            <div className=' bg-red-200 w-[190px]  '>
+                            <div className=' bg-red-200 w-[240px]  '>
                                 <div className='flex'>
                                     <div className='bg-black rounded-full h-12 w-12 m-2'>
                                         <img src="#" alt="rgreg" />
@@ -180,7 +183,7 @@ export default function ContactPage() {
                                     RIview
                                 </div>
                             </div>
-                            <div className=' bg-red-200 w-[190px]  '>
+                            <div className=' bg-red-200 w-[240px]  '>
                                 <div className='flex'>
                                     <div className='bg-black rounded-full h-12 w-12 m-2'>
                                         <img src="#" alt="rgreg" />

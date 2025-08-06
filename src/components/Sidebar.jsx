@@ -12,7 +12,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useSelector((state) => state.theme.mode);
-  const { userData: user, loading, error } = useSelector((state) => state.loginuser);
+  const { userData: user, loading, error } = useSelector((state) => state.loginUser);
 
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
@@ -76,15 +76,15 @@ function Sidebar() {
 
   const getButtonClass = (id) => {
     const base = 'relative p-2 rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer';
-    const common = 'hover:text-blue-600 dark:hover:text-[var(--text-color1)]';
+    const common = 'hover:text-blue-600 dark:hover:text-[#dfd0b8]';
     const isActive = clickEffect === id;
 
     if (isActive) {
       return theme === 'dark'
-        ? `${base} invisible-animated-border text-[var(--text-color1)] ${common}`
+        ? `${base} border border-white text-blue-700  bg-[#3E4A56] px-3 py-2.5 ${common}`
         : `${base} text-blue-600 bg-blue-100 border border-blue-600 px-3 py-2.5 ${common}`;
     } else {
-      return `${base} text-gray-500 dark:text-[var(--text-color)] ${common}`;
+      return `${base} text-gray-500 dark:text-[var(--sidebar-text)] ${common}`;
     }
   };
 
@@ -93,7 +93,7 @@ function Sidebar() {
     if (!text || !show) return children;
 
     const getTooltipClasses = () => {
-      const baseClasses = "absolute z-[9999] px-3 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-lg transition-all duration-200 opacity-100 visible whitespace-nowrap";
+      const baseClasses = "absolute z-[9999] px-3 py-2 text-sm font-medium text-white dark:text-black bg-gray-900 dark:bg-gray-400 rounded-lg shadow-lg transition-all duration-200 opacity-100 visible whitespace-nowrap";
 
       switch (position) {
         case 'right':
@@ -115,7 +115,7 @@ function Sidebar() {
         <div className={getTooltipClasses()}>
           {text}
           {/* Tooltip arrow */}
-          <div className={`absolute w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45 ${position === 'right' ? '-left-1 top-1/2 -translate-y-1/2' :
+          <div className={`absolute w-2 h-2 bg-gray-900 dark:bg-gray-400 rotate-45 ${position === 'right' ? '-left-1 top-1/2 -translate-y-1/2' :
             position === 'left' ? '-right-1 top-1/2 -translate-y-1/2' :
               position === 'top' ? 'left-1/2 -translate-x-1/2 -bottom-1' :
                 'left-1/2 -translate-x-1/2 -top-1'
@@ -142,8 +142,8 @@ function Sidebar() {
 
   return (
     <>
-      <div className="bg-[#f7f7ff] dark:bg-[var(--primary-color)] w-full">
-        <div className="relative w-full h-full md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center shadow-md">
+      <div className="bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] w-full h-full ">
+        <div className="relative md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center  shadow-md">
 
           {/* Logo (Only on Desktop) */}
           <div className="hidden md:flex justify-center">
@@ -290,7 +290,7 @@ function Sidebar() {
                     setShowLangMenu(false);
                     setHoveredItem(null);
                   }}
-                  className="w-12 h-12 rounded-full border-3 border-gray-300 dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform cursor-pointer"
+                  className="w-12 h-12 rounded-full border-3 border-gray-300 dark:border-[#d9d9d9] shadow-md hover:scale-125 transition-transform cursor-pointer"
                   onMouseEnter={() => setHoveredItem('avatar')}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
@@ -333,6 +333,7 @@ function Sidebar() {
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </div>

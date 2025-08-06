@@ -4,6 +4,7 @@ import { IoCall, IoVideocamOutline } from 'react-icons/io5';
 import { MdClose } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { setSearchQuery } from '../../feature/Slice/Chat/ChatHistory';
+import { FaSearch } from 'react-icons/fa';
 
 const getFullName = (user) => `${user?.firstname || ''} ${user?.lastname || ''}`.trim();
 
@@ -34,13 +35,13 @@ export const AudioCallModal = ({ user, onCancel, onCall }) => {
         <div className="flex justify-center gap-10 mt-6">
           <button
             onClick={onCancel}
-            className="bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-red-600"
+            className="bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-red-600 cursor-pointer"
           >
             <MdClose />
           </button>
           <button
             onClick={onCall}
-            className="bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-green-600"
+            className="bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-green-600 cursor-pointer"
           >
             <IoCall />
           </button>
@@ -77,13 +78,13 @@ export const VideoCallModal = ({ user, onCancel, onCall }) => {
         <div className="flex justify-center gap-10 mt-6">
           <button
             onClick={onCancel}
-            className="bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-red-600"
+            className="bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-red-600 cursor-pointer"
           >
             <MdClose />
           </button>
           <button
             onClick={onCall}
-            className="bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-green-600"
+            className="bg-green-500 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl hover:bg-green-600 cursor-pointer"
           >
             <IoVideocamOutline />
           </button>
@@ -120,16 +121,19 @@ export const SearchBox = ({ onClose }) => {
   };
 
   return (
-    <div className="absolute top-16 right-50 z-50" ref={boxRef}>
+    <div className="absolute top-15 right-55 z-50" ref={boxRef}>
       <div className="w-64 bg-white dark:bg-[#2e2e2e] rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 transition-colors duration-300">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-full p-2 px-4 bg-blue-50 dark:bg-[#1f1f1f] text-black dark:text-white rounded-xl outline-none"
-        />
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full p-2 pl-10 pr-4 bg-blue-50 dark:bg-[#1f1f1f] text-black dark:text-white rounded-xl outline-none"
+          />
+        </div>
       </div>
     </div>
   );

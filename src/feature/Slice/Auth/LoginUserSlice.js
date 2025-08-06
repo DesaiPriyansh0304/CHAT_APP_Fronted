@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { logout } from "./AuthSlice";
+//Auth slice
+import { logout, setAuthenticated } from "./AuthSlice";
 
 const URL = import.meta.env.VITE_REACT_APP;
 
@@ -9,10 +10,10 @@ export const fetchLoginUser = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      console.log("ℹ️token --->/LoginUserDataSlice", token);
+      // console.log("ℹ️token --->/LoginUserDataSlice", token);
       if (!token) {
         dispatch(logout());
-        return rejectWithValue("Token not found");
+        return rejectWithValue("Token not found-LoginuserSlice");
       }
 
       const response = await axios.get(`${URL}/api/auth/userdata/check`, {
@@ -21,22 +22,23 @@ export const fetchLoginUser = createAsyncThunk(
         },
       });
 
-      console.log("response --->LoginUserDataSlice", response);
-      console.log(
-        "response.data.user --->LoginUserDataSlice",
-        response.data.user
-      );
+      // console.log("response --->/LoginUserDataSlice", response);
+      // console.log(
+      //   "response.data.user --->/LoginUserDataSlice",
+      //   response.data.user
+      // );
 
       if (response.data && response.data.user) {
         const user = {
           ...response.data.user,
-          _id: response.data.user._id || response.data.user.id,
+          _id: response.data.user._id,
         };
-        console.log(
-          "response.data.user._id --->/LoginUserDataSlice",
-          response.data.user._id
-        );
 
+        // console.log(
+        //   "response.data.user._id --->/LoginUserDataSlice",
+        //   response.data.user._id
+        // );
+        dispatch(setAuthenticated(true)); // login success
         return { user, token };
       } else {
         dispatch(logout());
@@ -75,6 +77,7 @@ const loginUserSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLoginUser.fulfilled, (state, action) => {
+        console.log("✅ fulfilled reducer called", action.payload);
         state.loading = false;
         state.userData = action.payload.user;
       })

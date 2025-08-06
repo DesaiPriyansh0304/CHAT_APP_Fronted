@@ -5,29 +5,38 @@ import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
-// import { selectChatUnreadCount } from '../../feature/Slice/unreadCountSlice';
+import { fetchUnreadMessages } from '../../feature/Slice/unreadMessageSlice';
 
 function Chats({ selectUser, SetSelectUser }) {
 
-  const [search, setSearch] = useState('');            //serch State
-  const [debouncedSearch] = useDebounce(search, 400);  //useDebounce
-
+  const [search, setSearch] = useState('');            //search State
+  const [debouncedSearch] = useDebounce(search, 400);  //useDebounce 
 
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
   //getUser Message data
-  const { status, error } = useSelector((state) => state.getUserMessage);
+  const getUserMessage = useSelector((state) => state.getUserMessage || {});
+  const { status, error } = getUserMessage;
 
-  {/*Invited User Data Slice*/ }
+  //ChatList 
+  const chatList = useSelector((state) => state.chatList || {});
+  const { chats: chatListData = [], loading: chatListLoading } = chatList;
+
+  //Api call in Unread message
+  useEffect(() => {
+    dispatch(fetchUnreadMessages());
+  }, [])
+
+  // Invited User Data Slice
+  const invitedUserData = useSelector((state) => state.invitedUsers || {});
   const {
     invitedUsers = [],
     invitedBy = [],
     isLoaded,
-  } = useSelector((state) => state.invitedUsers);
+  } = invitedUserData;
 
   const onlineUserIds = useSelector(selectOnlineUsers); // get online user ID
-  // console.log('onlineUserIds --->/Chats-page', onlineUserIds);
 
   // Convert onlineUserIds to Set for fast lookup
   const onlineUserIdsSet = new Set(onlineUserIds);
@@ -50,11 +59,47 @@ function Chats({ selectUser, SetSelectUser }) {
     }
   }, [dispatch, debouncedSearch, isLoaded]);
 
-  {/*Scoller in only online user*/ }
+  {/*Scroller in only online user*/ }
   const scrollLeft = () => scrollRef.current && (scrollRef.current.scrollLeft -= 100);
   const scrollRight = () => scrollRef.current && (scrollRef.current.scrollLeft += 100);
+
   const getFullName = (user) => `${user.firstname || ''} ${user.lastname || ''}`.trim();   //User Full Name
   const allUnreadCounts = useSelector((state) => state.unreadCount.chatWiseCount);
+
+  // Filter function - chatList માં જે users નથી, તે combinedChatUsers માંથી મેળવો
+  const getAvailableUsers = () => {
+    const chatListUserIds = new Set(chatListData.map(chat => chat.userId));
+    return combinedChatUsers.filter(user => !chatListUserIds.has(user._id));
+  };
+
+  // Function to format time
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    try {
+      const date = new Date(timeString);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+      if (messageDate.getTime() === today.getTime()) {
+        // Today - show time
+        return date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      } else {
+        // Other days - show date
+        return date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+      }
+    } catch (error) {
+      return '';
+    }
+  };
+
   return (
     <>
       <div className="p-2 h-screen w-full">
@@ -62,7 +107,7 @@ function Chats({ selectUser, SetSelectUser }) {
         <div className="p-5 text-3xl font-semibold dark:text-[#f8f9fa]">Chats</div>
 
         {/* Search Box */}
-        <div className="mx-3 mb-6 relative">
+        <div className="mx-3 mb-10 relative">
           <div>
             <input
               type="text"
@@ -79,7 +124,6 @@ function Chats({ selectUser, SetSelectUser }) {
 
         {/* Online Avatars */}
         <div className="relative flex items-center justify-center w-full mb-4">
-
           {/*Left side icon*/}
           <motion.button
             whileTap={{ scale: 0.9 }}
@@ -90,7 +134,7 @@ function Chats({ selectUser, SetSelectUser }) {
             <FaChevronLeft />
           </motion.button>
 
-          {/*only online use show*/}
+          {/*only online user show*/}
           <motion.div
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide w-[60vw] px-10"
@@ -110,9 +154,6 @@ function Chats({ selectUser, SetSelectUser }) {
                   {/*Profile image*/}
                   <div className="flex flex-col items-center w-20">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 text-blue-800 font-semibold flex items-center justify-center">
-                      {chatUser.online && (
-                        <span className="absolute bottom-0 right-0 max-w-3 max-h-3 bg-green-500 border-2 border-white rounded-full" />
-                      )}
                       {chatUser.profile_avatar ? (
                         <img
                           src={chatUser.profile_avatar}
@@ -125,7 +166,6 @@ function Chats({ selectUser, SetSelectUser }) {
                           {chatUser.lastname?.[0]?.toUpperCase()}
                         </span>
                       )}
-
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     </div>
                     {/*user name*/}
@@ -134,9 +174,7 @@ function Chats({ selectUser, SetSelectUser }) {
                         {chatUser.firstname}
                       </p>
                     </div>
-
                   </div>
-
                 </motion.div>
               ))}
           </motion.div>
@@ -152,31 +190,121 @@ function Chats({ selectUser, SetSelectUser }) {
           </motion.button>
         </div>
 
-        {/* Recent Chat Users List */}
-        <div>
-
-          {/*Recent*/}
+        {/* Combined Recent Chats and Available Users */}
+        <div className='w-full h-auto overflow-auto'>
           <div>
             <p className="text-lg font-semibold dark:text-[var(--text-color3)] mb-4">Recent</p>
-          </div>
 
-          <div className='w-full h-[40vh]'>
             {status === 'loading' ? (
               <p className="text-center text-gray-500">Loading...</p>
             ) : error ? (
               <p className="text-center text-red-500">Error: {error}</p>
             ) : (
-              <div className=" overflow-auto">
-                {combinedChatUsers.map((chatUser) => {
-                  //count message
-                  const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
+              <div>
+                {/* first ChatList users */}
+                {chatListData.map((chat) => {
+                  // Online status 
+                  const isOnline = onlineUserIdsSet.has(chat.userId);
+                  const unreadCount = allUnreadCounts?.[chat.userId] || chat.unreadCount || 0;
+
                   return (
-                    <div key={chatUser._id}>
+                    <div key={`chat-${chat.conversationId}`}>
+                      <div
+                        onClick={() => {
+
+                          const userObj = {
+                            _id: chat.userId,
+                            firstname: chat.name.split(' ')[0] || '',
+                            lastname: chat.name.split(' ').slice(1).join(' ') || '',
+                            email: chat.email,
+                            profile_avatar: chat.avatar,
+                            online: isOnline,
+                            conversationId: chat.conversationId
+                          };
+                          SetSelectUser(userObj);
+                        }}
+                        className={`group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
+                         hover:bg-[#e3ecff] dark:hover:bg-gray-400
+                         ${selectUser?._id === chat.userId ? 'bg-gray-200' : ''}`}
+                      >
+                        {/* Avatar */}
+                        <div className="relative mr-3">
+                          {chat.avatar ? (
+                            <div className='w-10 h-10 rounded-full overflow-hidden'>
+                              <img
+                                src={chat.avatar}
+                                alt={chat.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-400 flex items-center justify-center">
+                              <span className="text-white text-lg font-semibold">
+                                {chat.name?.[0]?.toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          {isOnline && (
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border border-white rounded-full"></span>
+                          )}
+                        </div>
+
+                        {/* User data */}
+                        <div className="flex-1">
+                          <p
+                            className={`text-sm font-semibold truncate ${selectUser?._id === chat.userId
+                              ? 'text-black hover:text-black'
+                              : 'dark:text-white group-hover:text-black'
+                              }`}
+                          >
+                            {chat.name}
+                          </p>
+                          {/*Last Message*/}
+                          <p
+                            className={`text-sm line-clamp-1 break-words ${selectUser?._id === chat.userId
+                              ? 'text-gray-500 hover:text-black'
+                              : 'dark:text-white group-hover:text-black'
+                              }`}
+                          >
+                            {chat.lastMessage ?
+                              (chat.lastMessage.senderName === 'You' ?
+                                `You: ${chat.lastMessage.text}` :
+                                chat.lastMessage.text
+                              ) :
+                              'No message yet'
+                            }
+                          </p>
+                        </div>
+
+                        {/* Time and Unread count */}
+                        <div className="text-right min-w-[50px] ml-2">
+                          <p className="text-xs text-gray-400">
+                            {formatTime(chat.lastMessage?.time || chat.updatedAt)}
+                          </p>
+                          {unreadCount > 0 && (
+                            <div className="mt-1.5 bg-red-100 text-red-500 w-7 h-5 rounded-full text-xs font-bold flex items-center justify-center mx-auto">
+                              {unreadCount.toString().padStart(2, '0')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <hr className="my-0.5 mx-2 border-gray-300 dark:border-gray-500" />
+                    </div>
+                  );
+                })}
+
+                {/* પછી Available Users - ChatList ના અંતે */}
+                {getAvailableUsers().map((chatUser) => {
+                  console.log('✌️Available User --->', chatUser);
+                  const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
+
+                  return (
+                    <div key={`available-${chatUser._id}`}>
                       <div
                         onClick={() => SetSelectUser(chatUser)}
-                        className={` group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
+                        className={`group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
                          ${chatUser.isTyping
-                            ? 'bg-[#d9e8ff] hover:bg-[#e3ecff]  dark:hover:bg-[#e3ecff]'
+                            ? 'bg-[#d9e8ff] hover:bg-[#e3ecff] dark:hover:bg-[#e3ecff]'
                             : 'hover:bg-[#e3ecff] dark:hover:bg-gray-400'
                           }
                            ${selectUser?._id === chatUser._id ? 'bg-gray-200' : ''}`}
@@ -184,16 +312,15 @@ function Chats({ selectUser, SetSelectUser }) {
                         {/* Avatar */}
                         <div className="relative mr-3">
                           {chatUser.profile_avatar ? (
-                            //img
                             <div className='w-10 h-10 rounded-full overflow-hidden'>
                               <img
                                 src={chatUser.profile_avatar}
                                 alt={getFullName(chatUser)}
-                                className=" w-full h-full object-cover"
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           ) : (
-                            <div className="w-10 h-11\0 rounded-full overflow-hidden bg-gray-400 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-400 flex items-center justify-center">
                               <span className="text-white text-lg font-semibold">
                                 {chatUser.firstname?.[0]?.toUpperCase()}
                               </span>
@@ -216,20 +343,19 @@ function Chats({ selectUser, SetSelectUser }) {
                           </p>
                           {/*User bio*/}
                           <p
-                            className={`text-sm   line-clamp-1 break-words 
+                            className={`text-sm line-clamp-1 break-words 
                                ${chatUser.isTyping ? 'text-blue-600 italic' : ''} 
                                ${selectUser?._id === chatUser._id
-                                ? 'text-gray-500 '
-                                : 'dark:text-[#adb5bd]  group-hover:text-white'
+                                ? 'text-gray-500 hover:text-black'
+                                : 'dark:text-white group-hover:text-black'
                               }
                               `}
                           >
-                            {chatUser.bio || 'No message yet'}
+                            {chatUser.bio || 'Start a conversation'}
                           </p>
-
                         </div>
 
-                        {/* Unread */}
+                        {/* Unread count */}
                         <div className="text-right min-w-[50px] ml-2">
                           <p className="text-xs text-gray-400">{chatUser.time || ''}</p>
                           {unreadCount > 0 && (
@@ -238,13 +364,18 @@ function Chats({ selectUser, SetSelectUser }) {
                             </div>
                           )}
                         </div>
-
                       </div>
                       <hr className="my-0.5 mx-2 border-gray-300 dark:border-gray-500" />
                     </div>
                   );
                 })}
 
+                {/* જો કોઈ ડેટા નથી */}
+                {chatListData.length === 0 && getAvailableUsers().length === 0 && !chatListLoading && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400">No chats or users available</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

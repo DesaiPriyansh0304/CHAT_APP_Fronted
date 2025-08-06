@@ -8,15 +8,18 @@ import { TbHelpSquareRounded } from 'react-icons/tb';
 import { FaQuestion } from 'react-icons/fa6';
 import { IoIosContact } from 'react-icons/io';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Setting() {
 
   const [showAvailble, setShowAvailble] = useState(false);
   const [activeSection, setActiveSection] = useState('personalinfo');    //section
   const [openMenuId, setOpenMenuId] = useState(null);                    // NEW
+  const navigate = useNavigate(); // For navigation
+
 
   //Login user data Slice
-  const { userData: user } = useSelector((state) => state.loginuser);
+  const { userData: user } = useSelector((state) => state.loginUser);
 
   {/*menu open */ }
   const menuRef = useRef(null);
@@ -172,7 +175,9 @@ function Setting() {
                       </div>
                       {/*edit button */}
                       <div>
-                        <button className="flex items-center gap-2 bg-gray-100 hover:bg-gray-300 px-2 py-1 rounded text-sm text-black">
+                        <button
+                          onClick={() => navigate('/avtarpage')}
+                          className="flex items-center gap-2 bg-gray-100 hover:bg-gray-300 px-2 py-1 rounded text-sm text-black cursor-pointer">
                           <CiEdit className="text-lg" />
                           <span>Edit</span>
                         </button>

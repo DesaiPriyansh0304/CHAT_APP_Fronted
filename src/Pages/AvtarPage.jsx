@@ -8,7 +8,7 @@ import axios from 'axios';
 import { setUserData } from '../feature/Slice/Auth/LoginUserSlice';
 
 function AvtarPage() {
-  const user = useSelector((state) => state.loginuser.userData);
+  const user = useSelector((state) => state.loginUser.userData);
   const dispatch = useDispatch();
 
   const [avatrFrom, setAvtarFrom] = useState({
@@ -240,11 +240,10 @@ function AvtarPage() {
                     type="submit"
                     disabled={!formChanged}
                     className={`px-6 py-2 rounded-md font-medium shadow 
-                                            ${
-                                              formChanged
-                                                ? 'bg-[#67B7D1] hover:bg-[#58a5c3] dark:bg-[#3b9fc1] dark:hover:bg-[#2f91b2] text-white'
-                                                : 'bg-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
-                                            }`}
+                                            ${formChanged
+                        ? 'bg-[#67B7D1] hover:bg-[#58a5c3] dark:bg-[#3b9fc1] dark:hover:bg-[#2f91b2] text-white'
+                        : 'bg-gray-300 text-gray-500 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed'
+                      }`}
                   >
                     Update Profile
                   </motion.button>

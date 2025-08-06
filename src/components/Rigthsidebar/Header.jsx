@@ -49,7 +49,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
   const isGroupSelected = selectGroup && Object.keys(selectGroup).length > 0;
 
   const commonHeaderStyle =
-    'flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]';
+    'flex items-center  p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]';
   const userNameText = 'text-gray-900 dark:text-white';
   const typingText = 'text-sm text-gray-500 dark:text-gray-400';
   const buttonTextColor = 'text-gray-500 dark:text-gray-300 text-xl';
@@ -82,7 +82,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
           {isMobile && (
             <button
               onClick={onMobileBack}
-              className="text-gray-500 dark:text-gray-300 text-xl hover:text-blue-600 dark:hover:text-blue-400 mr-2"
+              className="text-gray-500 dark:text-gray-300 text-xl hover:text-blue-600 dark:hover:text-blue-400 mr-3.5 cursor-pointer"
               title="Back"
             >
               <IoChevronBackOutline />
@@ -107,7 +107,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
           </div>
         </div>
 
-        <div className={`flex items-center gap-3 md:gap-7 ${buttonTextColor}`}>
+        <div className={`flex items-center  gap-3 md:gap-7 ml-auto ${buttonTextColor}`}>
           {/* Hide some icons on mobile for better spacing */}
           {topItems.map(({ id, icon, title }) => {
             // On mobile, show only essential icons
@@ -117,7 +117,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
               <button
                 key={id}
                 title={title}
-                className={`${hoverBtn} ${isMobile ? 'text-lg' : ''}`}
+                className={`${hoverBtn} ${isMobile ? 'text-lg' : ''}cursor-pointer`}
                 type="button"
                 onClick={() => {
                   if (title === 'Call') {
@@ -152,32 +152,38 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
         </div>
 
         {/* Audio Call Modal */}
-        {showCallModal && (
-          <AudioCallModal
-            user={callData}
-            onCancel={() => setShowCallModal(false)}
-            onCall={() => setShowCallModal(false)}
-          />
-        )}
+        <div>
+          {showCallModal && (
+            <AudioCallModal
+              user={callData}
+              onCancel={() => setShowCallModal(false)}
+              onCall={() => setShowCallModal(false)}
+            />
+          )}
+        </div>
 
         {/* Video Call Modal */}
-        {showVideoModal && (
-          <VideoCallModal
-            user={callData}
-            onCancel={() => setShowVideoModal(false)}
-            onCall={() => setShowVideoModal(false)}
-          />
-        )}
+        <div>
+          {showVideoModal && (
+            <VideoCallModal
+              user={callData}
+              onCancel={() => setShowVideoModal(false)}
+              onCall={() => setShowVideoModal(false)}
+            />
+          )}
+        </div>
 
         {/* Search Box */}
-        {showSearchBox && (
-          <SearchBox
-            onClose={() => setShowSearchBox(false)}
-            onSearch={(value) => {
-              console.log('🔍 Search Payload:', value);
-            }}
-          />
-        )}
+        <div>
+          {showSearchBox && (
+            <SearchBox
+              onClose={() => setShowSearchBox(false)}
+              onSearch={(value) => {
+                console.log('🔍 Search Payload:', value);
+              }}
+            />
+          )}
+        </div>
       </div>
     );
   }

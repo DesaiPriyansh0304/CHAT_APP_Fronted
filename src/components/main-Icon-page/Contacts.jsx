@@ -25,19 +25,19 @@ const groupContactsByLetter = (contacts) => {
 };
 
 function Contacts() {
-
-  const [showAddModal, setShowAddModal] = useState(false);   //add contect modal
+  const [showAddModal, setShowAddModal] = useState(false);   //add contact modal
   const { token } = useParams();
   const dispatch = useDispatch();
 
-  const [search, setSearch] = useState('');                  //serchbar
+  const [search, setSearch] = useState('');                  //searchbar
   const [debouncedSearch] = useDebounce(search, 400);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);       //dot menu
   const [activeMenuId, setActiveMenuId] = useState(null);
 
-  {/*Dot Section*/ }
+  // Refs for outside click detection
   const dotmenuRef = useRef();
+  const modalRef = useRef(); // Modal માટે ref
 
   //dot menu function
   const toggleMenu = (id) => {
@@ -45,7 +45,7 @@ function Contacts() {
     setActiveMenuId(id);
   };
 
-  // click event
+  // Dot menu outside click handler
   useEffect(() => {
     const handleClickAnywhere = (event) => {
       if (isMenuOpen && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
@@ -59,7 +59,25 @@ function Contacts() {
     };
   }, [isMenuOpen]);
 
-  //sot menu icon
+  // Modal outside click handler
+  useEffect(() => {
+    const handleModalOutsideClick = (event) => {
+      if (showAddModal && modalRef.current && !modalRef.current.contains(event.target)) {
+        handleModalClose();
+      }
+    };
+
+    if (showAddModal) {
+      document.addEventListener('mousedown', handleModalOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleModalOutsideClick);
+    };
+  }, [showAddModal]);
+
+
+  //dot menu icons
   const dotMenu = [
     { id: 0, title: 'Share', icon: <IoShareSocialOutline /> },
     { id: 1, title: 'Block', icon: <MdBlockFlipped /> },
@@ -93,17 +111,21 @@ function Contacts() {
             }
           );
           const data = await response.json();
-          if (response.ok) toast.success('🎉 Invitation confirmed!');
-          else toast.error('❌ ' + data.message);
+          if (response.ok) {
+            toast.success('🎉 Invitation confirmed! You can now register.');
+            // Redirect to registration page if needed
+            // window.location.href = '/register';
+          } else {
+            toast.error('❌ ' + data.message);
+          }
         } catch (err) {
           console.error('Token verify error:', err);
+          toast.error('❌ Token verification failed.');
         }
       };
       verifyToken();
     }
   }, [token]);
-
-
 
   {/* Filter confirmed & valid users*/ }
   const confirmedInvitedUsers = invitedUsersArray
@@ -124,7 +146,7 @@ function Contacts() {
 
   const groupedContacts = groupContactsByLetter(confirmedUsers);
 
-  // add contect Function
+  // add contact Function
   const handleModalClose = () => {
     setShowAddModal(false);
     dispatch(resetInvitedUsersState());
@@ -170,64 +192,80 @@ function Contacts() {
         </div>
 
         {/* Loader */}
-        {loading && <div className="text-center text-gray-500 my-4">Loading contacts...</div>}
+        {loading && <div className="flex justify-center items-center py-8">
+          <div className="w-5 h-5 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-2 text-blue-400">Loading contact...</span>
+        </div>}
 
         {/* Grouped Contacts List */}
         <div className="space-y-4 overflow-y-auto h-[calc(100vh-200px)] pr-1">
-          {Object.keys(groupedContacts)
-            .sort()
-            .map((letter) => (
-              <div key={letter}>
-                {/*letter*/}
-                <div className="text-purple-600 dark:text-[var(--text-color)] font-semibold text-sm mt-8">
-                  {letter}
-                </div>
-                {groupedContacts[letter].map((inv, idx) => (
-                  <div
-                    key={idx}
-                    className="flex justify-between items-center px-4 py-2 rounded cursor-pointer"
-                  >
-                    {/*user name*/}
-                    <div className="text-gray-800 dark:text-[var(--text-color3)] font-medium">
-                      {inv.name || inv.email}
-                    </div>
-                    {/*dot menu section*/}
-                    <div className="relative text-gray-500 text-xl dark:text-[var(--text-color1)] cursor-pointer">
-                      {/*icon*/}
-                      <div>
-                        <button onClick={() => toggleMenu(inv.id)}>
-                          <EllipsisVerticalIcon size={16} />
-                        </button>
-                      </div>
-                      {/*dot menu open*/}
-                      <div>
-                        {isMenuOpen && activeMenuId === inv.id && (
-                          <div
-                            ref={dotmenuRef}
-                            className="absolute right-0 mt-2 w-30 bg-white border border-blue-300 rounded-xs shadow-md z-10"
-                          >
-                            <ul>
-                              {dotMenu.map(({ title, id, icon }) => (
-                                <li key={id} className="flex flex-col hover:bg-gray-100">
-                                  <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 justify-between">
-                                    <div className="text-gray-700 text-md">{title}</div>
-                                    <div className="text-blue-500">{icon}</div>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+          {Object.keys(groupedContacts).length === 0 && !loading ? (
+            <div className="text-center text-gray-500 mt-8">
+              No contacts found. Invite someone to get started!
+            </div>
+          ) : (
+            Object.keys(groupedContacts)
+              .sort()
+              .map((letter) => (
+                <div key={letter}>
+                  {/*letter*/}
+                  <div className="text-purple-600 dark:text-[var(--text-color)] font-semibold text-sm mt-8">
+                    {letter}
                   </div>
-                ))}
-              </div>
-            ))}
+                  {groupedContacts[letter].map((inv, idx) => (
+                    <div
+                      key={idx}
+                      className="flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                      {/*user name*/}
+                      <div className="text-gray-800 dark:text-[var(--text-color3)] font-medium">
+                        {inv.name || inv.email}
+                      </div>
+                      {/*dot menu section*/}
+                      <div className="relative text-gray-500 text-xl dark:text-[var(--text-color1)] cursor-pointer">
+                        {/*icon*/}
+                        <div>
+                          <button onClick={() => toggleMenu(inv.id)}>
+                            <EllipsisVerticalIcon size={16} />
+                          </button>
+                        </div>
+                        {/*dot menu open*/}
+                        <div>
+                          {isMenuOpen && activeMenuId === inv.id && (
+                            <div
+                              ref={dotmenuRef}
+                              className="absolute right-0 mt-2 w-30 bg-white border border-blue-300 rounded-xs shadow-md z-10 dark:bg-gray-800 dark:border-gray-600"
+                            >
+                              <ul>
+                                {dotMenu.map(({ title, id, icon }) => (
+                                  <li key={id} className="flex flex-col hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 justify-between">
+                                      <div className="text-gray-700 dark:text-gray-300 text-md">{title}</div>
+                                      <div className="text-blue-500">{icon}</div>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+          )}
         </div>
 
         {/* Add Contact Modal */}
-        {showAddModal && <ContactAdd onClose={handleModalClose} />}
+        {showAddModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
+            <div ref={modalRef}>
+              <ContactAdd onClose={handleModalClose} />
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );

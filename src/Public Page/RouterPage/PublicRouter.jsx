@@ -3,15 +3,12 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const PublicRoute = () => {
-  {
-    /* Auth Slice */
-  }
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  console.log('✌️isAuthenticated --->', isAuthenticated);
 
-  if (isAuthenticated) {
-    return <div>Loading...</div>;
-  }
+  const authState = useSelector((state) => state.auth || {});      //authSlice
+
+  const { isAuthenticated } = authState;
+  // console.log('isAuthenticated/Auth --->/PublicRouter', isAuthenticated);
+
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }

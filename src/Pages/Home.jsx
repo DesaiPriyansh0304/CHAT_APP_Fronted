@@ -10,6 +10,7 @@ import AvtarPage from './AvtarPage';
 import AllUser from '../components/main-Icon-page/AllUser';
 
 function Home() {
+
   const { tab, token } = useParams();                 //tab and token get Approuter
   const currentTab = tab || (token ? '' : 'chats');   //chats tb open 
 
@@ -40,7 +41,7 @@ function Home() {
   const handleGroupSelect = (group) => {
     setSelectGroup(group);
     setSelectedUser(null);
-    if (isMobile) setShowMobileRightSidebar(true); // Only on mobile
+    if (isMobile) setShowMobileRightSidebar(true);
   };
 
   // Handle mobile back navigation
@@ -54,6 +55,7 @@ function Home() {
       <div className="w-screen h-screen">
 
         {currentTab === 'alluser' ? (
+
           //avterpage + alluser page 
           <div className="h-full w-full grid grid-cols-[6%_94%]">
 

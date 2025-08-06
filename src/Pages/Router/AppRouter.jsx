@@ -3,21 +3,25 @@ import { Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 // Route Guards
-import PrivateRoute from '../src/Public Page/RouterPage/PrivetRouter';
-import PublicRoute from '../src/Public Page/RouterPage/PublicRouter';
+import PrivateRoute from '../../Public Page/RouterPage/PrivetRouter';
+import PublicRoute from '../../Public Page/RouterPage/PublicRouter';
 
 // Private Pages
-import Home from '../src/Pages/Home';
+import Home from '../Home';
 
 // Public Pages
-import Login from '../src/Public Page/SignIn-SignUP/Login';
-import Register from '../src/Public Page/SignIn-SignUP/Register';
-import OtpVerify from '../src/Public Page/otp verify/OTPVerify';
-import ForgetPassword from '../src/Public Page/Password/forgetpassword';
-import ResetPassword from '../src/Public Page/Password/ResetPassword';
+import Login from '../../Public Page/SignIn-SignUP/Login';
+import Register from '../../Public Page/SignIn-SignUP/Register';
+import OtpVerify from '../../Public Page/otp verify/OTPVerify';
+import ForgetPassword from '../../Public Page/Password/forgetpassword';
+import ResetPassword from '../../Public Page/Password/ResetPassword';
 
+//error Page
+import Errorpage from '../Errorpage';
+
+//Contact Page
+import Contact from '../Contact';
 import { Toaster } from 'react-hot-toast';
-import Contact from '../src/Pages/Contact';
 
 
 // GitHub Callback Component
@@ -45,6 +49,7 @@ function AppRouter() {
             <div>
                 <Toaster />
                 <Routes>
+
                     {/* 🔐----------------- Private routes ------------------ */}
                     <Route element={<PrivateRoute />}>
                         <Route path="/" element={<Home />} />                            {/*main router*/}
@@ -61,9 +66,12 @@ function AppRouter() {
                         <Route path="/reset-password" element={<ResetPassword />} />     {/*reset-password router*/}
                         <Route path="/github/callback" element={<GitHubCallback />} />
                     </Route>
-                    <Route>
-                        <Route path="/contact" element={<Contact />} />   {/*GitHub OAuth callback router*/}
-                    </Route>
+
+                    {/* 📃---------------All Time Open router --------------- */}
+
+                    <Route path="/contactes" element={<Contact />} />                    {/*Contect Page router*/}
+                    <Route path='*' element={<Errorpage />} />                           {/*Error Page*/}
+
                 </Routes>
 
             </div >

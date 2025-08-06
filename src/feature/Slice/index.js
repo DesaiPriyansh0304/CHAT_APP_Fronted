@@ -29,9 +29,12 @@ import filteredInvitedUsersReducer from "./Invited-User/FilteredInvitedUsers";
 import themeReducer from "./Theme/ThemeSlice";
 import unreadCountReducer from "./Socket/unreadCountSlice";
 
+import unreadMessagesReducer from "../Slice/unreadMessageSlice";
+import chatListReducer from "../Slice/Socket/chatListSlice";
+
 const rootReducer = combineReducers({
   auth: authReducer,
-  loginuser: loginuserReducer,
+  loginUser: loginuserReducer,
 
   users: userReducer,
   searchUser: searchUserReducer,
@@ -48,6 +51,10 @@ const rootReducer = combineReducers({
   filteredInvitedUsers: filteredInvitedUsersReducer,
   theme: themeReducer,
   unreadCount: unreadCountReducer,
+
+  unreadMessages: unreadMessagesReducer,
+
+  chatList: chatListReducer,
 });
 
 export default rootReducer;

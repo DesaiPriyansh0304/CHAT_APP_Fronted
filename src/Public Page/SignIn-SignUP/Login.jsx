@@ -42,8 +42,11 @@ function Login() {
       .matches(/\S+@\S+\.\S+/, 'Email format is invalid')
       .required('Email is required'),
     password: Yup.string()
-      .min(6, 'Password must be at least 6 characters')
-      .required('Password is required'),
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/,
+        "Password must have at least 6 characters, including uppercase, lowercase, and a number"
+      )
+      .required("Password is required"),
   });
 
   // Handle GitHub callback
@@ -135,9 +138,9 @@ function Login() {
         userLogin
       );
 
-      const { success, token } = response.data;
+      const { token } = response.data;
 
-      if (success && token) {
+      if (response.status === 200 && token) {
         dispatch(addToken({ token }));
         toast.success('Login Successful');
         navigate('/');

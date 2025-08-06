@@ -1,12 +1,14 @@
 import React from 'react';
-import Chats from './main-Icon-page/Chats';
+//Top Icon Page
 import ProfilePage from './main-Icon-page/ProfilePage';
+import Chats from './main-Icon-page/Chats';
 import Group from './main-Icon-page/Group';
 import Contacts from './main-Icon-page/Contacts';
 import Setting from './main-Icon-page/Setting';
+//Bottom Icon Pages
 import AvtarPage from '../Pages/AvtarPage';
 import AllUser from './main-Icon-page/AllUser';
-import { useSelector } from 'react-redux';
+
 
 function ChatContainer({
   selectUser,
@@ -17,7 +19,6 @@ function ChatContainer({
   setSelectGroup,
 }) {
 
-  const theme = useSelector((state) => state.theme.mode);
 
   const renderContent = () => {
     switch (activePage) {
@@ -73,9 +74,7 @@ function ChatContainer({
 
   return (
     <>
-      <div className={`${theme === 'dark' ? 'dark' : ''}`}>
-        <div className={`min-h-screen bg-[var(--secondary-color)] dark:bg-[#343a40] `}>{renderContent()}</div>
-      </div>
+      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] `}>{renderContent()}</div>
     </>
   );
 }

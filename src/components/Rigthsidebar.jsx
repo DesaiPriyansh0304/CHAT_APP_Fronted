@@ -62,7 +62,7 @@ const buildGroupMessagePayload = ({
 
 const Rightsidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   const dispatch = useDispatch();
-  const { userData: user } = useSelector((state) => state.loginuser);
+  const { userData: user } = useSelector((state) => state.loginUser);
   const { messages, loadingHistory, currentPage, totalPages, sender, receiver, groupUsers } =
     useSelector((state) => state.chatHistory);
   const { socket, isConnected } = useSelector((state) => state.socket);

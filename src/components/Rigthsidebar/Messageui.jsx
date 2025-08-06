@@ -27,7 +27,7 @@ export const SenderMessage = ({
   setPreviewMedia,
   setIsImagePreview,
 }) => {
-  const { userData: user } = useSelector((state) => state.loginuser);
+  const { userData: user } = useSelector((state) => state.loginUser);
   // console.log('✌️msg --->', msg);
 
   const onlineUsers = useSelector(selectOnlineUsers);
