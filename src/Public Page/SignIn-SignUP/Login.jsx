@@ -277,7 +277,7 @@ function Login() {
         {/* Left Image - Fixed positioning for desktop, hidden on mobile */}
         <div className="hidden md:block md:w-1/2 fixed left-0 top-0 h-screen z-0">
           <img
-            src='/public/Img/Login/login-image.png'
+            src='https://chat-vibe-talk.vercel.app/Img/Login/login-image.png '
             alt="Login"
             className="object-cover w-full h-full"
           />
@@ -315,7 +315,7 @@ function Login() {
             <div className="md:hidden mb-8 text-center">
               <div className="mb-4">
                 <img
-                  src="/public/Img/Login/login-image.png"
+                  src="https://chat-vibe-talk.vercel.app/Img/Login/login-image.png "
                   alt="Login"
                   className="w-full h-48 object-cover rounded-lg"
                 />
@@ -431,7 +431,7 @@ function Login() {
                 <div className="mb-3">
                   <div className="flex justify-center sm:justify-start">
                     <ReCAPTCHA
-                      sitekey="6Lftcp4rAAAAALgjHoAqnQgwoXK6KE0Z8rG_Xuv6"
+                      sitekey="6LcBV50rAAAAABLix2LnNVEzcgBg4owV95_y-g0K"
                       onChange={getRecaptchavalue}
                       onExpired={onRecaptchaExpired}
                       onErrored={() => setError(prev => ({ ...prev, recaptcha: 'reCAPTCHA error occurred. Please try again.' }))}
