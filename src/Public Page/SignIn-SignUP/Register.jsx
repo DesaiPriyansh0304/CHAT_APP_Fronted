@@ -96,12 +96,12 @@ function Register() {
       {/* Left Image */}
       <div className="relative hidden md:block">
         <img
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+          src="/public/Img/Login/login-image.png"
           alt="Register Visual"
           className="object-cover w-full h-full"
         />
-        <div className="absolute bottom-8 left-8 text-white text-xl lg:text-2xl font-light max-w-md">
-          Update your app, not your users' patience.
+        <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
+          keeping conversations alive and effortless.
         </div>
       </div>
 

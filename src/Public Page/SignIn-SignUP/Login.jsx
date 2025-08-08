@@ -283,7 +283,7 @@ function Login() {
           />
           {/* Fixed text overlay - won't scroll */}
           <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
-            keeping conversations alive and effortless
+            keeping conversations alive and effortless.
           </div>
 
         </div>
@@ -310,7 +310,7 @@ function Login() {
               background: #1d4ed8;
             }
           `}</style>
-          <div className="mx-4 px-4 pb-8 pt-20 sm:mx-6 sm:px-6 md:mx-8 md:px-8 lg:mx-12 lg:px-12 xl:mx-16 xl:px-16 min-h-screen flex flex-col justify-center login-scroll-container">
+          <div className="mx-4 px-4  pt-20 sm:mx-6 sm:px-6 md:mx-8 md:px-8 lg:mx-12 lg:px-12 xl:mx-16 xl:px-16 min-h-screen flex flex-col justify-center login-scroll-container">
             {/* Mobile header image/text - only visible on mobile */}
             <div className="md:hidden mb-8 text-center">
               <div className="mb-4">
@@ -321,7 +321,9 @@ function Login() {
                 />
               </div>
               <p className="text-lg font-light text-gray-700 max-w-sm mx-auto">
-
+                <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
+                  keeping conversations alive and effortless.
+                </div>
               </p>
             </div>
 
@@ -429,7 +431,7 @@ function Login() {
                 <div className="mb-3">
                   <div className="flex justify-center sm:justify-start">
                     <ReCAPTCHA
-                      sitekey="6LcBV50rAAAAABLix2LnNVEzcgBg4owV95_y-g0K"
+                      sitekey="6Lftcp4rAAAAALgjHoAqnQgwoXK6KE0Z8rG_Xuv6"
                       onChange={getRecaptchavalue}
                       onExpired={onRecaptchaExpired}
                       onErrored={() => setError(prev => ({ ...prev, recaptcha: 'reCAPTCHA error occurred. Please try again.' }))}
@@ -542,14 +544,15 @@ function Login() {
             </div>
 
             {/* Footer */}
-            <div className="mt-8 mb-10 text-xs text-center text-gray-500 leading-relaxed">
-              <div className="mb-2">© 2025 Releasium Inc. All rights reserved.</div>
+            <div className="mt-8  text-center text-gray-500 leading-relaxed">
+              <div className="mb-2 text-[14px]">© 2025 Releasium Inc. All rights reserved.</div>
               <div className="flex flex-wrap justify-center gap-1.5">
                 <Link to="#" className="hover:underline text-[13.5px] font-semibold text-[#bb5b5b]">Privacy Policy</Link>
                 <span>||</span>
                 <Link to="#" className="hover:underline text-[13.5px] font-semibold text-[#bb5b5b]">Terms & Conditions</Link>
               </div>
             </div>
+
           </div>
         </div>
       </div>
