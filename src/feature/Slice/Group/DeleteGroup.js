@@ -1,16 +1,16 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const URL = import.meta.env.VITE_REACT_APP;
 
 // 🔸 DELETE GROUP
 export const deleteGroup = createAsyncThunk(
-  'group/deleteGroup',
+  "group/deleteGroup",
   async (groupId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('Authtoken');
+      const token = localStorage.getItem("Authtoken");
       const res = await axios.post(
-        `${URL}/api/msg/deletegroup`,
+        `${URL}/api/group/deletegroup`,
         { groupId },
         {
           headers: {
@@ -27,10 +27,10 @@ export const deleteGroup = createAsyncThunk(
 
 // 🔸 LEAVE GROUP
 export const leaveGroup = createAsyncThunk(
-  'group/leaveGroup',
+  "group/leaveGroup",
   async (groupId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('Authtoken');
+      const token = localStorage.getItem("Authtoken");
       const res = await axios.post(
         `${URL}/api/msg/leavegroup`,
         { groupId },
@@ -49,7 +49,7 @@ export const leaveGroup = createAsyncThunk(
 
 // 🔸 REDUCER SLICE
 const groupActionSlice = createSlice({
-  name: 'groupAction',
+  name: "groupAction",
   initialState: {
     loading: false,
     error: null,

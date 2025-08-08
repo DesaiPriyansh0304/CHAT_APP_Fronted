@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { markMessagesAsRead } from '../../feature/Slice/unreadMessageSlice'; // Update path as needed
 import { MdOutlineDeleteOutline, MdOutlineVolumeOff, MdOutlineInventory2 } from 'react-icons/md';
 import {
   IoCallOutline,
@@ -11,6 +13,7 @@ import { BsThreeDots } from 'react-icons/bs';
 import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup';
 
 function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, onMobileBack }) {
+  const dispatch = useDispatch();
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -31,6 +34,14 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
   ];
 
   const dotmenuRef = useRef();
+
+  // Mark messages as read when user is selected
+  useEffect(() => {
+    if (selectUser && selectUser._id) {
+      console.log("🔔 Marking messages as read for user:", selectUser._id);
+      dispatch(markMessagesAsRead(selectUser._id));
+    }
+  }, [selectUser, dispatch]);
 
   useEffect(() => {
     const handleClickAnywhere = (event) => {

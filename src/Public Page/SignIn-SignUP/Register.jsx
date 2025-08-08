@@ -44,10 +44,7 @@ function Register() {
       .required("DOB is required"),
     gender: Yup.string().oneOf(["male", "female", "other"]).required("Gender is required"),
     password: Yup.string()
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/,
-        "Password must have at least 6 characters, including uppercase, lowercase, and a number"
-      )
+      .min(6, "Password must have at least 6 characters")
       .required("Password is required"),
   });
 
@@ -79,8 +76,8 @@ function Register() {
         firstname, lastname, email, mobile, dob, gender, password,
       });
 
-      const { success } = response.data;
-      if (success) {
+      const { status } = response.data;
+      if (status === 201) {
         toast.success('Registration Successful! Please verify OTP.');
         navigate('/otp-verify', { state: { email } });
       }
@@ -136,7 +133,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">First Name</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <IoPersonOutline className='mt-[6px] text-sm sm:text-base' />
+                    <IoPersonOutline className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type="text"
@@ -154,7 +151,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Last Name</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <IoPersonOutline className='mt-[6px] text-sm sm:text-base' />
+                    <IoPersonOutline className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type="text"
@@ -176,7 +173,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Date of Birth</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <MdOutlineDateRange className='mt-[6px] text-sm sm:text-base' />
+                    <MdOutlineDateRange className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type="date"
@@ -191,7 +188,7 @@ function Register() {
               </div>
               <div className="w-full sm:w-1/2">
                 <label className="text-black font-semibold text-sm sm:text-base">Gender</label>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4">
                   {['male', 'female', 'other'].map((g) => (
                     <label key={g} className="capitalize text-black text-sm sm:text-base flex items-center">
                       <input
@@ -216,7 +213,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Email</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <FiMail className='mt-[6px] text-sm sm:text-base' />
+                    <FiMail className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type="email"
@@ -234,7 +231,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Mobile</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <ImMobile className='mt-[6px] text-sm sm:text-base' />
+                    <ImMobile className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type="text"
@@ -256,7 +253,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Password</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <LuLockKeyhole className='mt-[6px] text-sm sm:text-base' />
+                    <LuLockKeyhole className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -271,7 +268,7 @@ function Register() {
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg sm:text-xl cursor-pointer"
                     onClick={() => setShowPassword(prev => !prev)}
                   >
-                    {showPassword ? <FaEyeSlash className='mt-[6px]' /> : <FaEye className='mt-[6px]' />}
+                    {showPassword ? <FaEyeSlash className='mt-[6px] text-blue-700' /> : <FaEye className='mt-[6px] text-blue-500' />}
                   </span>
                 </div>
                 {error.password && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.password}</p>}
@@ -280,7 +277,7 @@ function Register() {
                 <label className="text-black font-semibold text-sm sm:text-base">Confirm Password</label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    <LuLockKeyhole className='mt-[6px] text-sm sm:text-base' />
+                    <LuLockKeyhole className='mt-[6px] text-sm sm:text-base text-blue-700' />
                   </span>
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
@@ -295,7 +292,7 @@ function Register() {
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg sm:text-xl cursor-pointer"
                     onClick={() => setShowConfirmPassword(prev => !prev)}
                   >
-                    {showConfirmPassword ? <FaEyeSlash className='mt-[6px]' /> : <FaEye className='mt-[6px]' />}
+                    {showConfirmPassword ? <FaEyeSlash className='mt-[6px] text-blue-700' /> : <FaEye className='mt-[6px] text-blue-500' />}
                   </span>
                 </div>
                 {error.confirmpassword && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.confirmpassword}</p>}
