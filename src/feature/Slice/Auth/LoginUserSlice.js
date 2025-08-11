@@ -39,7 +39,7 @@ export const fetchLoginUser = createAsyncThunk(
         //   response.data.user._id
         // );
         dispatch(setAuthenticated(true)); // login success
-        return { user, token };
+        return { user };
       } else {
         dispatch(logout());
         return rejectWithValue("Invalid response from server");
@@ -62,10 +62,6 @@ const loginUserSlice = createSlice({
     error: null,
   },
   reducers: {
-    logoutUser: (state) => {
-      state.userData = null;
-      localStorage.removeItem("Authtoken");
-    },
     setUserData: (state, action) => {
       state.userData = action.payload;
     },
@@ -77,7 +73,7 @@ const loginUserSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLoginUser.fulfilled, (state, action) => {
-        console.log("✅ fulfilled reducer called", action.payload);
+        // console.log("fulfilled reducer called", action.payload);
         state.loading = false;
         state.userData = action.payload.user;
       })
@@ -88,5 +84,5 @@ const loginUserSlice = createSlice({
   },
 });
 
-export const { logoutUser, setUserData } = loginUserSlice.actions;
+export const { setUserData } = loginUserSlice.actions;
 export default loginUserSlice.reducer;

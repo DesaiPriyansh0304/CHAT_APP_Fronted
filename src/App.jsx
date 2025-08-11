@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 //Main Router
-import AppRouter from './Pages/Router/AppRouter';
+import AppRouter from './Router/AppRouter';
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
 function App() {

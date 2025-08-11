@@ -3,21 +3,26 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../feature/Slice/Auth/AuthSlice';
 import { toggleTheme } from '../feature/Slice/Theme/ThemeSlice';
-import { topItems, bottomItems, avatarItems, languages } from './Side panel/Icon';
-import './Side panel/Css/Slidebar.css';
-import 'flag-icons/css/flag-icons.min.css';
+import { topItems, bottomItems, avatarItems, languages } from '../Sidebar/icon';
+
 
 function Sidebar() {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useSelector((state) => state.theme.mode);
-  const { userData: user, loading, error } = useSelector((state) => state.loginUser);
 
-  const [showLangMenu, setShowLangMenu] = useState(false);
-  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  //there Slice
+  const theme = useSelector((state) => state.theme.mode);
+  //Login User Data Slice
+  const loginUserState = useSelector((state) => state.loginUser || {});
+  const { userData: user, loading, error } = loginUserState;
+
+
+  const [showLangMenu, setShowLangMenu] = useState(false);                 //Languge Menu
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);             //Avtar Menu 
+  const [hoveredItem, setHoveredItem] = useState(null);                    //Hover Icon     
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);       //Moblie Screen 
 
   // Handle window resize
   useEffect(() => {
@@ -57,10 +62,10 @@ function Sidebar() {
     }
   }, [theme]);
 
+  // Click outside handler 
   const menuRef = useRef();
   const langMenuRef = useRef();
 
-  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showAvatarMenu && menuRef.current && !menuRef.current.contains(e.target)) {
@@ -74,6 +79,7 @@ function Sidebar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAvatarMenu, showLangMenu]);
 
+  //icon comma
   const getButtonClass = (id) => {
     const base = 'relative p-2 rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer';
     const common = 'hover:text-blue-600 dark:hover:text-[#dfd0b8]';
@@ -135,6 +141,23 @@ function Sidebar() {
     setHoveredItem(null);
   };
 
+  // Avatar menu click handler 
+  const handleAvatarMenuClick = (title, page) => {
+    console.log('Avatar menu clicked:', title, page);
+
+    if (title === 'Logout') {
+      dispatch(logout());
+      navigate('/login');
+    } else if (page) {
+      navigate(`/${page}`);
+    }
+
+    // Menu Close
+    setShowAvatarMenu(false);
+    setShowLangMenu(false);
+    setHoveredItem(null);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -142,8 +165,8 @@ function Sidebar() {
 
   return (
     <>
-      <div className="bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] w-full h-full ">
-        <div className="relative md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center  shadow-md">
+      <div className="bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] w-full h-full">
+        <div className="relative md:h-screen flex flex-col md:justify-between md:py-4 py-2 items-center shadow-md">
 
           {/* Logo (Only on Desktop) */}
           <div className="hidden md:flex justify-center">
@@ -175,8 +198,10 @@ function Sidebar() {
             {isMobile && (
               <li className="relative ml-2">
                 <button
-                  onClick={() => {
-                    console.log('Avatar clicked, current state:', showAvatarMenu); // Debug log
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Mobile Avatar clicked, current state:', showAvatarMenu);
                     setShowAvatarMenu(prev => !prev);
                     setShowLangMenu(false);
                     setHoveredItem(null);
@@ -193,40 +218,33 @@ function Sidebar() {
             )}
           </ul>
 
-          {/* Mobile Avatar Menu - Positioned outside the ul to avoid overflow issues */}
+          {/* Mobile Avatar Menu  */}
           {isMobile && showAvatarMenu && (
             <div
               className="fixed top-20 right-4 w-48 bg-white border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
               ref={menuRef}
+              onClick={(e) => e.stopPropagation()}
             >
               <ul className="p-1.5">
                 {avatarItems.map(({ icon, title, id, page }) => (
                   <li key={id} className="flex flex-col">
                     {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
-                    <div
-                      onClick={() => {
-                        if (title === 'Logout') {
-                          dispatch(logout());
-                          navigate('/login');
-                        } else if (page) {
-                          navigate(`/${page}`);
-                        }
-                        setShowAvatarMenu(false);
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAvatarMenuClick(title, page);
                       }}
-                      className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                      className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors text-left"
                     >
                       <div className="text-blue-500 text-[15px]">{icon}</div>
                       <div className="text-base">{title}</div>
-                    </div>
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-
-          {/* Top Menu */}
-          <ul className={`flex ${isMobile ? 'flex-row gap-4 mb-2 mt-1' : 'flex-col gap-4 mt-6'} items-center`}>
-          </ul>
 
           {/* Bottom Menu (Desktop Only) */}
           <div className="hidden md:flex flex-col items-center relative mt-auto">
@@ -304,29 +322,20 @@ function Sidebar() {
 
               {showAvatarMenu && (
                 <div
-                  className="absolute left-14 bottom-0 w-40 bg-white border border-blue-300 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-600"
+                  className="absolute left-14 bottom-0 w-39 bg-white border border-blue-300 rounded-md shadow-lg z-10 dark:bg-gray-800 dark:border-gray-600"
                   ref={menuRef}
                 >
                   <ul className="p-1.5">
                     {avatarItems.map(({ icon, title, id, page }) => (
                       <li key={id} className="flex flex-col">
                         {title === 'Logout' && <hr className="border-gray-300 dark:border-gray-600 my-1" />}
-                        <div
-                          onClick={() => {
-                            console.log('Avatar clicked, current state:', showAvatarMenu);
-                            if (title === 'Logout') {
-                              dispatch(logout());
-                              navigate('/login');
-                            } else if (page) {
-                              navigate(`/${page}`);
-                            }
-                            setShowAvatarMenu(false);
-                          }}
-                          className="w-full flex items-center gap-6 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                        <button
+                          onClick={() => handleAvatarMenuClick(title, page)}
+                          className="w-full flex items-center gap-6 px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md "
                         >
                           <div className="text-blue-500 text-[15px]">{icon}</div>
                           <div className="text-base">{title}</div>
-                        </div>
+                        </button>
                       </li>
                     ))}
                   </ul>

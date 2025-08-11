@@ -14,7 +14,6 @@ function PrivateRoute() {
   const { isAuthenticated } = authState;
   const { loading, error } = loginUserState;
 
-
   // console.log('isAuthenticated ->/auth/PrivetRouter', isAuthenticated);
   // console.log('loading ->/LoginUser/PrivetRouter', loading);
   // console.log('error ->/LoginUser/PrivetRouter', error);
@@ -27,13 +26,16 @@ function PrivateRoute() {
 
   if (loading) {
     return (
-      <div className='w-full h-screen flex justify-center items-center'>
-        <h3 className='text-2xl text-blue-600'>
+      <div className="w-full h-screen flex flex-col justify-center items-center gap-4">
+        {/* Spinner */}
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <h3 className="text-2xl text-blue-600">
           Checking authentication...
         </h3>
       </div>
     );
   }
+
 
   if (!isAuthenticated || error) {
     return <Navigate to="/login" replace />;

@@ -586,3 +586,6 @@ VITE_REACT_APP=http://localhost:8000
 # VITE_GOOGLE_CLIENT_ID=661327388232-dub9s4ss3aqt126g4gcsr2tkrg1suo5r.apps.googleusercontent.com
 
 http://localhost:5173/github/callback
+
+
+user in dasboer and navigat in login page to show poup in looguot bihind ti login page navigate

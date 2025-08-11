@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiUserAddLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { FaSearch } from 'react-icons/fa';
-import ContactAdd from '../../All-Icon-Folder/Contacts/ContactAdd';
+import ContactAdd from '../Chat-contatainer/Contacts/ContactAdd';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 import { EllipsisVerticalIcon } from 'lucide-react';
 import { IoShareSocialOutline } from 'react-icons/io5';
 import { MdBlockFlipped } from 'react-icons/md';
-import { fetchInvitedUsers, resetInvitedUsersState } from '../../feature/Slice/Invited-User/InvitedUsersSlice';
+import { fetchInvitedUsers, resetInvitedUsersState } from '../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
 
 // Group users alphabetically

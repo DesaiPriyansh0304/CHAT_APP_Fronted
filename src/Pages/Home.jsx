@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-//main screen page
-import Sidebar from '../components/Sidebar';
-import ChatContainer from '../components/ChatContainer';
-import Rightsidebar from '../components/Rigthsidebar';
-//tab-icon page
-import AvtarPage from './AvtarPage';
-import AllUser from '../components/main-Icon-page/AllUser';
+//main screen page (sidebar + chatcontainer + rigthsidebar)
+import Sidebar from '../Dashboard-Page/Sidebar';
+import ChatContainer from '../Dashboard-Page/ChatContainer';
+import Rightsidebar from '../Dashboard-Page/Rigthsidebar';
+//tab-icon page (AvtarPage + AllUser)
+import AvtarPage from '../Icon-Page/AvtarPage';
+import AllUser from '../Icon-Page/AllUser';
+
 
 function Home() {
 
   const { tab, token } = useParams();                 //tab and token get Approuter
   const currentTab = tab || (token ? '' : 'chats');   //chats tb open 
 
-  const [selectedUser, setSelectedUser] = useState(null);                       //Select User
-  const [selectGroup, setSelectGroup] = useState(null);                         //Select Group
-  const [userchat, setUserChat] = useState('1');                                //user chat
-  const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);  //reposive open in sidebar
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);            //Detect mobile screen
+  const [selectedUser, setSelectedUser] = useState(null);                        //Select User
+  const [selectGroup, setSelectGroup] = useState(null);                          //Select Group
+  const [userchat, setUserChat] = useState('1');                                 //user chat
+  const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);   //reposive open in sidebar
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);             //Detect mobile screen
+  console.log('✌️isMobile --->', isMobile);
 
   //resize screen check
   useEffect(() => {
@@ -55,10 +57,8 @@ function Home() {
       <div className="w-screen h-screen">
 
         {currentTab === 'alluser' ? (
-
           //avterpage + alluser page 
           <div className="h-full w-full grid grid-cols-[6%_94%]">
-
             {/* Sidebar */}
             <div className="h-full w-full overflow-hidden">
               <Sidebar
@@ -73,12 +73,10 @@ function Home() {
             <div className="h-full w-full overflow-visible">
               <AllUser />
             </div>
-
           </div>
         ) : currentTab === 'avtarpage' ? (
           //avterpage + sidebar 
           <div className="h-full w-full grid grid-cols-[6%_94%]">
-
             {/* Sidebar */}
             <div className="h-full w-full overflow-visible">
               <Sidebar
@@ -93,12 +91,10 @@ function Home() {
             <div className="h-full w-full overflow-hidden">
               <AvtarPage />
             </div>
-
           </div>
         ) : (
           //sidebar + chatcontainer + rigthsidebar
           <div className="h-full w-full md:grid md:grid-cols-[6%_25%_69%] flex flex-col">
-
             {/* Sidebar */}
             {!showMobileRightSidebar && (
               <div className="md:static fixed bottom-0 left-0 w-full h-16 md:h-full md:w-full md:order-1 order-3 z-10">
@@ -138,7 +134,7 @@ function Home() {
 
             {/* RightSidebar - Mobile Overlay */}
             {showMobileRightSidebar && isMobile && (
-              <div className="fixed inset-0 z-50 md:hidden overflow-y-auto bg-white">
+              <div className="fixed inset-0 z-50 md:hidden overflow-y-auto">
                 <Rightsidebar
                   selectUser={selectedUser}
                   SetSelectUser={handleUserSelect}

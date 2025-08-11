@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserGroups, addGroup } from '../../feature/Slice/Group/UserGroup';
-import { leaveGroup } from '../../feature/Slice/Group/DeleteGroup';
-import CreateGroupModal from '../../All-Icon-Folder/Group/Groupadd';
-import AddMemberModal from '../../All-Icon-Folder/Group/AddMemberModal';
+import { fetchUserGroups, addGroup } from '../feature/Slice/Group/UserGroup';
+import { leaveGroup } from '../feature/Slice/Group/DeleteGroup';
+import CreateGroupModal from '../Chat-contatainer/Group/Groupadd';
+import AddMemberModal from '../Chat-contatainer/Group/AddMemberModal';
 import { RiGroupLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { FaSearch } from 'react-icons/fa';
 import { BsThreeDots } from 'react-icons/bs';
 import { IoIosPersonAdd } from 'react-icons/io';
 import { MdBlockFlipped } from 'react-icons/md';
-import { DeleteGroupButton } from '../../All-Icon-Folder/Contacts/DeleteGroup';
+import { DeleteGroupButton } from '../Chat-contatainer/Contacts/DeleteGroup';
 
 const GroupList = ({ selectGroup, setSelectGroup }) => {
   const dispatch = useDispatch();

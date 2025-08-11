@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import InvitedData from '../../All-Icon-Folder/all-User/InvitedData';
-import OtherUser from '../../All-Icon-Folder/all-User/OtherUser';
-import LiveChatUser from '../../All-Icon-Folder/all-User/LivechatUser';
+import InvitedData from '../Chat-contatainer/All-User/InvitedData';
+import OtherUser from '../Chat-contatainer/All-User/OtherUser';
+import LiveChatUser from '../Chat-contatainer/All-User/LivechatUser';
 
 function AllUser() {
 

@@ -67,18 +67,43 @@ function Login() {
   useEffect(() => {
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
 
     if (error) {
-      console.error('GitHub OAuth Error:', error);
-      toast.error('GitHub login was cancelled or failed');
+      console.log('GitHub OAuth Error:', { error, errorDescription });
+      let errorMessage = 'GitHub login was cancelled or failed';
+
+      if (error === 'access_denied') {
+        errorMessage = 'GitHub login was cancelled by user';
+      } else if (errorDescription) {
+        errorMessage = `GitHub error: ${errorDescription}`;
+      }
+
+      toast.error(errorMessage);
+      setError({ form: errorMessage });
+
+      // Clean up URL
       navigate('/login', { replace: true });
       return;
     }
 
     if (code) {
+      console.log('GitHub authorization code received, processing...');
       handleGithubCallback(code);
     }
-  }, [searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, navigate]);
+
+  // Add this debug function to check environment variables (remove in production)
+  // useEffect(() => {
+  //   console.log('Environment check:', {
+  //     hasGithubClientId: !!GITHUB_CLIENT_ID,
+  //     hasApiUrl: !!import.meta.env.VITE_REACT_APP,
+  //     currentOrigin: getCurrentDomain(),
+  //     redirectUri: REDIRECT_URI
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const handleGithubCallback = async (code) => {
     try {
@@ -86,33 +111,62 @@ function Login() {
       console.log('GitHub Auth Code:', code);
       console.log('Redirect URI used:', REDIRECT_URI);
 
+      // Clear any existing errors
+      setError({});
+
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP}/api/auth/github`,
         {
           code,
           redirect_uri: REDIRECT_URI
+        },
+        {
+          timeout: 10000, // 10 second timeout
+          headers: {
+            'Content-Type': 'application/json',
+          }
         }
       );
+
+      console.log('GitHub login response:', response.data);
 
       const { token, userData } = response.data;
 
       if (response.status === 200 && token) {
         dispatch(addToken({ token }));
         toast.success(`Welcome ${userData.firstname}! GitHub Login Successful`);
+
+        // Clean up URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+
         navigate('/', { replace: true });
       } else {
         throw new Error('Invalid GitHub login response');
       }
     } catch (error) {
-      console.error('GitHub Login Error:', error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'GitHub login failed. Please try again.';
+      console.log('GitHub Login Error Details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        code: error.code
+      });
+
+      let errorMessage = 'GitHub login failed. Please try again.';
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timeout. Please check your internet connection and try again.';
+      } else if (error.code === 'NETWORK_ERROR') {
+        errorMessage = 'Network error. Please check your connection.';
+      }
 
       setError({ form: errorMessage });
       toast.error('GitHub login unsuccessful');
-      navigate('/login', { replace: true });
+
+      // Clean up URL parameters on error
+      window.history.replaceState({}, document.title, '/login');
+
     } finally {
       setIsGithubLoading(false);
     }
@@ -207,10 +261,11 @@ function Login() {
     }
   };
 
+  //Google login
   const handleGoogleSuccess = async (authResult) => {
     try {
       setIsGoogleLoading(true);
-      console.log('Google Auth Result:', authResult);
+      // console.log('Google Auth Result:', authResult);
 
       if (authResult?.code) {
         const response = await axios.post(
@@ -218,15 +273,18 @@ function Login() {
           { code: authResult.code }
         );
 
-        const { token, userData } = response.data;
+        const { token } = response.data;
 
-        if (response.status === 200 && token) {
-          dispatch(addToken({ token }));
-          toast.success(`Welcome ${userData.firstname}! Google Login Successful`);
-          navigate('/');
-        } else {
-          throw new Error('Invalid Google login response');
+        if (!token) {
+          toast.error('No token received from server.');
+          setIsGoogleLoading(false);
+          return;
         }
+
+        dispatch(addToken({ token }));
+        toast.success('Google Login Successful');
+
+        setIsGoogleLoading(false);
       }
     } catch (error) {
       console.log('Google Login Error:', error);
@@ -237,7 +295,6 @@ function Login() {
 
       setError({ form: errorMessage });
       toast.error('Google login unsuccessful');
-    } finally {
       setIsGoogleLoading(false);
     }
   };
@@ -258,14 +315,25 @@ function Login() {
   const handleGithubLogin = () => {
     if (!GITHUB_CLIENT_ID) {
       toast.error('GitHub Client ID not configured');
+      console.log('VITE_GITHUB_CLIENT_ID not found in environment variables');
       return;
     }
 
+    // Clear any existing errors
+    setError({});
+
     console.log('GitHub OAuth URL:', GITHUB_OAUTH_URL);
     console.log('Redirect URI:', REDIRECT_URI);
+    console.log('GitHub Client ID:', GITHUB_CLIENT_ID);
 
-    setIsGithubLoading(true);
-    window.location.href = GITHUB_OAUTH_URL;
+    try {
+      setIsGithubLoading(true);
+      window.location.href = GITHUB_OAUTH_URL;
+    } catch (error) {
+      console.log('Error redirecting to GitHub:', error);
+      setIsGithubLoading(false);
+      toast.error('Failed to redirect to GitHub. Please try again.');
+    }
   };
 
   // Check if form is valid for button enable/disable
@@ -274,21 +342,20 @@ function Login() {
   return (
     <>
       <div className="min-h-screen bg-white flex relative">
-        {/* Left Image - Fixed positioning for desktop, hidden on mobile */}
+        {/* Left side */}
         <div className="hidden md:block md:w-1/2 fixed left-0 top-0 h-screen z-0">
           <img
-            src='https://chat-vibe-talk.vercel.app/Img/Login/login-image.png '
+            src='/Img/Login/login-image.png'
             alt="Login"
             className="object-cover w-full h-full"
           />
-          {/* Fixed text overlay - won't scroll */}
+
           <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
             keeping conversations alive and effortless.
           </div>
-
         </div>
 
-        {/* Right Form - Scrollable, positioned to the right */}
+        {/* Right side */}
         <div className="w-full md:w-1/2 md:ml-auto relative z-10 bg-white overflow-y-auto h-screen"
           style={{
             scrollbarWidth: 'thin',
@@ -315,15 +382,12 @@ function Login() {
             <div className="md:hidden mb-8 text-center">
               <div className="mb-4">
                 <img
-                  src="https://chat-vibe-talk.vercel.app/Img/Login/login-image.png "
+                  src="/Img/Login/login-image.png"
                   alt="Login"
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
               <p className="text-lg font-light text-gray-700 max-w-sm mx-auto">
-                <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
-                  keeping conversations alive and effortless.
-                </div>
               </p>
             </div>
 
@@ -384,7 +448,7 @@ function Login() {
                       name="email"
                       id="email"
                       placeholder="Enter your email"
-                      className="w-full p-3 pl-10 rounded-lg border border-gray-300 text-black
+                      className="w-full p-3 pl-10 rounded-md border border-gray-300 text-black
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                       value={userLogin.email}
                       onChange={handleChange}
@@ -409,7 +473,7 @@ function Login() {
                       name="password"
                       id="password"
                       placeholder="Enter your password"
-                      className="w-full p-3 pl-10 pr-12 rounded-lg border border-gray-300 text-black
+                      className="w-full p-3 pl-10 pr-12 rounded-md border border-gray-300 text-black
                        focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                       value={showPassword ? userLogin.password : displayValue}
                       onChange={handleChange}
@@ -445,7 +509,7 @@ function Login() {
                 <div className="flex justify-start mb-4">
                   <Link
                     to="/forget-password"
-                    state={{ email: userLogin.email }}
+                    // state={{ email: userLogin.email }}
                     className="text-[15px] bg-gradient-to-r from-[#09A6F3] to-[#0C63E7] text-transparent bg-clip-text font-semibold hover:underline"
                   >
                     Forgot password
@@ -457,7 +521,7 @@ function Login() {
                 <button
                   type="submit"
                   disabled={!isFormValid || isLoading || isGoogleLoading || isGithubLoading}
-                  className={`w-full p-3 rounded-lg text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${!isFormValid || isLoading || isGoogleLoading || isGithubLoading
+                  className={`w-full p-3 rounded-md text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${!isFormValid || isLoading || isGoogleLoading || isGithubLoading
                     ? 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]  shadow-lg hover:shadow-xl cursor-not-allowed '
                     : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3] cursor-pointer shadow-lg hover:shadow-xl'
                     }`}
@@ -511,7 +575,7 @@ function Login() {
                   {/* GitHub Button */}
                   <button
                     type="button"
-                    className={`flex-1 flex items-center justify-center gap-3 px-4.5 py-2 border border-gray-300 rounded-lg text-[16px] transition-all ${isGithubLoading || isLoading || isGoogleLoading
+                    className={`flex-1 flex items-center justify-center gap-3 px-4.5 py-2 border border-gray-300 rounded-md text-[16px] transition-all ${isGithubLoading || isLoading || isGoogleLoading
                       ? 'cursor-not-allowed opacity-50'
                       : 'cursor-pointer hover:bg-gray-50 hover:shadow-md'
                       }`}

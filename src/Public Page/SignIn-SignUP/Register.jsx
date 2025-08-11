@@ -9,6 +9,8 @@ import { FiMail } from 'react-icons/fi';
 import { ImMobile } from "react-icons/im";
 import { LuLockKeyhole } from 'react-icons/lu';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaLocationArrow } from "react-icons/fa6";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 function Register() {
   const [userRegister, setUserRegister] = useState({
@@ -92,22 +94,44 @@ function Register() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen overflow-auto">
+    <div className="min-h-screen bg-white flex relative">
       {/* Left Image */}
-      <div className="relative hidden md:block">
+      <div className="hidden md:block md:w-1/2 fixed left-0 top-0 h-screen z-0">
         <img
-          src="/public/Img/Login/login-image.png"
-          alt="Register Visual"
+          src='/public/Img/Login/login-image.png'
+          alt="Login"
           className="object-cover w-full h-full"
         />
+        {/* Fixed text overlay - won't scroll */}
         <div className="absolute bottom-8 left-8 text-[5px] lg:text-2xl font-light max-w-md z-10 bg-gradient-to-r from-blue-400 to-blue-700 text-transparent bg-clip-text">
           keeping conversations alive and effortless.
         </div>
+
       </div>
 
       {/* Right Form */}
-      <div className="min-h-screen flex flex-col justify-center items-center bg-white px-4 py-8 md:px-6">
-        <div className="w-full max-w-4xl mx-auto border border-gray-200 p-4 sm:p-6 rounded-xl shadow-lg">
+      <div className="w-full md:w-1/2 md:ml-auto relative z-10 bg-white overflow-y-auto h-screen"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#0D41E1 #f1f1f1',
+        }}>
+        <style jsx>{`
+            .login-scroll-container::-webkit-scrollbar {
+              width: 4px;
+              display: block !important;
+            }
+            .login-scroll-container::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .login-scroll-container::-webkit-scrollbar-thumb {
+              background: #2563eb;
+              border-radius: 2px;
+            }
+            .login-scroll-container::-webkit-scrollbar-thumb:hover {
+              background: #1d4ed8;
+            }
+          `}</style>
+        <div className="w-full max-w-4xl mx-auto p-4 sm:p-6">
           {/*title*/}
           <div className="text-center text-gray-800 mb-6">
             <h2 className="text-2xl sm:text-3xl font-bold mb-1">Create an Account</h2>
@@ -141,7 +165,7 @@ function Register() {
                     value={userRegister.firstname}
                     onChange={handleChange}
                     placeholder="Enter first name"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                 </div>
@@ -159,7 +183,7 @@ function Register() {
                     value={userRegister.lastname}
                     onChange={handleChange}
                     placeholder="Enter last name"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                 </div>
@@ -180,12 +204,13 @@ function Register() {
                     name="dob"
                     value={userRegister.dob}
                     onChange={handleChange}
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                 </div>
                 {error.dob && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.dob}</p>}
               </div>
+              {/*Gender*/}
               <div className="w-full sm:w-1/2">
                 <label className="text-black font-semibold text-sm sm:text-base">Gender</label>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4">
@@ -210,7 +235,9 @@ function Register() {
             {/* Email & Mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
               <div className="w-full sm:w-1/2">
-                <label className="text-black font-semibold text-sm sm:text-base">Email</label>
+                <label className="text-black font-semibold text-sm sm:text-base">
+                  Email
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500">
                     <FiMail className='mt-[6px] text-sm sm:text-base text-blue-700' />
@@ -221,12 +248,13 @@ function Register() {
                     value={userRegister.email}
                     onChange={handleChange}
                     placeholder="Enter email"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                 </div>
                 {error.email && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.email}</p>}
               </div>
+              {/*Mobile*/}
               <div className="w-full sm:w-1/2">
                 <label className="text-black font-semibold text-sm sm:text-base">Mobile</label>
                 <div className="relative">
@@ -239,7 +267,7 @@ function Register() {
                     value={userRegister.mobile}
                     onChange={handleChange}
                     placeholder="Enter mobile"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                 </div>
@@ -261,14 +289,14 @@ function Register() {
                     value={userRegister.password}
                     onChange={handleChange}
                     placeholder="Enter password"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 pr-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 pr-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                   <span
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg sm:text-xl cursor-pointer"
                     onClick={() => setShowPassword(prev => !prev)}
                   >
-                    {showPassword ? <FaEyeSlash className='mt-[6px] text-blue-700' /> : <FaEye className='mt-[6px] text-blue-500' />}
+                    {showPassword ? <IoEyeOffOutline className='mt-[6px] text-blue-700' /> : <IoEyeOutline className='mt-[6px] text-blue-500' />}
                   </span>
                 </div>
                 {error.password && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.password}</p>}
@@ -285,14 +313,14 @@ function Register() {
                     value={userRegister.confirmpassword}
                     onChange={handleChange}
                     placeholder="Enter confirm password"
-                    className="w-full p-3 mt-1 pl-9 sm:pl-10 pr-10 rounded-2xl bg-[#E5E7EB] text-black border border-gray-300
+                    className="w-full p-3 mt-1 pl-9 sm:pl-10 pr-10 rounded-md  text-black border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm sm:text-base"
                   />
                   <span
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg sm:text-xl cursor-pointer"
                     onClick={() => setShowConfirmPassword(prev => !prev)}
                   >
-                    {showConfirmPassword ? <FaEyeSlash className='mt-[6px] text-blue-700' /> : <FaEye className='mt-[6px] text-blue-500' />}
+                    {showConfirmPassword ? <IoEyeOffOutline className='mt-[6px] text-blue-700' /> : <IoEyeOutline className='mt-[6px] text-blue-500' />}
                   </span>
                 </div>
                 {error.confirmpassword && <p className="text-xs sm:text-sm text-red-500 mt-1">{error.confirmpassword}</p>}
@@ -304,12 +332,22 @@ function Register() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full p-3 rounded-2xl text-white font-semibold text-sm sm:text-base ${isLoading
-                  ? 'bg-[#3799FA] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3] cursor-pointer'
+                className={`w-full p-3 rounded-lg text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${!isLoading
+                  ? 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3]  shadow-lg hover:shadow-xl cursor-not-allowed '
+                  : 'bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] hover:from-[#0C63E7] hover:via-[#0A85ED] hover:to-[#09A6F3] cursor-pointer shadow-lg hover:shadow-xl'
                   }`}
               >
-                {isLoading ? 'Registering...' : 'Sign Up'}
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Signing Up...
+                  </>
+                ) : (
+                  <>
+                    Sign Up
+                    <FaLocationArrow className="text-xl " />
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -365,16 +403,16 @@ function Register() {
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-6 px-4">
+        <div className=" sm:mt-2 px-4">
           <p className="text-center text-xs sm:text-sm text-gray-500">
             Already have an account?{' '}
-            <Link to="/" className="text-[#0C63E7] font-semibold hover:underline">
+            <Link to="/" className="text-[#0C63E7] font-semibold text-md hover:underline">
               Sign In
             </Link>
           </p>
         </div>
 
-        <div className="mt-4 sm:mt-6 text-xs text-center text-gray-500 px-4  leading-relaxed">
+        <div className=" sm:mt-6 text-xs mb-[22px] text-center text-gray-500 px-4  leading-relaxed">
           <div className="mb-1">© 2025 Releasium Inc. All rights reserved.</div>
           <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
             <Link to="#" className="hover:underline font-medium text-[#bb5b5b]">Privacy Policy</Link>

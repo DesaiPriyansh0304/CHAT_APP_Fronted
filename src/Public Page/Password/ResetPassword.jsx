@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MdOutlineLockReset } from "react-icons/md";
 import { LuLockKeyhole } from 'react-icons/lu';
 import { FiLoader } from 'react-icons/fi';
+import { MdKey } from "react-icons/md";
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -24,6 +25,8 @@ function ResetPassword() {
   const [expiryTime, setExpiryTime] = useState(180);                      //Expiry Time            
   const [warning, setWarning] = useState(false);                          //Email warning      
   const inputRefs = useRef([]);
+
+
 
   //Password Validation
   const [passwordValidation, setPasswordValidation] = useState({
@@ -209,6 +212,30 @@ function ResetPassword() {
     </div>
   );
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text').trim();
+    if (!/^\d*$/.test(pasteData)) return; // only numbers allow
+
+    const digits = pasteData.split('').slice(0, 6);
+    const newOtpValues = [...otpValues];
+
+    digits.forEach((digit, idx) => {
+      newOtpValues[idx] = digit;
+    });
+
+    setOtpValues(newOtpValues);
+
+    // focus next empty field
+    const firstEmptyIndex = newOtpValues.findIndex((val) => val === '');
+    if (firstEmptyIndex !== -1) {
+      inputRefs.current[firstEmptyIndex]?.focus();
+    } else {
+      inputRefs.current[5]?.blur();
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-[#1F2937] flex justify-center items-center p-4">
 
@@ -218,7 +245,7 @@ function ResetPassword() {
           disabled:opacity-40 disabled:cursor-not-allowed"
           onClick={() => {
             localStorage.removeItem('otpExpiresAt');
-            navigate(-1);
+            navigate('/forget-password');
           }}
           disabled={loading || resending}
         >
@@ -264,24 +291,25 @@ function ResetPassword() {
                   value={digit}
                   onChange={(e) => handleChange(e, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
+                  onPaste={handlePaste}
                   className="w-10 h-12 text-center mx-2  rounded-xl text-lg
-                   border-gray-500 border-2 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 "
+                   border-gray-500 border-2 bg-gray-800 text-white "
                 />
               ))}
             </div>
 
-            <hr className=" mt-2 mb-3.5 mx-[18px] border-t-2 border-[#0077b6] " />
+            <hr className=" mt-2 mb-5  mx-[18px] border-t-2 border-[#0077b6] " />
 
             {/* New Password */}
             <div className="relative mb-3">
               {/*icon*/}
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white">
-                <LuLockKeyhole className='mt-[1px]' />
+                <MdKey className='mt-[1px]' />
               </span>
               <input
                 type={showNewPassword ? "text" : "password"}
                 placeholder="Enter New Password"
-                className="w-full pl-10 pr-10 py-3 rounded-2xl
+                className="w-full pl-10 pr-10 py-3 rounded-md
                   bg-[#1F2F50] border border-[#7D95FB] text-white focus:outline-none focus:ring-2 focus:ring-blue-600
                   placeholder:text-white"
                 value={newPassword}
@@ -315,12 +343,12 @@ function ResetPassword() {
             {/* Confirm Password */}
             <div className="relative mb-4 mt-4">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white">
-                <LuLockKeyhole className='mt-[1px]' />
+                <MdKey className='mt-[1px]' />
               </span>
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm New Password"
-                className={`w-full p-3 pl-10 pr-10 rounded-2xl
+                className={`w-full p-3 pl-10 pr-10 rounded-md
                  bg-[#1F2F50] border border-[#7D95FB] text-white focus:outline-none focus:ring-2 focus:ring-blue-600
                  placeholder:text-white
                   ${confirmPassword && newPassword !== confirmPassword ? 'border-red-500 focus:ring-red-600 focus:ring-2' : ''}`}
@@ -354,10 +382,14 @@ function ResetPassword() {
             <div>
               <button
                 type="submit"
-                className="w-full p-3 rounded-2xl font-semibold mb-2 text-[18px]
+                className="w-full p-3 rounded-md font-semibold mb-3 text-[16px]
                    bg-gradient-to-r from-[#0D41E1] via-[#0A85ED] to-[#07C8F9] text-white    
-                   hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer"
-                disabled={loading}
+                   disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer"
+                disabled={
+                  loading ||
+                  otp.length !== 6 ||
+                  newPassword !== confirmPassword
+                }
               >
                 {loading ? (
                   <div className="flex flex-row items-center justify-center gap-2">
@@ -394,15 +426,14 @@ function ResetPassword() {
           <div >
             <button onClick={() => {
               localStorage.removeItem('otpExpiresAt');
-              navigate(-1);
+              navigate('/forget-password');
             }}
               disabled={loading || resending}
               className={`${!email ? 'w-full justify-center' : 'px-15'}
-                  py-3 px-20 rounded-2xl text-[15px]
-                bg-gradient-to-r from-[#343a40] via-[#495057] to-[#6c757d] text-[#f8f9fa]  
-                hover:from-[#495057] hover:via-[#6c757d] hover:to-[#adb5bd]             
-                font-semibold transition cursor-pointer
-                disabled:opacity-40 disabled:cursor-not-allowed`}
+                  py-3 px-20 rounded-2xl text-[15px] bg-gradient-to-r from-[#343a40] via-[#495057] to-[#6c757d] text-[#f8f9fa]  
+                  hover:from-[#495057] hover:via-[#6c757d] hover:to-[#adb5bd]         
+                  font-semibold transition cursor-pointer
+                  disabled:opacity-40 disabled:cursor-not-allowed`}
             >
               Cancel
             </button>

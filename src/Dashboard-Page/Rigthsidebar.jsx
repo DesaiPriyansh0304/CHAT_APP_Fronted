@@ -16,10 +16,10 @@ import {
   resetChatUnreadCount,
 } from '../feature/Slice/Socket/unreadCountSlice';
 
-import Header from './Rigthsidebar/Header';
-import Chatbody from './Rigthsidebar/Chatbody';
-import Inputside from './Rigthsidebar/Inputside';
-import RightProfilePanel from './Rigthsidebar/chatprofiledata';
+import Header from '../components/Rigthsidebar/Header';
+import Chatbody from '../components/Rigthsidebar/Chatbody';
+import Inputside from '../components/Rigthsidebar/Inputside';
+import RightProfilePanel from '../components/Rigthsidebar/chatprofiledata';
 
 const buildPrivateMessagePayload = ({
   user,

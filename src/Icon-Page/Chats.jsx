@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchInvitedUsers } from "../../feature/Slice/Invited-User/InvitedUsersSlice";
+import { fetchInvitedUsers } from "../feature/Slice/Invited-User/InvitedUsersSlice";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useDebounce } from "use-debounce";
-import { selectOnlineUsers } from "../../feature/Slice/Socket/OnlineuserSlice";
-import { fetchUnreadMessages } from "../../feature/Slice/unreadMessageSlice";
+import { selectOnlineUsers } from "../feature/Slice/Socket/OnlineuserSlice";
+import { fetchUnreadMessages } from "../feature/Slice/unreadMessageSlice";
 
 function Chats({ selectUser, SetSelectUser }) {
   const [search, setSearch] = useState("");

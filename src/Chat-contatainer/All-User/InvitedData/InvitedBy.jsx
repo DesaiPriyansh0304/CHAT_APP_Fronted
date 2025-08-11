@@ -87,8 +87,8 @@ const InvitedByUser = () => {
                                     <p className="text-sm text-gray-500 truncate">{user.email}</p>
                                     <span
                                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.is_Confirmed
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-800'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800'
                                             }`}
                                     >
                                         {user.is_Confirmed ? 'Online' : 'Offline'}

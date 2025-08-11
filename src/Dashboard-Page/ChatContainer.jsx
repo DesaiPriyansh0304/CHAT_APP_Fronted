@@ -1,13 +1,13 @@
 import React from 'react';
-//Top Icon Page
-import ProfilePage from './main-Icon-page/ProfilePage';
-import Chats from './main-Icon-page/Chats';
-import Group from './main-Icon-page/Group';
-import Contacts from './main-Icon-page/Contacts';
-import Setting from './main-Icon-page/Setting';
-//Bottom Icon Pages
-import AvtarPage from '../Pages/AvtarPage';
-import AllUser from './main-Icon-page/AllUser';
+//Top Icon Page(Prifile + chats + group + contact + setting)
+import ProfilePage from '../Icon-Page/ProfilePage';
+import Chats from '../Icon-Page/Chats';
+import Group from '../Icon-Page/Group';
+import Contacts from '../Icon-Page/Contacts';
+import Setting from '../Icon-Page/Setting';
+//Bottom Icon Pages(AvtarPage + Alluser)
+import AvtarPage from '../Icon-Page/AvtarPage';
+import AllUser from '../Icon-Page/AllUser';
 
 
 function ChatContainer({
@@ -30,19 +30,19 @@ function ChatContainer({
         );
       case 'chats':
         return (
-          <div>
+          <>
             <Chats
               selectUser={selectUser}
               SetSelectUser={SetSelectUser}
               setUserChat={setUserChat}
             />
-          </div>
+          </>
         );
       case 'group':
         return (
-          <div>
+          <>
             <Group selectGroup={selectGroup} setSelectGroup={setSelectGroup} />
-          </div>
+          </>
         );
       case 'contact':
         return (
@@ -52,21 +52,21 @@ function ChatContainer({
         );
       case 'setting':
         return (
-          <div>
+          <>
             <Setting />
-          </div>
+          </>
         );
       case 'avtarpage':
         return (
-          <div>
+          <>
             <AvtarPage />
-          </div>
+          </>
         );
       case 'alluser':
         return (
-          <div>
+          <>
             <AllUser />
-          </div>
+          </>
         );
       default:
     }
@@ -74,7 +74,9 @@ function ChatContainer({
 
   return (
     <>
-      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] `}>{renderContent()}</div>
+      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] `}>
+        {renderContent()}
+      </div>
     </>
   );
 }
