@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { markMessagesAsRead } from '../../feature/Slice/unreadMessageSlice'; // Update path as needed
+import { markMessagesAsRead } from '../../feature/Slice/unreadMessageSlice';
 import { MdOutlineDeleteOutline, MdOutlineVolumeOff, MdOutlineInventory2 } from 'react-icons/md';
 import {
   IoCallOutline,
@@ -13,25 +13,45 @@ import { BsThreeDots } from 'react-icons/bs';
 import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup';
 
 function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, onMobileBack }) {
+
   const dispatch = useDispatch();
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [showCallModal, setShowCallModal] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  const [showMoreOptions, setShowMoreOptions] = useState(false);       //menu
+  const [showCallModal, setShowCallModal] = useState(false);           //audio call
+  const [showVideoModal, setShowVideoModal] = useState(false);         //video call       
   const [callData, setCallData] = useState(null);
-  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);           //search box
+  const [hoveredItem, setHoveredItem] = useState(null);                //tooltip hover state
 
+  //top icon
   const topItems = [
-    { id: 1, icon: <IoSearchOutline />, title: 'Search' },
-    { id: 2, icon: <IoCallOutline />, title: 'Call' },
-    { id: 3, icon: <IoVideocamOutline />, title: 'Video Call' },
-    { id: 4, icon: <IoPersonOutline />, title: 'Profile' },
+    { id: 1, icon: <IoSearchOutline />, title: 'Search', label: "Search Message" },
+    { id: 2, icon: <IoCallOutline />, title: 'Call', label: "Audio Call" },
+    { id: 3, icon: <IoVideocamOutline />, title: 'Video Call', label: "Video Call" },
+    { id: 4, icon: <IoPersonOutline />, title: 'Profile', label: "Profile" },
   ];
 
+  //menu Icon
   const dotUpsideItems = [
-    { id: 1, icon: <MdOutlineInventory2 />, title: 'Archive' },
-    { id: 2, icon: <MdOutlineVolumeOff />, title: 'Mute' },
-    { id: 3, icon: <MdOutlineDeleteOutline />, title: 'Delete' },
+    { id: 101, icon: <MdOutlineInventory2 />, title: 'Archive' },
+    { id: 102, icon: <MdOutlineVolumeOff />, title: 'Mute' },
+    { id: 103, icon: <MdOutlineDeleteOutline />, title: 'Delete' },
   ];
+
+  //Tooltip Component
+  const Tooltip = ({ children, text, show = false }) => {
+    if (!text || !show) return children;
+
+    return (
+      <div className="relative group">
+        {children}
+        <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-[9999] px-3 py-2 text-sm font-medium text-white dark:text-black bg-gray-900 dark:bg-gray-400 rounded-lg shadow-lg transition-all duration-200 opacity-100 visible whitespace-nowrap">
+          {text}
+          <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 bg-gray-900 dark:bg-gray-400 rotate-45"></div>
+        </div>
+      </div>
+    );
+  };
 
   const dotmenuRef = useRef();
 
@@ -43,6 +63,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
     }
   }, [selectUser, dispatch]);
 
+  //click event
   useEffect(() => {
     const handleClickAnywhere = (event) => {
       if (showMoreOptions && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
@@ -59,12 +80,6 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
   const isUserSelected = selectUser && Object.keys(selectUser).length > 0;
   const isGroupSelected = selectGroup && Object.keys(selectGroup).length > 0;
 
-  const commonHeaderStyle =
-    'flex items-center  p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]';
-  const userNameText = 'text-gray-900 dark:text-white';
-  const typingText = 'text-sm text-gray-500 dark:text-gray-400';
-  const buttonTextColor = 'text-gray-500 dark:text-gray-300 text-xl';
-  const hoverBtn = 'hover:text-blue-600 dark:hover:text-blue-400';
 
   const renderMoreMenu = () => (
     <div
@@ -87,67 +102,82 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
 
   if (isUserSelected) {
     return (
-      <div className={commonHeaderStyle}>
+      <div className='flex items-center p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
         <div className="flex items-center space-x-3">
+
           {/* Mobile Back Button */}
-          {isMobile && (
-            <button
-              onClick={onMobileBack}
-              className="text-gray-500 dark:text-gray-300 text-xl hover:text-blue-600 dark:hover:text-blue-400 mr-3.5 cursor-pointer"
-              title="Back"
-            >
-              <IoChevronBackOutline />
-            </button>
-          )}
+          <div>
+            {isMobile && (
+              <button
+                onClick={onMobileBack}
+                className="text-gray-500 dark:text-gray-300 text-xl hover:text-blue-600 dark:hover:text-blue-400 mr-3.5 cursor-pointer"
+                title="Back"
+              >
+                <IoChevronBackOutline />
+              </button>
+            )}
+          </div>
 
           <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileClick}>
-            <img
-              className="w-12 h-12 rounded-full object-cover"
-              alt={`${selectUser.firstname} ${selectUser.lastname}`}
-              src={selectUser.img || selectUser.profile_avatar || 'https://via.placeholder.com/40'}
-            />
-            <div className={userNameText}>
+            {/* Profile image*/}
+            <div>
+              <img
+                className="w-12 h-12 rounded-full object-cover"
+                alt={`${selectUser.firstname} ${selectUser.lastname}`}
+                src={selectUser.img || selectUser.profile_avatar || 'https://via.placeholder.com/40'}
+              />
+            </div>
+            {/*User name*/}
+            <div className='text-gray-900 dark:text-white'>
               <div className="flex items-center gap-2 font-semibold">
                 <span>{`${selectUser.firstname} ${selectUser.lastname}`}</span>
                 {selectUser.online && (
                   <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
                 )}
               </div>
-              {isTyping && <span className={typingText}>typing...</span>}
+              {isTyping && <span className='text-sm text-gray-500 dark:text-gray-400'>typing...</span>}
             </div>
           </div>
         </div>
 
-        <div className={`flex items-center  gap-3 md:gap-7 ml-auto ${buttonTextColor}`}>
-          {/* Hide some icons on mobile for better spacing */}
-          {topItems.map(({ id, icon, title }) => {
+        <div className={`flex items-center gap-3 md:gap-7 ml-auto text-gray-500 dark:text-gray-300 text-xl`}>
+          {/* Top Icons with Tooltips */}
+          {topItems.map(({ id, icon, title, label }) => {
             // On mobile, show only essential icons
             if (isMobile && (title === 'Search' || title === 'Profile')) return null;
 
             return (
-              <button
+              <Tooltip
                 key={id}
-                title={title}
-                className={`${hoverBtn} ${isMobile ? 'text-lg' : ''}cursor-pointer`}
-                type="button"
-                onClick={() => {
-                  if (title === 'Call') {
-                    setCallData(isUserSelected ? selectUser : selectGroup);
-                    setShowCallModal(true);
-                  } else if (title === 'Video Call') {
-                    setCallData(isUserSelected ? selectUser : selectGroup);
-                    setShowVideoModal(true);
-                  } else if (title === 'Search') {
-                    setShowSearchBox(true);
-                  } else if (title === 'Profile') {
-                    onProfileClick();
-                  }
-                }}
+                text={label}
+                show={hoveredItem === `top-${id}` && !isMobile}
               >
-                {icon}
-              </button>
+                <button
+                  title={title}
+                  className={`hover:text-blue-600 dark:hover:text-blue-400 ${isMobile ? 'text-lg' : ''} cursor-pointer`}
+                  type="button"
+                  onMouseEnter={() => setHoveredItem(`top-${id}`)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  onClick={() => {
+                    if (title === 'Call') {
+                      setCallData(isUserSelected ? selectUser : selectGroup);
+                      setShowCallModal(true);
+                    } else if (title === 'Video Call') {
+                      setCallData(isUserSelected ? selectUser : selectGroup);
+                      setShowVideoModal(true);
+                    } else if (title === 'Search') {
+                      setShowSearchBox(true);
+                    } else if (title === 'Profile') {
+                      onProfileClick();
+                    }
+                  }}
+                >
+                  {icon}
+                </button>
+              </Tooltip>
             );
           })}
+
 
           <div className="relative">
             <button
@@ -201,7 +231,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
 
   if (isGroupSelected) {
     return (
-      <div className={commonHeaderStyle}>
+      <div className='flex items-center p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
         <div className="flex items-center space-x-3">
           {/* Mobile Back Button */}
           {isMobile && (
@@ -220,47 +250,55 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
               alt={selectGroup.groupName}
               src={'https://via.placeholder.com/40?text=G'}
             />
-            <div className={userNameText}>
+            <div className='text-gray-900 dark:text-white'>
               <div className="flex items-center gap-2 font-semibold">
                 <span>{selectGroup.groupName}</span>
               </div>
-              <span className={typingText}>
+              <span className='text-sm text-gray-500 dark:text-gray-400'>
                 Created by: {selectGroup.createdBy.firstname} {selectGroup.createdBy.lastname}
               </span>
             </div>
           </div>
         </div>
 
-        <div className={`flex items-center gap-3 md:gap-7 ${buttonTextColor}`}>
-          {/* Hide some icons on mobile for better spacing */}
-          {topItems.map(({ id, icon, title }) => {
+        <div className={`flex items-center gap-3 md:gap-7 text-gray-500 dark:text-gray-300 text-xl`}>
+          {/* Top Icons with Tooltips */}
+          {topItems.map(({ id, icon, title, label }) => {
             // On mobile, show only essential icons
             if (isMobile && (title === 'Search' || title === 'Profile')) return null;
 
             return (
-              <button
+              <Tooltip
                 key={id}
-                title={title}
-                className={`${hoverBtn} ${isMobile ? 'text-lg' : ''}`}
-                type="button"
-                onClick={() => {
-                  if (title === 'Call') {
-                    setCallData(isUserSelected ? selectUser : selectGroup);
-                    setShowCallModal(true);
-                  } else if (title === 'Video Call') {
-                    setCallData(isUserSelected ? selectUser : selectGroup);
-                    setShowVideoModal(true);
-                  } else if (title === 'Search') {
-                    setShowSearchBox(true);
-                  } else if (title === 'Profile') {
-                    onProfileClick();
-                  }
-                }}
+                text={label}
+                show={hoveredItem === `top-${id}` && !isMobile}
               >
-                {icon}
-              </button>
+                <button
+                  title={title}
+                  className={`hover:text-blue-600 dark:hover:text-blue-400 ${isMobile ? 'text-lg' : ''} cursor-pointer`}
+                  type="button"
+                  onMouseEnter={() => setHoveredItem(`top-${id}`)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  onClick={() => {
+                    if (title === 'Call') {
+                      setCallData(isUserSelected ? selectUser : selectGroup);
+                      setShowCallModal(true);
+                    } else if (title === 'Video Call') {
+                      setCallData(isUserSelected ? selectUser : selectGroup);
+                      setShowVideoModal(true);
+                    } else if (title === 'Profile') {
+                      onProfileClick();
+                    } else if (title === 'Search') {
+                      setShowSearchBox(true);
+                    }
+                  }}
+                >
+                  {icon}
+                </button>
+              </Tooltip>
             );
           })}
+
 
           <div className="relative">
             <button

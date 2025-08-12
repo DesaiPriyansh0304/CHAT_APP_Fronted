@@ -261,7 +261,7 @@ function Sidebar({ isMobile }) {
             {showLangMenu && (
               <div
                 ref={langMenuRef}
-                className="absolute bottom-24 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
+                className="absolute bottom-33 left-12 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
               >
                 <ul className="p-2">
                   {languages.map((lang) => (
@@ -301,7 +301,7 @@ function Sidebar({ isMobile }) {
 
               {showAvatarMenu && (
                 <div
-                  className="absolute left-14 bottom-0 w-39 bg-white border border-blue-300 rounded-md shadow-lg z-10 dark:bg-gray-800 dark:border-gray-600"
+                  className="absolute left-14 bottom-3 w-39 bg-white border border-blue-300 rounded-md shadow-lg z-10 dark:bg-gray-800 dark:border-gray-600"
                   ref={menuRef}
                 >
                   <ul className="p-1.5">

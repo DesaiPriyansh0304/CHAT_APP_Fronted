@@ -96,16 +96,26 @@ function Inputside({
         </div>
       )}
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-[#f3f3f6] dark:bg-[#1e1e1e] relative transition-colors duration-300">
+      <div className="p-5.5 border-t border-gray-200 dark:border-gray-700 bg-[#FFFFFF] dark:bg-[#1e1e1e] relative transition-colors duration-300">
         <form onSubmit={handleSendMessage} className="flex items-center gap-3">
           <input
             type="text"
             placeholder="Enter message..."
             value={message}
             onChange={onInputChange}
-            className="flex-1 rounded-md py-2 px-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#2a2a2a] text-black dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
+            className="flex-1 rounded-md py-2 px-4 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-[#2a2a2a] text-black dark:text-white focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
             autoComplete="off"
           />
+
+          {/* Emoji Picker Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            className="text-lg text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white cursor-pointer"
+            title="Emoji"
+          >
+            <MdOutlineEmojiEmotions />
+          </button>
 
           {/* Image Upload */}
           <input
@@ -118,34 +128,28 @@ function Inputside({
           />
           <label
             htmlFor="upload-image"
-            className="text-2xl text-gray-600 dark:text-gray-300 cursor-pointer"
+            className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer"
           >
             <MdImage />
           </label>
+
+
 
           {/* File Upload */}
           <input type="file" onChange={handleFileUpload} multiple hidden id="upload-file" />
           <label
             htmlFor="upload-file"
-            className="text-2xl text-gray-600 dark:text-gray-300 cursor-pointer"
+            className="text-lg text-gray-600 dark:text-gray-300 cursor-pointer"
           >
             <MdAttachFile />
           </label>
 
-          {/* Emoji Picker Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowEmojiPicker((prev) => !prev)}
-            className="text-2xl text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
-            title="Emoji"
-          >
-            <MdOutlineEmojiEmotions />
-          </button>
+
 
           {/* Send Button */}
           <button
             type="submit"
-            className="flex items-center justify-center bg-[#7269EF] text-white rounded-md p-2 hover:bg-[#564cd1] disabled:opacity-50"
+            className="flex items-center justify-center w-11 h-11 bg-[#141be7] text-white rounded-md p-2 hover:bg-[#564cd1] disabled:opacity-50"
             title="Send Message"
             disabled={!message.trim() && image.length === 0 && file.length === 0}
           >

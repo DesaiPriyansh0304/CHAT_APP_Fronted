@@ -3,11 +3,13 @@ import { motion } from 'framer-motion';
 import { IoCall, IoVideocamOutline } from 'react-icons/io5';
 import { MdClose } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
-import { setSearchQuery } from '../../feature/Slice/Chat/ChatHistory';
 import { FaSearch } from 'react-icons/fa';
+//chathistory slice
+import { setSearchQuery } from '../../feature/Slice/Chat/ChatHistory';
 
 const getFullName = (user) => `${user?.firstname || ''} ${user?.lastname || ''}`.trim();
 
+{/*Audio Call Modal*/ }
 export const AudioCallModal = ({ user, onCancel, onCall }) => {
   return (
     <div
@@ -51,6 +53,7 @@ export const AudioCallModal = ({ user, onCancel, onCall }) => {
   );
 };
 
+{/*Video Call Modal */ }
 export const VideoCallModal = ({ user, onCancel, onCall }) => {
   return (
     <div
@@ -94,6 +97,8 @@ export const VideoCallModal = ({ user, onCancel, onCall }) => {
   );
 };
 
+
+{/*Serch Message Bar*/ }
 export const SearchBox = ({ onClose }) => {
   const [query, setQuery] = useState('');
   const boxRef = useRef(null);
@@ -122,6 +127,8 @@ export const SearchBox = ({ onClose }) => {
 
   return (
     <div className="absolute top-15 right-55 z-50" ref={boxRef}>
+      {/* Triangle pointer positioned relative to search box */}
+      <div className="absolute right-4 -top-1 w-2 h-2 mb-0.5 bg-blue-50  dark:bg-[#2e2e2e] rotate-45 border-l border-t border-gray-200 dark:border-gray-600"></div>
       <div className="w-64 bg-white dark:bg-[#2e2e2e] rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 transition-colors duration-300">
         <div className="relative">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300" />

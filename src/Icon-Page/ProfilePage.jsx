@@ -8,12 +8,11 @@ import { useNavigate } from 'react-router-dom';
 
 function ProfilePage() {
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);          //dot menu
-  const [activeSection, setActiveSection] = useState('about');  //active action section
+  const [isMenuOpen, setIsMenuOpen] = useState(false);             //dot menu
+  const [activeSection, setActiveSection] = useState('about');     //active action section
 
   //loginUser Slice
   const loginUserState = useSelector((state) => state.loginUser || {});
-
   const { userData: user } = loginUserState;
 
   const navigate = useNavigate();
@@ -183,7 +182,7 @@ function ProfilePage() {
                       {/*User Name*/}
                       <div>
                         <p className="text-gray-500 dark:text-[#7f94d2] mt-2">Name</p>
-                        <p className="font-semibold dark:text-[var(--Chatcontainer-text)]">
+                        <p className="font-medium dark:text-[var(--Chatcontainer-text)]">
                           {user?.firstname} {user?.lastname}
                         </p>
                       </div>
@@ -223,10 +222,10 @@ function ProfilePage() {
                       </div>
 
                       {/*User Location*/}
-                      <div>
+                      {/* <div>
                         <p className="text-gray-500 dark:text-[#7f94d2] mt-6">Location</p>
                         <p className="font-medium dark:text-[var(--Chatcontainer-text)]">California, USA</p>
-                      </div>
+                      </div> */}
 
                     </div>
                   </div>
@@ -244,7 +243,7 @@ function ProfilePage() {
                 {/*section name and icon*/}
                 <div className="flex items-center  dark:text-[var(--Chatcontainer-text)] gap-2">
                   <div className='font-semibold'>
-                    <MdAttachFile />
+                    <MdAttachFile size={20} />
                   </div>
                   <span className="text-gray-700  dark:text-[var(--Chatcontainer-text)] font-medium">
                     Attached Files
@@ -277,10 +276,10 @@ function ProfilePage() {
                       </div>
 
                       {/*User Name*/}
-                      <div>
+                      {/* <div>
                         <p className="text-gray-500 dark:text-[#7f94d2] mt-6">Name</p>
-                        <p className="font-semibold dark:text-[var(--Chatcontainer-text)]">Patricia Smith</p>
-                      </div>
+                        <p className="font-semibold dark:text-[var(--Chatcontainer-text)]"> {user?.firstname} {user?.lastname}</p>
+                      </div> */}
 
                     </div>
                   </div>

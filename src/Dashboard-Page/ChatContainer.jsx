@@ -12,7 +12,7 @@ import AllUser from '../Icon-Page/AllUser';
 
 function ChatContainer({
   selectUser,
-  SetSelectUser,
+  setSelectUser,
   activePage,
   setUserChat,
   selectGroup,
@@ -33,7 +33,7 @@ function ChatContainer({
           <>
             <Chats
               selectUser={selectUser}
-              SetSelectUser={SetSelectUser}
+              setSelectUser={setSelectUser}
               setUserChat={setUserChat}
             />
           </>
@@ -74,7 +74,7 @@ function ChatContainer({
 
   return (
     <>
-      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] `}>
+      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)]`}>
         {renderContent()}
       </div>
     </>

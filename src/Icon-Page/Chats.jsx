@@ -7,7 +7,7 @@ import { useDebounce } from "use-debounce";
 import { selectOnlineUsers } from "../feature/Slice/Socket/OnlineuserSlice";
 import { fetchUnreadMessages } from "../feature/Slice/unreadMessageSlice";
 
-function Chats({ selectUser, SetSelectUser }) {
+function Chats({ selectUser, setSelectUser }) {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 400);
 
@@ -147,7 +147,7 @@ function Chats({ selectUser, SetSelectUser }) {
                   key={chatUser._id}
                   className="text-center w-16"
                   whileHover={{ scale: 1.05 }}
-                  onClick={() => SetSelectUser(chatUser)}
+                  onClick={() => setSelectUser(chatUser)}
                 >
                   <div className="flex flex-col items-center w-20">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 text-blue-800 font-semibold flex items-center justify-center">
@@ -213,7 +213,7 @@ function Chats({ selectUser, SetSelectUser }) {
                 <div key={`chat-${chat.conversationId}`}>
                   <div
                     onClick={() =>
-                      SetSelectUser({
+                      setSelectUser({
                         _id: chat.userId,
                         firstname: chat.name.split(" ")[0] || "",
                         lastname:
@@ -308,7 +308,7 @@ function Chats({ selectUser, SetSelectUser }) {
               return (
                 <div key={`available-${chatUser._id}`}>
                   <div
-                    onClick={() => SetSelectUser(chatUser)}
+                    onClick={() => setSelectUser(chatUser)}
                     className={`group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
                       ${chatUser.isTyping
                         ? "bg-[#d9e8ff] hover:bg-[#e3ecff] dark:hover:bg-[#e3ecff]"
