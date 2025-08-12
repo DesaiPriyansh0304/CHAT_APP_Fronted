@@ -7,9 +7,11 @@ import { SlSettings } from 'react-icons/sl';
 import { BsMotherboard } from 'react-icons/bs';
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BsGlobe2 } from "react-icons/bs";
-//Avtar Icon
 import { LuMoon, LuSun } from 'react-icons/lu';
+//Avtar icon
 import { FiUser, FiSettings, FiLogOut } from 'react-icons/fi';
+// flag-icon
+import 'flag-icons/css/flag-icons.min.css';
 
 
 //Top Icon
@@ -23,17 +25,17 @@ export const topItems = [
 
 // Bottom Icon
 export const bottomItems = (theme, setShowLangMenu, dispatch, toggleTheme) => [
-    { id: 100, icon: <BsMotherboard size={24} />, title: 'AllUser', page: 'alluser', lable: "All User" },
-    { id: 101, icon: <LiaUserEditSolid size={28} />, title: 'Edit', page: 'avtarpage', lable: "Edit Profile" },
+    { id: 101, icon: <BsMotherboard size={24} />, title: 'AllUser', page: 'alluser', lable: "All User" },
+    { id: 102, icon: <LiaUserEditSolid size={28} />, title: 'Edit', page: 'avtarpage', lable: "Edit Profile" },
     {
-        id: 102,
+        id: 103,
         icon: <BsGlobe2 size={22} />,
         title: 'Language',
         action: () => setShowLangMenu((prev) => !prev),
         lable: "Language"
     },
     {
-        id: 103,
+        id: 104,
         icon: theme === 'dark' ? <LuSun size={24} /> : <LuMoon size={24} />,
         title: theme === 'dark' ? 'Light Mode' : 'Dark Mode',
         action: () => dispatch(toggleTheme()),
@@ -43,9 +45,9 @@ export const bottomItems = (theme, setShowLangMenu, dispatch, toggleTheme) => [
 
 // Avatar Icon menu
 export const avatarItems = [
-    { id: 200, icon: <FiUser />, title: 'Profile', page: 'profile' },
-    { id: 201, icon: <FiSettings />, title: 'Settings', page: 'setting' },
-    { id: 202, icon: <FiLogOut />, title: 'Logout' },
+    { id: 201, icon: <FiUser />, title: 'Profile', page: 'profile' },
+    { id: 202, icon: <FiSettings />, title: 'Settings', page: 'setting' },
+    { id: 203, icon: <FiLogOut />, title: 'Logout' },
 ];
 
 // Language menu list 

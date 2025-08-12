@@ -1,31 +1,19 @@
 import React from 'react';
 import './App.css';
+import { BrowserRouter as Router } from 'react-router-dom';
 //Main Router
 import AppRouter from './Router/AppRouter';
-import { GoogleOAuthProvider } from '@react-oauth/google'
+//GoogleAuthProvider
+import GoogleAuthProvider from './providers/GoogleAuthProvider';
 
 function App() {
-
-  //client ID /Google
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-  if (!googleClientId) {
-    // console.log('Google Client ID not found in environment variables: ', googleClientId);
-    return (
-      <div className='w-full h-screen flex justify-center mt-5 '>
-        <h3 className='text-2xl text-center text-red-500'>
-          Configuration Error: Missing Google Client ID
-        </h3>
-      </div>
-
-    );
-  }
-
   return (
     <>
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <AppRouter />
-      </GoogleOAuthProvider>
+      <Router>
+        <GoogleAuthProvider>
+          <AppRouter />
+        </GoogleAuthProvider>
+      </Router>
     </>
   );
 }

@@ -13,20 +13,20 @@ import AllUser from '../Icon-Page/AllUser';
 function Home() {
 
   const { tab, token } = useParams();                 //tab and token get Approuter
-  const currentTab = tab || (token ? '' : 'chats');   //chats tb open 
+  const currentTab = tab || (token ? 'contact' : 'chats');   //chats tb open 
 
   const [selectedUser, setSelectedUser] = useState(null);                        //Select User
   const [selectGroup, setSelectGroup] = useState(null);                          //Select Group
   const [userchat, setUserChat] = useState('1');                                 //user chat
   const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);   //reposive open in sidebar
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);             //Detect mobile screen
-  console.log('✌️isMobile --->', isMobile);
 
   //resize screen check
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
+    handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
@@ -66,6 +66,7 @@ function Home() {
                 setSelectedUser={handleUserSelect}
                 selectGroup={selectGroup}
                 setSelectedGroup={handleGroupSelect}
+                isMobile={isMobile}
               />
             </div>
 
@@ -84,6 +85,7 @@ function Home() {
                 setSelectedUser={handleUserSelect}
                 selectGroup={selectGroup}
                 setSelectedGroup={handleGroupSelect}
+                isMobile={isMobile}
               />
             </div>
 
@@ -103,6 +105,7 @@ function Home() {
                   setSelectedUser={handleUserSelect}
                   selectGroup={selectGroup}
                   setSelectedGroup={handleGroupSelect}
+                  isMobile={isMobile}
                 />
               </div>
             )}
@@ -111,7 +114,7 @@ function Home() {
             <div className="h-full w-full order-1 md:order-2 overflow-hidden flex-1">
               <ChatContainer
                 selectUser={selectedUser}
-                SetSelectUser={handleUserSelect}
+                setSelectUser={handleUserSelect}
                 activePage={currentTab}
                 setUserChat={setUserChat}
                 selectGroup={selectGroup}
@@ -137,7 +140,7 @@ function Home() {
               <div className="fixed inset-0 z-50 md:hidden overflow-y-auto">
                 <Rightsidebar
                   selectUser={selectedUser}
-                  SetSelectUser={handleUserSelect}
+                  setSelectUser={handleUserSelect}
                   userchat={userchat}
                   selectGroup={selectGroup}
                   setSelectGroup={handleGroupSelect}

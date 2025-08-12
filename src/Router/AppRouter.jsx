@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 // Route Guards
 import PrivateRoute from '../Public Page/RouterPage/PrivateRouter';
 import PublicRoute from '../Public Page/RouterPage/PublicRouter';
@@ -12,9 +11,8 @@ import Register from '../Public Page/SignIn-SignUP/Register';
 import OtpVerify from '../Public Page/otp verify/OTPVerify';
 import ForgetPassword from '../Public Page/Password/forgetpassword';
 import ResetPassword from '../Public Page/Password/ResetPassword';
-//error Page
+//Always Accessible 
 import Errorpage from '../Pages/Errorpage';
-//Contact Page
 import Contact from '../Pages/Contact';
 import { Toaster } from 'react-hot-toast';
 
@@ -25,19 +23,6 @@ const GitHubCallback = () => {
 };
 
 function AppRouter() {
-
-    //Theme Slice
-    const theme = useSelector((state) => state.theme.mode);
-
-    //change value in theme
-    useEffect(() => {
-        const root = window.document.documentElement;
-        if (theme === 'dark') {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
-    }, [theme]);
 
     return (
         <>
@@ -58,7 +43,7 @@ function AppRouter() {
                     <Route path="/otp-verify" element={<OtpVerify />} />             {/*otp-verify router*/}
                     <Route path="/forget-password" element={<ForgetPassword />} />   {/*forget-password router*/}
                     <Route path="/reset-password" element={<ResetPassword />} />     {/*reset-password router*/}
-                    <Route path="/github/callback" element={<GitHubCallback />} />
+                    <Route path="/github/callback" element={<GitHubCallback />} />   {/*github-callback router*/}
                 </Route>
 
                 {/* 📃--------------- Always Accessible --------------- */}
