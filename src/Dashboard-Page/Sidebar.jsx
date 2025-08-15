@@ -70,20 +70,6 @@ function Sidebar({ isMobile }) {
     };
   }, [showAvatarMenu, showLangMenu]);
 
-  //common button Css 
-  const getButtonClass = (id) => {
-    const base = 'relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer border';
-    const common = 'hover:text-blue-600 dark:hover:text-[#dfd0b8]';
-    const isActive = clickEffect === id;
-
-    if (isActive) {
-      return theme === 'dark'
-        ? `${base} border-white text-blue-700 bg-[#3E4A56] ${common}`
-        : `${base} text-blue-600 bg-blue-100 border-blue-600 py-4 px-3 ${common}`;
-    } else {
-      return `${base} border-transparent text-gray-500 dark:text-[var(--sidebar-text)] ${common}`;
-    }
-  };
 
   //Tooltip Component
   const Tooltip = ({ children, text, position = "right", show = false }) => {
@@ -139,6 +125,22 @@ function Sidebar({ isMobile }) {
     setHoveredItem(null);
   };
 
+  //common button Css 
+  const getButtonClass = (id) => {
+    const base = 'relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer border';
+    const common = 'hover:text-blue-600 dark:hover:text-gray-300';
+    const isActive = clickEffect === id;
+
+    if (isActive) {
+      return theme === 'dark'
+        ? `${base} text-gray-300 bg-[#3E4A56] border border-gray-200  ${common}`
+        : `${base} text-blue-600 bg-blue-100 border border-blue-600 ${common}`;
+    } else {
+      return `${base} border-transparent text-gray-500 dark:text-sky-400 ${common}`;
+    }
+  };
+
+
 
   if (loading) {
     return (
@@ -153,7 +155,7 @@ function Sidebar({ isMobile }) {
 
   return (
     <>
-      <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-2xl">
+      <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-xl dark:shadow-sky-500/50">
 
         {/* Desktop Layout */}
         {!isMobile ? (
@@ -248,7 +250,7 @@ function Sidebar({ isMobile }) {
                       setShowLangMenu(false);
                       setHoveredItem(null);
                     }}
-                    className="w-13 h-13 rounded-full border-2 border-gray-300 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
+                    className="w-13 h-13 rounded-full border-2 border-sky-500 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
                     onMouseEnter={() => setHoveredItem('avatar')}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
@@ -288,7 +290,7 @@ function Sidebar({ isMobile }) {
           </div>
         ) : (
           /* Mobile Layout */
-          <div className="h-[64px] bg-white shadow-2xl p-3">
+          <div className="h-[64px] shadow-2xl p-3">
             <div className="flex flex-row gap-3 items-center">
 
               {/* Top Menu Items */}
@@ -331,7 +333,7 @@ function Sidebar({ isMobile }) {
             {/* Mobile Avatar Menu */}
             {showAvatarMenu && (
               <div
-                className="fixed top-113 right-6 w-40 bg-white border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
+                className="fixed top-113 right-6 w-40 bg-gray-800 border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
                 ref={menuRef}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
