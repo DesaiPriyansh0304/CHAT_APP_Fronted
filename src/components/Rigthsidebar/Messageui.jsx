@@ -13,9 +13,6 @@ import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
 
 export const SenderMessage = ({
   msg,
-  // sender,
-  // messageDate,
-  // groupUsers,
   messageText,
   messageContent,
   hasText,
@@ -28,8 +25,6 @@ export const SenderMessage = ({
   setIsImagePreview,
 }) => {
   const { userData: user } = useSelector((state) => state.loginUser);
-  // console.log('✌️msg --->', msg);
-
   const onlineUsers = useSelector(selectOnlineUsers);
 
   const receiverId = msg.receiverId?._id || msg.receiverId;
@@ -38,21 +33,18 @@ export const SenderMessage = ({
   const isReceiverOnline = onlineUsers.includes(receiverId);
 
   // ✅ Tick logic
-  let tickIcon = <BsCheck className="text-gray-500" />; // Single gray tick (sent)
+  let tickIcon = <BsCheck className="text-gray-500" />; // Sent
   if (isSeen) {
-    tickIcon = <BsCheckAll className="text-blue-500" />; // Seen - blue
+    tickIcon = <BsCheckAll className="text-blue-500" />; // Seen
   } else if (isReceiverOnline) {
-    tickIcon = <BsCheckAll className="text-gray-500" />; // Delivered - gray double
+    tickIcon = <BsCheckAll className="text-gray-500" />; // Delivered
   }
 
-
   return (
-    //main div
     <div className="flex flex-col self-end">
-      {/*image and chatdata*/}
       <div className="flex flex-row gap-1">
-        {/*dot menu*/}
-        <div className="justify-start text-gray-500">
+        {/* Dot menu */}
+        <div className="justify-start text-gray-500 mt-1">
           <DotMenu
             messageText={messageText}
             messageContent={messageContent}
@@ -61,81 +53,85 @@ export const SenderMessage = ({
             isFile={isFile || isFileBase64}
             position="right"
             onOptionClick={(option) => {
-              console.log('Sender Option Selected:', option);
+              console.log("Sender Option Selected:", option);
             }}
           />
-          {/* <RxDotsVertical /> */}
         </div>
 
-        {/*chat data And Time zone*/}
+        {/* Chat data */}
         <div className="inline-block">
-          <div>
-            <ul>
-              <li className="">
-                {/*chat message and time zone*/}
-                <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
-                  {/*Chat Message*/}
-                  <div className="">
-                    {hasText && <p className="whitespace-pre-wrap break-words">{messageText}</p>}
+          <ul>
+            <li className="relative">
+              {/* Chat bubble */}
+              <div className="relative inline-block max-w-xs px-4 py-2 rounded-lg bg-gray-300 text-gray-600">
+                {/* Message text */}
+                {hasText && (
+                  <p className="whitespace-pre-wrap break-words">{messageText}</p>
+                )}
 
-                    {(isImage || isImageBase64) &&
-                      Array.isArray(msg.content) &&
-                      msg.content.map((url, i) => (
-                        <img
-                          key={i}
-                          src={url}
-                          alt={`sent-img-${i}`}
-                          className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                          onClick={() => {
-                            setPreviewMedia(url);
-                            setIsImagePreview(true);
-                          }}
-                        />
-                      ))}
+                {/* Images */}
+                {(isImage || isImageBase64) &&
+                  Array.isArray(msg.content) &&
+                  msg.content.map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt={`sent-img-${i}`}
+                      className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+                      onClick={() => {
+                        setPreviewMedia(url);
+                        setIsImagePreview(true);
+                      }}
+                    />
+                  ))}
 
-                    {(isFile || isFileBase64) &&
-                      Array.isArray(msg.content) &&
-                      msg.content.map((url, i) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setPreviewMedia(url);
-                            setIsImagePreview(false);
-                          }}
-                          className="mt-2 flex items-center gap-1 text-sm underline"
-                        >
-                          <FaFileAlt />{' '}
-                          {Array.isArray(msg.fileName)
-                            ? msg.fileName[i]
-                            : fileName || `File ${i + 1}`}
-                        </button>
-                      ))}
+                {/* Files */}
+                {(isFile || isFileBase64) &&
+                  Array.isArray(msg.content) &&
+                  msg.content.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setPreviewMedia(url);
+                        setIsImagePreview(false);
+                      }}
+                      className="mt-2 flex items-center gap-1 text-sm underline"
+                    >
+                      <FaFileAlt />{" "}
+                      {Array.isArray(msg.fileName)
+                        ? msg.fileName[i]
+                        : fileName || `File ${i + 1}`}
+                    </button>
+                  ))}
+
+                {/* Time + Tick */}
+                <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
+                  <div className="text-xs text-black">
+                    <IoTimeOutline />
                   </div>
-                  {/* Time + Tick */}
-                  <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
-                    <div className="text-xs text-black">
-                      <IoTimeOutline />
-                    </div>
-                    <div className="text-black text-xs">
-                      {new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true,
-                      })}
-                    </div>
-                    <div className="text-sm ml-1">{tickIcon}</div>
+                  <div className="text-black text-xs">
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
                   </div>
+                  <div className="text-sm ml-1">{tickIcon}</div>
                 </div>
-                {/*sender Full Name*/}
-                <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-right">
-                  {user?.firstname} {user?.lastname}
-                </div>
-              </li>
-            </ul>
-          </div>
+
+                {/* Tail */}
+                <div className="absolute bottom-0 right-[-4px] mr-[17px] mb-[-5px] w-3 h-3 bg-gray-300 dark:bg-[#2e2e2e] rotate-45 "></div>
+              </div>
+
+              {/* Sender Name */}
+              <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-right">
+                {user?.firstname} {user?.lastname}
+              </div>
+            </li>
+          </ul>
         </div>
 
-        {/*sender image*/}
+        {/* Sender avatar */}
         <div className="w-11 h-11 rounded-full overflow-hidden self-end">
           {user.profile_avatar ? (
             <img
@@ -144,17 +140,17 @@ export const SenderMessage = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="">
+            <span>
               {user.firstname?.[0]?.toUpperCase()}
               {user.lastname?.[0]?.toUpperCase()}
             </span>
           )}
-          {/* <img src={user?.profile_avatar} alt="" /> */}
         </div>
       </div>
     </div>
   );
 };
+
 
 const isLikelyURL = (text) => /^https?:\/\//.test(text);
 
@@ -207,11 +203,11 @@ export const ReceiverMessage = ({
   const isReceiverOnline = onlineUsers.includes(receiverId);
 
   // ✅ Tick logic
-  let tickIcon = <BsCheck className="text-gray-500" />; // Single gray tick (sent)
+  let tickIcon = <BsCheck className="text-gray-500" />;
   if (isSeen) {
-    tickIcon = <BsCheckAll className="text-blue-500" />; // Seen - blue
+    tickIcon = <BsCheckAll className="text-blue-500" />;
   } else if (isReceiverOnline) {
-    tickIcon = <BsCheckAll className="text-gray-500" />; // Delivered - gray double
+    tickIcon = <BsCheckAll className="text-gray-500" />;
   }
 
   return (
@@ -224,7 +220,6 @@ export const ReceiverMessage = ({
             let fname = '';
             let lname = '';
 
-            // ✅ સુધારેલું avatar logic
             if (groupUsers?.length) {
               const foundUser = groupUsers.find((u) => {
                 const uid = u?.user?._id || u?.user?.userId;
@@ -255,80 +250,82 @@ export const ReceiverMessage = ({
           })()}
         </div>
 
+        {/* Message bubble */}
         <div className="inline-block">
-          <div>
-            <ul>
-              <li>
-                {/* Chat message and time zone */}
-                <div className="max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
-                  {/* Chat Text */}
-                  {hasText && !isLikelyURL(messageText) && (
-                    <p className="whitespace-pre-wrap break-words">{messageText}</p>
-                  )}
+          <ul>
+            <li className="relative">
+              <div className="relative inline-block max-w-xs px-4 py-2 rounded-xl bg-gray-300 text-gray-600">
+                {/* Chat Text */}
+                {hasText && !isLikelyURL(messageText) && (
+                  <p className="whitespace-pre-wrap break-words">{messageText}</p>
+                )}
 
-                  {/* Image Preview */}
-                  {hasValidContent &&
-                    (isImage || isImageBase64) &&
-                    Array.isArray(msg.content) &&
-                    msg.content.map((url, i) => (
-                      <img
-                        key={i}
-                        src={url}
-                        alt={`received-img-${i}`}
-                        className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                        onClick={() => {
-                          setPreviewMedia(url);
-                          setIsImagePreview(true);
-                        }}
-                      />
-                    ))}
+                {/* Image Preview */}
+                {hasValidContent &&
+                  (isImage || isImageBase64) &&
+                  Array.isArray(msg.content) &&
+                  msg.content.map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt={`received-img-${i}`}
+                      className="mt-2 max-h-48 rounded-lg border cursor-pointer"
+                      onClick={() => {
+                        setPreviewMedia(url);
+                        setIsImagePreview(true);
+                      }}
+                    />
+                  ))}
 
-                  {/* File Preview */}
-                  {hasValidContent &&
-                    (isFile || isFileBase64) &&
-                    Array.isArray(msg.content) &&
-                    msg.content.map((url, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setPreviewMedia(url);
-                          setIsImagePreview(false);
-                        }}
-                        className="mt-2 flex items-center gap-1 text-sm underline"
-                      >
-                        <FaFileAlt />{' '}
-                        {Array.isArray(msg.fileName)
-                          ? msg.fileName[i]
-                          : fileName || `File ${i + 1}`}
-                      </button>
-                    ))}
+                {/* File Preview */}
+                {hasValidContent &&
+                  (isFile || isFileBase64) &&
+                  Array.isArray(msg.content) &&
+                  msg.content.map((url, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setPreviewMedia(url);
+                        setIsImagePreview(false);
+                      }}
+                      className="mt-2 flex items-center gap-1 text-sm underline"
+                    >
+                      <FaFileAlt />{' '}
+                      {Array.isArray(msg.fileName)
+                        ? msg.fileName[i]
+                        : fileName || `File ${i + 1}`}
+                    </button>
+                  ))}
 
-                  {/* Timestamp */}
-                  <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
-                    <div className="text-xs text-black">
-                      <IoTimeOutline />
-                    </div>
-                    <div className="text-black text-xs">
-                      {new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: true,
-                      })}
-                    </div>
-                    <div className="text-sm ml-1">{tickIcon}</div>
+                {/* Timestamp */}
+                <div className="flex flex-row gap-1.5 items-center mt-1.5 justify-end">
+                  <div className="text-xs text-black">
+                    <IoTimeOutline />
                   </div>
+                  <div className="text-black text-xs">
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </div>
+                  <div className="text-sm ml-1">{tickIcon}</div>
                 </div>
 
-                {/* Sender name */}
-                <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-left">
-                  {senderName}
-                </div>
-              </li>
-            </ul>
-          </div>
+                {/* Tail pointer (left side) */}
+                <div className="absolute bottom-0 left-[-4px] ml-[17px] mb-[-5px]  w-3 h-3 bg-gray-300 dark:bg-[#2e2e2e] rotate-45 border-r border-b border-gray-200 dark:border-gray-600"></div>
+              </div>
+
+              {/* Sender name */}
+              <div className="text-xs text-gray-500 dark:text-[var(--text-color)] mt-1.5 text-left">
+                {senderName}
+              </div>
+            </li>
+          </ul>
         </div>
 
-        <div className="justify-start text-gray-500">
+        {/* Dot Menu */}
+        <div className="justify-start text-gray-500 mt-1">
           <DotMenu
             messageText={messageText}
             messageContent={messageContent}
@@ -345,6 +342,7 @@ export const ReceiverMessage = ({
     </div>
   );
 };
+
 
 //dot menu
 export const DotMenu = ({

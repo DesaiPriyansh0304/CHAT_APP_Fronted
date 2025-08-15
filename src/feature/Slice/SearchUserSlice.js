@@ -30,7 +30,7 @@ export const fetchInvitedUsers = createAsyncThunk(
         invitedBy: data.data.invitedBy || [],
       };
     } catch (error) {
-      console.error("fetchInvitedUsers error:", error);
+      console.log("fetchInvitedUsers error:", error);
       return rejectWithValue("Network error");
     }
   }
@@ -44,9 +44,7 @@ const invitedUsersSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {
-    // You can add filtering/resetting reducers here if needed
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchInvitedUsers.pending, (state) => {

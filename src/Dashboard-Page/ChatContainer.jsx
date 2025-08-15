@@ -14,11 +14,9 @@ function ChatContainer({
   selectUser,
   setSelectUser,
   activePage,
-  setUserChat,
   selectGroup,
   setSelectGroup,
 }) {
-
 
   const renderContent = () => {
     switch (activePage) {
@@ -34,14 +32,16 @@ function ChatContainer({
             <Chats
               selectUser={selectUser}
               setSelectUser={setSelectUser}
-              setUserChat={setUserChat}
             />
           </>
         );
       case 'group':
         return (
           <>
-            <Group selectGroup={selectGroup} setSelectGroup={setSelectGroup} />
+            <Group
+              selectGroup={selectGroup}
+              setSelectGroup={setSelectGroup}
+            />
           </>
         );
       case 'contact':
@@ -74,7 +74,7 @@ function ChatContainer({
 
   return (
     <>
-      <div className={`min-h-screen bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)]`}>
+      <div className={`md:h-full bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] shadow-2xl`}>
         {renderContent()}
       </div>
     </>

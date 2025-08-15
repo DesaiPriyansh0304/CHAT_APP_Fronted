@@ -102,8 +102,8 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
 
   if (isUserSelected) {
     return (
-      <div className='flex items-center p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
-        <div className="flex items-center space-x-3">
+      <div className='flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
+        <div className="flex items-center space-x-3 flex-1 min-w-0">
 
           {/* Mobile Back Button */}
           <div>
@@ -118,9 +118,9 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
             )}
           </div>
 
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileClick}>
+          <div className="flex items-center space-x-3 cursor-pointer min-w-0" onClick={onProfileClick}>
             {/* Profile image*/}
-            <div>
+            <div className="flex-shrink-0">
               <img
                 className="w-12 h-12 rounded-full object-cover"
                 alt={`${selectUser.firstname} ${selectUser.lastname}`}
@@ -128,11 +128,11 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
               />
             </div>
             {/*User name*/}
-            <div className='text-gray-900 dark:text-white'>
+            <div className='text-gray-900 dark:text-white min-w-0'>
               <div className="flex items-center gap-2 font-semibold">
-                <span>{`${selectUser.firstname} ${selectUser.lastname}`}</span>
+                <span className="truncate">{`${selectUser.firstname} ${selectUser.lastname}`}</span>
                 {selectUser.online && (
-                  <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                  <span className="w-2 h-2 bg-green-500 rounded-full inline-block flex-shrink-0"></span>
                 )}
               </div>
               {isTyping && <span className='text-sm text-gray-500 dark:text-gray-400'>typing...</span>}
@@ -140,7 +140,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
           </div>
         </div>
 
-        <div className={`flex items-center gap-3 md:gap-7 ml-auto text-gray-500 dark:text-gray-300 text-xl`}>
+        <div className={`flex items-center gap-3 md:gap-7 text-gray-500 dark:text-gray-300 text-xl flex-shrink-0`}>
           {/* Top Icons with Tooltips */}
           {topItems.map(({ id, icon, title, label }) => {
             // On mobile, show only essential icons
@@ -231,7 +231,7 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
 
   if (isGroupSelected) {
     return (
-      <div className='flex items-center p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
+      <div className='flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]'>
         <div className="flex items-center space-x-3">
           {/* Mobile Back Button */}
           {isMobile && (

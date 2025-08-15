@@ -14,25 +14,30 @@ import { PiSignIn } from "react-icons/pi";
 import ReCAPTCHA from "react-google-recaptcha";
 
 function Login() {
-  const [userLogin, setUserLogin] = useState({ email: '', password: '' });
-  const [error, setError] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isGithubLoading, setIsGithubLoading] = useState(false);
-  const [recaptcha, setRecaptcha] = useState(null);
-
-  const [realValue, setRealValue] = useState('');
-  const [displayValue, setDisplayValue] = useState('');
+  //form data
+  const [userLogin, setUserLogin] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState({});                                //validation error
+  const [isLoading, setIsLoading] = useState(false);                     //loading
+  const [showPassword, setShowPassword] = useState(false);               //Show password
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);         //google loading
+  const [isGithubLoading, setIsGithubLoading] = useState(false);         //github loading
+  const [recaptcha, setRecaptcha] = useState(null);                      //recaptch 
+  const [realValue, setRealValue] = useState('');                        //password value  
+  const [displayValue, setDisplayValue] = useState('');                  //display value 
   const timeoutRef = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
 
+
+  //recaptcha
   const getRecaptchavalue = (value) => {
     setRecaptcha(value);
-    console.log('reCAPTCHA value:', value);
+    // console.log('reCAPTCHA value:', value);
     if (value && error.recaptcha) {
       setError(prev => ({ ...prev, recaptcha: null }));
     }
@@ -40,9 +45,12 @@ function Login() {
 
   const onRecaptchaExpired = () => {
     setRecaptcha(null);
-    setError(prev => ({ ...prev, recaptcha: 'reCAPTCHA expired. Please verify again.' }));
+    setError(prev => ({ ...prev, recaptcha: 'Security verification timed out. Please re-verify.' }));
   }
 
+
+
+  {/*github Login*/ }
   const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
 
   const getCurrentDomain = () => {

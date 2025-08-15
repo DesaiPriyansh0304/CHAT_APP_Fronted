@@ -8,17 +8,17 @@ import Rightsidebar from '../Dashboard-Page/Rigthsidebar';
 //tab-icon page (AvtarPage + AllUser)
 import AvtarPage from '../Icon-Page/AvtarPage';
 import AllUser from '../Icon-Page/AllUser';
-
+import DraggableChatbot from '../Chatbot/DraggableChatbot';
 
 function Home() {
 
-  const { tab, token } = useParams();                 //tab and token get Approuter
+  const { tab, token } = useParams();                        //tab and token get Approuter
   const currentTab = tab || (token ? 'contact' : 'chats');   //chats tb open 
 
   const [selectedUser, setSelectedUser] = useState(null);                        //Select User
   const [selectGroup, setSelectGroup] = useState(null);                          //Select Group
-  const [userchat, setUserChat] = useState('1');                                 //user chat
-  const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);   //reposive open in sidebar
+  // const [userchat, setUserChat] = useState('1');                                 //user chat
+  const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);   //reposive open in Rigthsidebar show
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);             //Detect mobile screen
 
   //resize screen check
@@ -54,46 +54,51 @@ function Home() {
   return (
     <>
       {/*main dive*/}
-      <div className="w-screen h-screen">
+      <div className="md:w-screen md:h-screen">
 
         {currentTab === 'alluser' ? (
           //avterpage + alluser page 
-          <div className="h-full w-full grid grid-cols-[6%_94%]">
+          <div className="h-full w-full md:grid md:grid-cols-[6%_94%] flex flex-col">
             {/* Sidebar */}
-            <div className="h-full w-full overflow-hidden">
-              <Sidebar
-                selectUser={selectedUser}
-                setSelectedUser={handleUserSelect}
-                selectGroup={selectGroup}
-                setSelectedGroup={handleGroupSelect}
-                isMobile={isMobile}
-              />
-            </div>
+            {!showMobileRightSidebar && (
+              <div className="md:static fixed bottom-0 left-0 w-full h-16 md:h-full md:w-full md:order-1 order-2 z-10">
+                <Sidebar
+                  selectUser={selectedUser}
+                  setSelectedUser={handleUserSelect}
+                  selectGroup={selectGroup}
+                  setSelectedGroup={handleGroupSelect}
+                  isMobile={isMobile}
+                />
+              </div>
+            )}
 
             {/* AllUser Page */}
-            <div className="h-full w-full overflow-visible">
+            <div className="order-1 md:order-2 overflow-hidden flex-1">
               <AllUser />
             </div>
           </div>
         ) : currentTab === 'avtarpage' ? (
-          //avterpage + sidebar 
-          <div className="h-full w-full grid grid-cols-[6%_94%]">
+          // AvtarPage + Sidebar
+          <div className="h-full w-full md:grid md:grid-cols-[6%_94%] flex flex-col">
             {/* Sidebar */}
-            <div className="h-full w-full overflow-visible">
-              <Sidebar
-                selectUser={selectedUser}
-                setSelectedUser={handleUserSelect}
-                selectGroup={selectGroup}
-                setSelectedGroup={handleGroupSelect}
-                isMobile={isMobile}
-              />
-            </div>
+            {!showMobileRightSidebar && (
+              <div className="md:static fixed bottom-0 left-0 w-full h-16 md:h-full md:w-full md:order-1 order-2 z-10">
+                <Sidebar
+                  selectUser={selectedUser}
+                  setSelectedUser={handleUserSelect}
+                  selectGroup={selectGroup}
+                  setSelectedGroup={handleGroupSelect}
+                  isMobile={isMobile}
+                />
+              </div>
+            )}
 
             {/* Avtar Page */}
-            <div className="h-full w-full overflow-hidden">
+            <div className="order-1 md:order-2 overflow-hidden flex-1">
               <AvtarPage />
             </div>
           </div>
+
         ) : (
           //sidebar + chatcontainer + rigthsidebar
           <div className="h-full w-full md:grid md:grid-cols-[6%_25%_69%] flex flex-col">
@@ -111,23 +116,21 @@ function Home() {
             )}
 
             {/* Chat Container */}
-            <div className="h-full w-full order-1 md:order-2 overflow-hidden flex-1">
+            <div className="order-1 md:order-2 overflow-hidden flex-1">
               <ChatContainer
                 selectUser={selectedUser}
                 setSelectUser={handleUserSelect}
                 activePage={currentTab}
-                setUserChat={setUserChat}
                 selectGroup={selectGroup}
                 setSelectGroup={handleGroupSelect}
               />
             </div>
 
             {/* RightSidebar */}
-            <div className="h-full w-full order-2 md:order-3 overflow-hidden hidden md:block">
+            <div className="order-2 md:order-3 overflow-hidden hidden md:block">
               <Rightsidebar
                 selectUser={selectedUser}
                 SetSelectUser={handleUserSelect}
-                userchat={userchat}
                 selectGroup={selectGroup}
                 setSelectGroup={handleGroupSelect}
                 isMobile={isMobile}
@@ -141,7 +144,6 @@ function Home() {
                 <Rightsidebar
                   selectUser={selectedUser}
                   setSelectUser={handleUserSelect}
-                  userchat={userchat}
                   selectGroup={selectGroup}
                   setSelectGroup={handleGroupSelect}
                   isMobile={isMobile}
@@ -152,6 +154,8 @@ function Home() {
 
           </div>
         )}
+
+        <DraggableChatbot />
       </div>
     </>
   );
