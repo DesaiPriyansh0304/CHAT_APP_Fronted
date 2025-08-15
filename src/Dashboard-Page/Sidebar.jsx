@@ -11,48 +11,52 @@ function Sidebar({ isMobile }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [showLangMenu, setShowLangMenu] = useState(false);               //Languge Menu
+  const [showLangMenu, setShowLangMenu] = useState(false);               //Language Menu
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);           //Avatar Menu 
   const [hoveredItem, setHoveredItem] = useState(null);                  //Hover Effect 
+  const [showBottomIconsMobile, setShowBottomIconsMobile] = useState(false); // Bottom icons toggle for mobile 
 
-  //theme Slice
+  //theme Slice - Make sure we're getting the current theme
   const theme = useSelector((state) => state.theme.mode);
   //Login User Data Slice
   const loginUserState = useSelector((state) => state.loginUser || {});
   const { loading, error } = loginUserState;
   const user = loginUserState?.userData;
 
+  // Apply theme to document on mount and theme change
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
-
-  //clike to get icon id
+  //click to get icon id
   const [clickEffect, setClickEffect] = useState(() => {
     const savedTab = localStorage.getItem('activeTab');
     if (savedTab) return savedTab;
     const currentPath = location.pathname.split('/')[1];
+    // Pass current theme to bottomItems to get the correct state
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
     const match = allTabs.find((item) => item.page === currentPath);
     return match ? match.id : null;
   });
 
-  //store in icon id(localhost)
+  //store in icon id(localStorage)
   useEffect(() => {
     const currentPath = location.pathname.split('/')[1];
+    // Make sure to pass the current theme here as well
     const allTabs = [...topItems, ...bottomItems(theme, setShowLangMenu, dispatch, toggleTheme)];
     const match = allTabs.find((item) => item.page === currentPath);
     if (match) {
       setClickEffect(match.id);
       localStorage.setItem('activeTab', match.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location, theme]);
+  }, [location, theme, dispatch]); // Add dispatch as dependency
 
-  // cilck Event
+  // click Event
   const menuRef = useRef(null);       // avatar menu ref (mobile/desktop)
   const langMenuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-
       if (showAvatarMenu && menuRef.current && !menuRef.current.contains(e.target)) {
         setShowAvatarMenu(false);
       }
@@ -62,14 +66,10 @@ function Sidebar({ isMobile }) {
     };
 
     document.addEventListener('pointerdown', handleClickOutside);
-    // document.addEventListener('touchstart', handleClickOutside);
-
     return () => {
       document.removeEventListener('pointerdown', handleClickOutside);
-      // document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [showAvatarMenu, showLangMenu]);
-
 
   //Tooltip Component
   const Tooltip = ({ children, text, position = "right", show = false }) => {
@@ -101,8 +101,7 @@ function Sidebar({ isMobile }) {
     );
   };
 
-
-  //clike in top iaon
+  //click in top icon
   const handleTabClick = (id, page) => {
     setClickEffect(id);
     localStorage.setItem('activeTab', id);
@@ -110,9 +109,13 @@ function Sidebar({ isMobile }) {
     setShowLangMenu(false);
     setShowAvatarMenu(false);
     setHoveredItem(null);
+    // Close bottom menu on mobile after navigation
+    if (isMobile) {
+      setShowBottomIconsMobile(false);
+    }
   };
 
-  //avtar menu oncilke event
+  //avatar menu onclick event
   const handleAvatarMenuClick = (title, page) => {
     if (title === 'Logout') {
       dispatch(logout());
@@ -123,12 +126,18 @@ function Sidebar({ isMobile }) {
     setShowAvatarMenu(false);
     setShowLangMenu(false);
     setHoveredItem(null);
+    // Close bottom menu on mobile after action
+    if (isMobile) {
+      setShowBottomIconsMobile(false);
+    }
   };
 
-  //common button Css 
+  //common button CSS 
   const getButtonClass = (id) => {
-    const base = 'relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer border';
-    const common = 'hover:text-blue-600 dark:hover:text-gray-300';
+    const base = isMobile
+      ? 'relative w-10 h-10 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 cursor-pointer border'
+      : 'relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-110 cursor-pointer border';
+    const common = 'hover:text-blue-600 dark:hover:text-[#dfd0b8]';
     const isActive = clickEffect === id;
 
     if (isActive) {
@@ -140,8 +149,6 @@ function Sidebar({ isMobile }) {
     }
   };
 
-
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -151,11 +158,12 @@ function Sidebar({ isMobile }) {
   }
   if (error) return <p>Error: {error}</p>;
 
+  // Get bottom menu items with current theme - this ensures the theme button shows correct state
   const bottomMenuItems = bottomItems(theme, setShowLangMenu, dispatch, toggleTheme);
 
   return (
     <>
-      <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-xl dark:shadow-sky-500/50">
+      <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-2xl">
 
         {/* Desktop Layout */}
         {!isMobile ? (
@@ -200,8 +208,9 @@ function Sidebar({ isMobile }) {
                         <Tooltip text={lable} position="right" show={hoveredItem === `bottom-${id}`}>
                           <button
                             onClick={() => {
-                              if (action) action();
-                              else if (page) {
+                              if (action) {
+                                action();
+                              } else if (page) {
                                 navigate(`/${page}`);
                                 setClickEffect(id);
                                 localStorage.setItem('activeTab', id);
@@ -250,7 +259,7 @@ function Sidebar({ isMobile }) {
                       setShowLangMenu(false);
                       setHoveredItem(null);
                     }}
-                    className="w-13 h-13 rounded-full border-2 border-sky-500 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
+                    className="w-13 h-13 rounded-full border-2 border-gray-300 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
                     onMouseEnter={() => setHoveredItem('avatar')}
                     onMouseLeave={() => setHoveredItem(null)}
                   >
@@ -261,7 +270,7 @@ function Sidebar({ isMobile }) {
                     />
                   </button>
 
-                  {/*showavtar menu*/}
+                  {/*show avatar menu*/}
                   {showAvatarMenu && (
                     <div
                       className="absolute left-15 bottom-5 w-39 bg-white border border-blue-300 rounded-md shadow-lg z-10 dark:bg-gray-800 dark:border-gray-600"
@@ -289,51 +298,120 @@ function Sidebar({ isMobile }) {
             </div>
           </div>
         ) : (
-          /* Mobile Layout */
-          <div className="h-[64px] shadow-2xl p-3">
-            <div className="flex flex-row gap-3 items-center">
+          /* Mobile Layout - FIXED */
+          <div className="h-[64px] bg-white dark:bg-[var(--sidebar-bg)] shadow-2xl">
+            <div className="flex flex-row items-center justify-between w-full h-full px-2">
 
-              {/* Top Menu Items */}
-              <div className='ml-2'>
-                <ul className="flex flex-row gap-2">
-                  {topItems.map(({ icon, page, id }) => (
-                    <li key={id} className="relative">
-                      <button
-                        onClick={() => handleTabClick(id, page)}
-                        className={getButtonClass(id)}
-                      >
-                        {icon}
-                      </button>
+              {/* Menu Items Container - Shows either top or bottom icons */}
+              <div className='flex-1 flex justify-start overflow-x-auto'>
+                <ul className="flex flex-row gap-1 items-center min-w-max">
+                  {!showBottomIconsMobile ? (
+                    // Show Top Icons
+                    topItems.map(({ icon, page, id }) => ( // Limit to 4 items to prevent overflow
+                      <li key={id} className="relative flex-shrink-0">
+                        <button
+                          onClick={() => handleTabClick(id, page)}
+                          className={getButtonClass(id)}
+                        >
+                          {icon}
+                        </button>
+                      </li>
+                    ))
+                  ) : (
+                    // Show Bottom Icons
+                    bottomMenuItems.slice(0, 4).map(({ id, icon, action, page }) => ( // Limit to 4 items
+                      <li key={id} className="relative flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            if (action) {
+                              action();
+                            } else if (page) {
+                              navigate(`/${page}`);
+                              setClickEffect(id);
+                              localStorage.setItem('activeTab', id);
+                            }
+                            setShowAvatarMenu(false);
+                            setHoveredItem(null);
+                          }}
+                          className={getButtonClass(id)}
+                        >
+                          {icon}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+
+              {/* Right side container */}
+              <div className="flex flex-row gap-2 items-center flex-shrink-0">
+
+                {/* Toggle Button for Bottom Icons */}
+                <button
+                  onClick={() => setShowBottomIconsMobile(prev => !prev)}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 flex-shrink-0"
+                  title={showBottomIconsMobile ? "Show Main Menu" : "Show More Options"}
+                >
+                  {!showBottomIconsMobile ? (
+                    // More options icon (3 dots)
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                    </svg>
+                  ) : (
+                    // Back/Close icon
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </button>
+
+                {/* Mobile Avatar */}
+                <div className="relative flex-shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowAvatarMenu(prev => !prev);
+                      setShowLangMenu(false);
+                      setHoveredItem(null);
+                    }}
+                    className="w-10 h-10 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md hover:scale-110 transition-transform"
+                  >
+                    <img
+                      src={user?.profile_avatar || 'https://via.placeholder.com/100'}
+                      alt="User"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Language Menu */}
+            {showLangMenu && (
+              <div
+                ref={langMenuRef}
+                className="absolute top-16 right-12 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
+              >
+                <ul className="p-2">
+                  {languages.map((lang) => (
+                    <li
+                      key={lang.code}
+                      onClick={() => setShowLangMenu(false)}
+                      className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-200 rounded-md transition-colors"
+                    >
+                      <span className={`fi fi-${lang.flag} w-5 h-5`}></span>
+                      <span>{lang.label}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-
-              {/* Mobile Avatar */}
-              <div className="relative ml-auto">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowAvatarMenu(prev => !prev);
-                    setShowLangMenu(false);
-                    setHoveredItem(null);
-                  }}
-                  className="w-11 h-11 rounded-full border-2 border-[#d2d2cf] dark:border-[var(--text-color)] shadow-md hover:scale-125 transition-transform"
-                >
-                  <img
-                    src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                    alt="User"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                </button>
-              </div>
-            </div>
+            )}
 
             {/* Mobile Avatar Menu */}
             {showAvatarMenu && (
               <div
-                className="fixed top-113 right-6 w-40 bg-gray-800 border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
+                className="absolute top-16 right-2 w-40 bg-white border border-blue-300 rounded-md shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-600"
                 ref={menuRef}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
