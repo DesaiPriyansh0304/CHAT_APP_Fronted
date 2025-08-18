@@ -80,7 +80,7 @@ function ProfilePage() {
               {/*menu code*/}
               {isMenuOpen && (
                 <div
-                  className="absolute right-5 top-12 w-40 bg-white rounded-md shadow-md z-10"
+                  className="absolute right-5 top-12 w-40 bg-white dark:bg-gray-800 dark:text-amber-50 rounded-md shadow-md z-10"
                   ref={dotmenuRef}
                 >
                   {/*dot menu */}

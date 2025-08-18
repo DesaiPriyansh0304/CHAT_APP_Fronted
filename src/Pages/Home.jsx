@@ -116,7 +116,7 @@ function Home() {
             )}
 
             {/* Chat Container */}
-            <div className="order-1 md:order-2 overflow-hidden flex-1">
+            <div className="order-1 md:order-2 overflow-hidden">
               <ChatContainer
                 selectUser={selectedUser}
                 setSelectUser={handleUserSelect}

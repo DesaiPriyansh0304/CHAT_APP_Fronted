@@ -17,18 +17,18 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
   const { userData } = useSelector((state) => state.loginUser);
   const loginUserId = userData?._id;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isdotMenu, setIsdotMenu] = useState(false);
-  const [activegroupMenuId, setActivegroupMenuId] = useState(null);
-  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
-  const [targetGroupId, setTargetGroupId] = useState(null);
-  const [deleteGroup, setDeleteGroup] = useState(false);
-  const [deleteGroupId, setDeleteGroupId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);                  //model menu(create group)
+  const [searchTerm, setSearchTerm] = useState('');                       //serch group name
+  const [isdotMenu, setIsdotMenu] = useState(false);                      //dot menu
+  const [activegroupMenuId, setActivegroupMenuId] = useState(null);       // 
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);          //Add member   
+  const [targetGroupId, setTargetGroupId] = useState(null);               //Grop ID
+  const [deleteGroup, setDeleteGroup] = useState(false);                  //Delete Group select data
+  const [deleteGroupId, setDeleteGroupId] = useState(null);               //Delete group Id    
 
   const dotmenuRef = useRef();
 
-  // ✅ FIXED: Toggle dot menu & reset popups
+  // Toggle dot menu & reset popups
   const toggleMenu = (id) => {
     const isSameMenu = activegroupMenuId === id;
 
@@ -61,11 +61,13 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isdotMenu]);
 
+  //fined in user role
   const getUserRoleInGroup = (group, userId) => {
     const entry = group.userIds.find((u) => u.user._id === userId);
     return entry?.role || null;
   };
 
+  //role in show menu
   const getDotMenuByRole = (role) => {
     switch (role) {
       case 'admin':
@@ -91,16 +93,19 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
     }
   };
 
+  //user wise group
   useEffect(() => {
     if (!hasFetched) {
       dispatch(fetchUserGroups());
     }
   }, [dispatch, hasFetched]);
 
+  //Create Group
   const handleGroupCreated = (newGroup) => {
     dispatch(addGroup(newGroup));
     setIsModalOpen(false);
   };
+
 
   const filteredGroups = Array.isArray(groups)
     ? groups.filter((group) =>
@@ -115,12 +120,12 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl dark:text-[var(--text-color3)] font-semibold">Groups</h2>
           <RiGroupLine
-            className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-black cursor-pointer mr-3.5"
+            className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-black dark:hover:text-gray-100 cursor-pointer mr-3.5"
             onClick={() => setIsModalOpen(true)}
           />
         </div>
 
-        {/* Search */}
+        {/* Search bar */}
         <div className="relative mb-6">
           <input
             type="text"
@@ -226,7 +231,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
           )}
         </ul>
 
-        {/* Modals */}
+        {/* Crete Group Modals  */}
         {isModalOpen && (
           <CreateGroupModal
             onClose={() => setIsModalOpen(false)}
@@ -234,6 +239,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
           />
         )}
 
+        {/* Add member Group */}
         {isAddMemberOpen && (
           <AddMemberModal
             groupId={targetGroupId}

@@ -179,7 +179,7 @@ function Sidebar({ isMobile }) {
 
 
   return (
-    <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-2xl">
+    <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-xl dark:shadow-sky-400">
       {!isMobile ? (
         /* Desktop layout here — unchanged */
         <div className="h-full py-2 flex flex-col">

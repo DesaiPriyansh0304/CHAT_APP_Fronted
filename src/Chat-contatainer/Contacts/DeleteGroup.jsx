@@ -40,7 +40,7 @@ export const DeleteGroupButton = ({ groupId, onClose }) => {
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire({
                     title: "Cancelled",
-                    text: "Your group is safe :)",
+                    text: "Your group is safe : 😊",
                     icon: "error",
                 });
                 onClose();

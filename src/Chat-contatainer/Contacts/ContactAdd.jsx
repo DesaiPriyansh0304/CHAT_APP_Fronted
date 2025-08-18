@@ -69,25 +69,25 @@ function ContactAdd({ onClose }) {
 
     return (
         <>
-            <div className="bg-white rounded-xl shadow-lg w-[500px] max-w-md p-6 relative mx-4">
+            <div className="bg-white rounded-xl shadow-lg w-full max-w-md mx-auto p-4 sm:p-6 relative">
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl cursor-pointer"
+                    className="absolute top-3 right-3 text-gray-400 hover:text-black text-2xl cursor-pointer touch-manipulation"
                 >
                     &times;
                 </button>
 
-                <h2 className="text-xl font-semibold mb-6 text-gray-800">Add Contact</h2>
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-800 pr-8">Add Contact</h2>
 
                 {/* Email */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
                         type="email"
                         placeholder="Enter email"
-                        className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
-                            } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400`}
+                        className={`w-full px-3 sm:px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-base`}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -96,26 +96,26 @@ function ContactAdd({ onClose }) {
 
                 {/* Message */}
                 <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                         Invitation Message
                     </label>
                     <textarea
                         placeholder="Enter a message"
                         rows={4}
-                        className={`w-full px-4 py-2 border ${errors.message ? 'border-red-500' : 'border-gray-300'
-                            } rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400 text-sm`}
+                        className={`w-full px-3 sm:px-4 py-3 border ${errors.message ? 'border-red-500' : 'border-gray-300'
+                            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-base`}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        style={{ resize: 'vertical', minHeight: '40px' }}
+                        style={{ resize: 'vertical', minHeight: '80px' }}
                     />
                     {errors.message && <p className="text-sm text-red-500 mt-1">{errors.message}</p>}
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-between space-x-4">
+                <div className="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
                     <button
                         onClick={onClose}
-                        className="text-white px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-700 transition-colors cursor-pointer"
+                        className="w-full sm:w-auto text-white px-4 py-3 bg-gray-600 rounded-md hover:bg-gray-700 transition-colors cursor-pointer touch-manipulation"
                         disabled={loading}
                     >
                         Close
@@ -123,7 +123,7 @@ function ContactAdd({ onClose }) {
                     <button
                         onClick={handleInvite}
                         disabled={loading}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-blue-300 transition-colors cursor-pointer"
+                        className="w-full sm:w-auto bg-blue-500 text-white px-4 py-3 rounded-md hover:bg-blue-600 disabled:bg-blue-300 transition-colors cursor-pointer touch-manipulation"
                     >
                         {loading ? 'Sending...' : 'Invite Contact'}
                     </button>
@@ -133,4 +133,4 @@ function ContactAdd({ onClose }) {
     );
 }
 
-export default ContactAdd;
+export default ContactAdd;  

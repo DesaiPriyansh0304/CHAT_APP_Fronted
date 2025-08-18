@@ -109,7 +109,7 @@ function Chats({ selectUser, setSelectUser }) {
 
   return (
     <>
-      <div className="p-2 md:h-full md:w-full">
+      <div className="p-2 h-screen md:w-full">
         {/* Header */}
         <div className="p-5 flex items-center justify-between">
           <div className="text-2xl font-semibold dark:text-[#f8f9fa]">Chats</div>

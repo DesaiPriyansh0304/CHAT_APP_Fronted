@@ -74,7 +74,7 @@ function ChatContainer({
 
   return (
     <>
-      <div className={`md:h-full bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] shadow-2xl`}>
+      <div className={`bg-[#F5F7FB] dark:bg-[var(--chatcontainer-bg)] shadow-2xl`}>
         {renderContent()}
       </div>
     </>

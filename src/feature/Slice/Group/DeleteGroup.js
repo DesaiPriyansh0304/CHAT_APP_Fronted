@@ -32,7 +32,7 @@ export const leaveGroup = createAsyncThunk(
     try {
       const token = localStorage.getItem("Authtoken");
       const res = await axios.post(
-        `${URL}/api/msg/leavegroup`,
+        `${URL}/api/group/leavegroup`,
         { groupId },
         {
           headers: {

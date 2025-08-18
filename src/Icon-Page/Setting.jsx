@@ -60,7 +60,7 @@ function Setting() {
 
   return (
     <>
-      <div className="p-2  overflow-hidden">
+      <div className="p-2">
         {/* Title */}
         <div className="flex justify-between">
           <div className="p-5 text-2xl font-bold dark:text-[var(--text-color3)]">Settings</div>
