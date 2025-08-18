@@ -23,7 +23,6 @@ const GitHubCallback = () => {
 };
 
 function AppRouter() {
-
     return (
         <>
             <Toaster />

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../feature/Slice/Auth/AuthSlice';
 import { toggleTheme } from '../feature/Slice/Theme/ThemeSlice';
 import { topItems, bottomItems, avatarItems, languages } from '../Sidebar/icon';
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { RxCross2 } from "react-icons/rx";
 
 function Sidebar({ isMobile }) {
 
@@ -11,21 +13,23 @@ function Sidebar({ isMobile }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [showLangMenu, setShowLangMenu] = useState(false);               //Language Menu
-  const [showAvatarMenu, setShowAvatarMenu] = useState(false);           //Avatar Menu 
-  const [hoveredItem, setHoveredItem] = useState(null);                  //Hover Effect 
-  const [showBottomIconsMobile, setShowBottomIconsMobile] = useState(false); // Bottom icons toggle for mobile 
+  const [showLangMenu, setShowLangMenu] = useState(false);                     //Language Menu
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);                 //Avatar Menu 
+  const [hoveredItem, setHoveredItem] = useState(null);                        //Hover Effect 
+  const [showBottomIconsMobile, setShowBottomIconsMobile] = useState(false);   // Bottom icons toggle for mobile 
 
-  //theme Slice - Make sure we're getting the current theme
+  //theme Slice 
   const theme = useSelector((state) => state.theme.mode);
   //Login User Data Slice
   const loginUserState = useSelector((state) => state.loginUser || {});
   const { loading, error } = loginUserState;
   const user = loginUserState?.userData;
 
-  // Apply theme to document on mount and theme change
+  //theme change
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    }
   }, [theme]);
 
   //click to get icon id
@@ -49,9 +53,9 @@ function Sidebar({ isMobile }) {
       setClickEffect(match.id);
       localStorage.setItem('activeTab', match.id);
     }
-  }, [location, theme, dispatch]); // Add dispatch as dependency
+  }, [location, theme, dispatch]);
 
-  // click Event
+  // click Event - Menu
   const menuRef = useRef(null);       // avatar menu ref (mobile/desktop)
   const langMenuRef = useRef(null);
 
@@ -132,10 +136,10 @@ function Sidebar({ isMobile }) {
     }
   };
 
+  //mobile languge menu
   const handleLanguageButtonClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Language button clicked, current showLangMenu:', showLangMenu);
     setShowLangMenu(prev => {
       console.log('Setting showLangMenu to:', !prev);
       return !prev;
@@ -310,13 +314,13 @@ function Sidebar({ isMobile }) {
         </div>
       ) : (
         /* Mobile Layout */
-        <div className="h-[64px] bg-white dark:bg-[var(--sidebar-bg)] shadow-2xl">
+        <div className="h-[64px] bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-2xl">
           <div className="flex flex-row items-center justify-between w-full h-full px-2">
             <div className='flex-1 flex justify-start overflow-x-auto'>
               <ul className="flex flex-row gap-1 items-center min-w-max">
                 {!showBottomIconsMobile ? (
                   topItems.map(({ icon, page, id }) => (
-                    <li key={id} className="relative flex-shrink-0">
+                    <li key={id} className="relative flex-shrink- hover:">
                       <button
                         onClick={() => handleTabClick(id, page)}
                         className={getButtonClass(id)}
@@ -340,7 +344,6 @@ function Sidebar({ isMobile }) {
                             return;
                           }
 
-                          // અન્ય buttons માટે
                           if (action) {
                             action();
                           } else if (page) {
@@ -374,17 +377,11 @@ function Sidebar({ isMobile }) {
                 }}
                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  {showBottomIconsMobile ? (
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  ) : (
-                    <>
-                      <circle cx="12" cy="12" r="1" />
-                      <circle cx="19" cy="12" r="1" />
-                      <circle cx="5" cy="12" r="1" />
-                    </>
-                  )}
-                </svg>
+                {showBottomIconsMobile ? (
+                  <RxCross2 />
+                ) : (
+                  <HiOutlineDotsVertical />
+                )}
               </button>
 
               {/* Avatar Button */}
@@ -396,7 +393,7 @@ function Sidebar({ isMobile }) {
                     setShowAvatarMenu(prev => !prev);
                     setShowLangMenu(false);
                   }}
-                  className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:scale-105 transition-transform"
+                  className="w-10 h-10 rounded-full border border-gray-400 dark:border-sky-300 overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:scale-105 transition-transform"
                 >
                   <img
                     src={user?.profile_avatar || 'https://via.placeholder.com/100'}
@@ -412,20 +409,19 @@ function Sidebar({ isMobile }) {
           {showLangMenu && (
             <div
               ref={langMenuRef}
-              className="fixed top-90 left-1/2 -translate-x-1/2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
+              className="fixed top-90 left-1/2 -translate-x-1/2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
               onClick={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
             >
               <div className="p-2">
                 <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 mb-1">Select Language</div>
-                <ul className="max-h-48 overflow-y-auto">
+                <ul className="max-h-47 overflow-y-auto">
                   {languages.map((lang) => (
                     <li
                       key={lang.code}
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('Language selected:', lang.label);
                         setShowLangMenu(false);
                       }}
                       onTouchStart={(e) => e.stopPropagation()}
@@ -466,8 +462,9 @@ function Sidebar({ isMobile }) {
             </div>
           )}
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   )
 }
 

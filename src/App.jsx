@@ -9,6 +9,7 @@ import AppRouter from './Router/AppRouter';
 import GoogleAuthProvider from './providers/GoogleAuthProvider';
 
 function App() {
+
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.mode);
 
@@ -19,7 +20,9 @@ function App() {
 
   // Ensure theme is applied correctly
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    }
   }, [theme]);
 
   return (

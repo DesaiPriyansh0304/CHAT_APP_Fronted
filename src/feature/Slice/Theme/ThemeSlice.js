@@ -4,7 +4,6 @@ const getInitialTheme = () => {
   const savedTheme = localStorage.getItem("Theme");
   const theme = savedTheme === "dark" ? "dark" : "light";
 
-  // Apply theme class immediately on initialization
   if (typeof document !== "undefined") {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }
