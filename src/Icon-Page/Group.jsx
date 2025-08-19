@@ -114,11 +114,11 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
     : [];
 
   return (
-    <div className="flex h-screen w-full">
-      <div className="p-4 text-gray-800 w-full overflow-y-auto">
+    <div className="h-screen w-full">
+      <div className="p-4 overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl dark:text-[var(--text-color3)] font-semibold">Groups</h2>
+          <h2 className="text-2xl text-gray-800 dark:text-[var(--text-color3)] font-semibold">Groups</h2>
           <RiGroupLine
             className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-black dark:hover:text-gray-100 cursor-pointer mr-3.5"
             onClick={() => setIsModalOpen(true)}
@@ -132,9 +132,9 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
             placeholder="Search groups..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-md bg-[#e4e9f7] text-gray-700 placeholder-gray-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 text-gray-400  border-2 border-blue-500 placeholder-gray-500 focus:outline-none"
           />
-          <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500 " />
         </div>
 
         {/* Group List */}
@@ -156,16 +156,16 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
               return (
                 <li
                   key={group._id}
-                  className={`cursor-pointer px-2 py-2 rounded ${selectGroup?._id === group._id ? 'bg-[#d4dfff] dark:text-[var(----text-color)]' : ''
+                  className={`group cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-800 px-2 py-2 rounded ${selectGroup?._id === group._id ? 'bg-[#d4dfff] dark:bg-gray-300' : ''
                     } relative`}
                   onClick={() => setSelectGroup(group)}
                 >
                   <div className="flex items-center justify-between relative">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-700 font-semibold">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full text-purple-700 font-semibold">
                         {group.groupName.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-medium dark:text-[var(--text-color3)]">
+                      <span className={`font-medium dark:text-[var(--text-color3)]  group-hover:text-white ${selectGroup?._id === group._id ? 'dark:text-gray-800' : ''} `}>
                         #{group.groupName}
                       </span>
                     </div>
@@ -182,7 +182,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
                       {isdotMenu && activegroupMenuId === group._id && (
                         <div
                           ref={dotmenuRef}
-                          className="absolute bottom-10 right-0 w-44 bg-white border-4 border-blue-300 rounded-md shadow-md z-50"
+                          className="absolute bottom-5 right-0 w-44 bg-white dark:bg-gray-800  rounded-md shadow-md z-50"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <ul>
@@ -214,7 +214,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
                                     console.log('Block Group not implemented yet');
                                   }
                                 }}
-                                className="hover:bg-gray-100 cursor-pointer px-3 py-2 flex justify-between items-center text-sm text-gray-700"
+                                className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer px-3 py-2 flex justify-between items-center text-sm text-gray-700 dark:text-white"
                               >
                                 <span>{title}</span>
                                 <span className="text-blue-500">{icon}</span>

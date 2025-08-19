@@ -179,7 +179,7 @@ function Sidebar({ isMobile }) {
 
 
   return (
-    <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-xl dark:shadow-sky-400">
+    <div className="md:w-full md:h-full bg-[#f7f7ff] dark:bg-[var(--sidebar-bg)] shadow-xl dark:shadow-sky-500/50">
       {!isMobile ? (
         /* Desktop layout here — unchanged */
         <div className="h-full py-2 flex flex-col">
@@ -274,7 +274,7 @@ function Sidebar({ isMobile }) {
                     setShowLangMenu(false);
                     setHoveredItem(null);
                   }}
-                  className="w-13 h-13 rounded-full border-2 border-gray-300 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
+                  className="w-13 h-13 rounded-full border-[3px] border-purple-200 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
                   onMouseEnter={() => setHoveredItem('avatar')}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
@@ -393,7 +393,7 @@ function Sidebar({ isMobile }) {
                     setShowAvatarMenu(prev => !prev);
                     setShowLangMenu(false);
                   }}
-                  className="w-10 h-10 rounded-full border border-gray-400 dark:border-sky-300 overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:scale-105 transition-transform"
+                  className="w-10 h-10 rounded-full border-[3px] border-purple-200 dark:border-sky-300 overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:scale-105 transition-transform"
                 >
                   <img
                     src={user?.profile_avatar || 'https://via.placeholder.com/100'}
@@ -405,7 +405,7 @@ function Sidebar({ isMobile }) {
             </div>
           </div>
 
-          {/* Mobile Language Menu - showLangMenu state પર આધારિત */}
+          {/* Mobile Language Menu*/}
           {showLangMenu && (
             <div
               ref={langMenuRef}

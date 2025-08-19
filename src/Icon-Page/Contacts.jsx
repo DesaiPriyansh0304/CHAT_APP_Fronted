@@ -186,7 +186,7 @@ function Contacts() {
               placeholder="Search users.."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-md bg-[#e4e9f7] text-gray-700 placeholder-gray-500 focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 border-2 border-blue-500 text-gray-700 placeholder-gray-500 focus:outline-none"
             />
           </div>
         </div>

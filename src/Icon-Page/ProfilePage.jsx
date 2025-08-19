@@ -5,6 +5,7 @@ import { IoPersonOutline } from 'react-icons/io5';
 import { MdAttachFile } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import "./../Chat-contatainer/Profile/profile.css"
 
 function ProfilePage() {
 
@@ -61,6 +62,17 @@ function ProfilePage() {
       <div className="h-screen w-full">
         {/*Header*/}
         <div className="p-2 relative">
+          {/* Add inline styles for animation */}
+          <style jsx>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+            @keyframes counter-spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(-360deg); }
+            }
+          `}</style>
 
           {/*my profile and dot icon*/}
           <div className="flex justify-between">
@@ -74,7 +86,7 @@ function ProfilePage() {
             <div className="p-5 relative text-semibold">
               {/*dot menu open icon*/}
               <button onClick={toggleMenu}>
-                <EllipsisVerticalIcon className="h-6 w-6 text-gray-500  dark:text-[var(--Chatcontainer-text)] cursor-pointer" />
+                <EllipsisVerticalIcon className="h-6 w-6 text-gray-500  dark:text-[var(--Chatcontainer-text)] cursor-pointer hover:text-blue-600" />
               </button>
 
               {/*menu code*/}
@@ -96,7 +108,7 @@ function ProfilePage() {
                             navigate('/avtarpage');
                           }
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100 hover:rounded-md "
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100  dark:hover:bg-gray-500 cursor-pointer"
                       >
                         {name}
                       </button>
@@ -111,17 +123,49 @@ function ProfilePage() {
           <div className="mt-3 flex flex-col items-center justify-center">
             <div className="flex flex-col items-center">
               {/*Profile Image*/}
-              <div>
-                <img
-                  src={user?.profile_avatar || 'https://via.placeholder.com/100'}
-                  alt="Avatar"
-                  className="rounded-full w-24 h-24 border-4 border-gray-300 object-cover"
-                />
+              <div className='relative flex items-center justify-center'>
+                <div
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
+                    background: 'conic-gradient(from 0deg, #0061ff, #60efff,#595cff)',
+                    animation: 'spin 3s linear infinite',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                    // className='bg-orange-400'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '92px',
+                      height: '92px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                    <img
+                      src={user?.profile_avatar || 'https://via.placeholder.com/100'}
+                      alt="Avatar"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transform: 'rotate(0deg)',
+                        animation: 'counter-spin 3s linear infinite'
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
 
               {/*User name*/}
               <div>
-                <h5 className="text-black mt-4 font-semibold text-lg dark:text-[var(--text-color3)]">
+                <h5 className=" mt-4 font-semibold text-lg dark:text-[var(--text-color3)] bg-gradient-to-r from-[#0061ff] via-[#696eff] to-[#bf0fff] bg-clip-text text-transparent">
                   {user?.firstname} {user?.lastname}
                 </h5>
               </div>
@@ -149,7 +193,7 @@ function ProfilePage() {
           <div className="overflow-auto h-[50vh] mx-2">
 
             {/*About section*/}
-            <div className="w-full bg-gray-100 dark:bg-[#495057] rounded-md">
+            <div className="w-full mb-3 bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-[#495057]  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] rounded-md border border-blue-600 shadow-md shadow-indigo-500/50 dark:border-gray-400 dark:shadow-gray-500">
               <div
                 className="flex items-center justify-between cursor-pointe  px-4 py-2.5 cursor-pointer "
                 onClick={() => handleToggleSection('about')}
@@ -159,16 +203,16 @@ function ProfilePage() {
                   <div className='font-semibold'>
                     <IoPersonOutline />
                   </div>
-                  <span className="text-gray-700 dark:text-[var(--Chatcontainer-text)]  font-medium">
+                  <span className="text-gray-800 dark:text-[var(--Chatcontainer-text)]  font-medium">
                     About
                   </span>
                 </div>
                 {/*Up and Down Icon*/}
                 <div>
                   {activeSection === 'about' ? (
-                    <ChevronUp className="w-5 h-5 text-gray-600 dark:text-[var(--Chatcontainer-text)]" />
+                    <ChevronUp className="w-5 h-5 text-gray-700 dark:text-[var(--Chatcontainer-text)]" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-600 dark:text-[var(--Chatcontainer-text)]" />
+                    <ChevronDown className="w-5 h-5 text-gray-700 dark:text-[var(--Chatcontainer-text)]" />
                   )}
                 </div>
               </div>
@@ -176,7 +220,7 @@ function ProfilePage() {
               {/* About inside section detail*/}
               <div>
                 {activeSection === 'about' && (
-                  <div className="bg-white dark:bg-[#262E35] ">
+                  <div className="bg-blue-50 dark:bg-[#262E35] ">
                     <div className="mt-0.5 px-4 py-2.5 space-y-3 text-sm text-gray-800 h-[36vh] overflow-auto">
 
                       {/*User Name*/}
@@ -234,7 +278,7 @@ function ProfilePage() {
             </div>
 
             {/*Attached Files Section*/}
-            <div className="w-full  bg-gray-100  dark:bg-[#495057]  mt-2 rounded cursor-pointer">
+            <div className="w-full  bg-gradient-to-r from-sky-200 to-purple-200 border border-blue-600  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] mt-2 rounded cursor-pointer shadow-md shadow-indigo-500/50 dark:border-gray-400 dark:shadow-gray-500">
 
               <div
                 className="flex items-center justify-between cursor-pointer px-4 py-2.5"
@@ -243,18 +287,18 @@ function ProfilePage() {
                 {/*section name and icon*/}
                 <div className="flex items-center  dark:text-[var(--Chatcontainer-text)] gap-2">
                   <div className='font-semibold'>
-                    <MdAttachFile size={20} />
+                    <MdAttachFile size={18} />
                   </div>
-                  <span className="text-gray-700  dark:text-[var(--Chatcontainer-text)] font-medium">
+                  <span className="text-gray-800  dark:text-[var(--Chatcontainer-text)] font-medium">
                     Attached Files
                   </span>
                 </div>
                 {/*Up and Down Icon*/}
                 <div>
                   {activeSection === 'attachfile' ? (
-                    <ChevronUp className="w-5 h-5 dark:text-[var(--Chatcontainer-text)] text-gray-600" />
+                    <ChevronUp className="w-5 h-5 dark:text-[var(--Chatcontainer-text)] text-gray-700" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 dark:text-[var(--Chatcontainer-text)] text-gray-600" />
+                    <ChevronDown className="w-5 h-5 dark:text-[var(--Chatcontainer-text)] text-gray-700" />
                   )}
                 </div>
               </div>
@@ -262,7 +306,7 @@ function ProfilePage() {
               {/*Attached Files inside section detail*/}
               <div>
                 {activeSection === 'attachfile' && (
-                  <div className="bg-white dark:bg-[#262E35]">
+                  <div className="bg-blue-50 dark:bg-[#262E35]">
                     <div className="mt-1 px-4 py-2.5 space-y-3 text-sm text-gray-800 max-h-[37vh] overflow-auto">
 
                       {/*User uploader*/}
