@@ -10,37 +10,57 @@ import "./../Chat-contatainer/Profile/profile.css"
 function ProfilePage() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);             //dot menu
+  // console.log('isMenuOpen --->Profile Page', isMenuOpen);
   const [activeSection, setActiveSection] = useState('about');     //active action section
+
+  const navigate = useNavigate();
 
   //loginUser Slice
   const loginUserState = useSelector((state) => state.loginUser || {});
   const { userData: user } = loginUserState;
 
-  const navigate = useNavigate();
-
   //dot section
   const dotmenuRef = useRef();
-  //dot function
-  const toggleMenu = () => {
+  const buttonRef = useRef();
+
+  //dot function - Completely fixed
+  const toggleMenu = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
   };
+
   //dot menu icon
   const dotMenu = [
     { id: 1, name: 'Edit', page: 'avtarpage' },
     { id: 2, name: 'Action' },
     { id: 3, name: 'Another action' },
   ];
-  //click event
+
+  //click event - Complete fix for outside clicks
   useEffect(() => {
-    const handleClickAnywhere = (event) => {
-      if (isMenuOpen && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+    const handleClickOutside = (event) => {
+      // Check if click is outside both menu and button
+      if (
+        dotmenuRef.current &&
+        !dotmenuRef.current.contains(event.target) &&
+
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickAnywhere);
+    if (isMenuOpen) {
+      // Use timeout to prevent immediate closing
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 0);
+    }
+
     return () => {
-      document.removeEventListener('mousedown', handleClickAnywhere);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
 
@@ -85,7 +105,7 @@ function ProfilePage() {
             {/*dot section*/}
             <div className="p-5 relative text-semibold">
               {/*dot menu open icon*/}
-              <button onClick={toggleMenu}>
+              <button ref={buttonRef} onClick={toggleMenu}>
                 <EllipsisVerticalIcon className="h-6 w-6 text-gray-500  dark:text-[var(--Chatcontainer-text)] cursor-pointer hover:text-blue-600" />
               </button>
 
