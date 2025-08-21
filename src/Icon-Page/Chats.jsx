@@ -17,21 +17,23 @@ function Chats({ selectUser, setSelectUser }) {
 
   // User messages
   const getUserMessage = useSelector((state) => state.getUserMessage || {});
+  console.log('getUserMessage --->chat.jsx', getUserMessage);
   const { status, error } = getUserMessage;
 
-  // Chat list
+  // Chat list slice (show in user)
   const chatList = useSelector((state) => state.chatList || {});
+  console.log('chatList --->chat.jsx', chatList);
   const { chats: chatListData = [], loading: chatListLoading } = chatList;
 
   // Invited users Slice
   const invitedUserData = useSelector((state) => state.invitedUsers || {});
+  console.log('invitedUserData --->chat.jsx', invitedUserData);
   const { invitedUsers = [], invitedBy = [], isLoaded } = invitedUserData;
 
   // Unread messages
   useEffect(() => {
     dispatch(fetchUnreadMessages());
   }, [dispatch]);
-
 
   const onlineUserIds = useSelector(selectOnlineUsers);
   const onlineUserIdsSet = new Set(onlineUserIds);
@@ -47,8 +49,6 @@ function Chats({ selectUser, setSelectUser }) {
       online: onlineUserIdsSet.has(user._id),
     })
   );
-  // console.log('combinedChatUsers/all user show --->chat.jsx', combinedChatUsers);
-  // console.log('confirmedInvitedUsers --->chat.jsx', confirmedInvitedUsers);
 
   // Fetch users 
   useEffect(() => {
@@ -76,6 +76,35 @@ function Chats({ selectUser, setSelectUser }) {
     return combinedChatUsers.filter((user) => !chatListUserIds.has(user._id));
   };
 
+  // Filter functions for search
+  const filterChatsBySearch = (chats, searchTerm) => {
+    if (!searchTerm.trim()) return chats;
+
+    return chats.filter((chat) => {
+      const name = chat.name?.toLowerCase() || "";
+      const lastMessage = chat.lastMessage?.text?.toLowerCase() || "";
+      const search = searchTerm.toLowerCase();
+
+      return name.includes(search) || lastMessage.includes(search);
+    });
+  };
+
+  const filterAvailableUsersBySearch = (users, searchTerm) => {
+    if (!searchTerm.trim()) return users;
+
+    return users.filter((user) => {
+      const fullName = getFullName(user).toLowerCase();
+      const email = user.email?.toLowerCase() || "";
+      const bio = user.bio?.toLowerCase() || "";
+      const search = searchTerm.toLowerCase();
+
+      return fullName.includes(search) || email.includes(search) || bio.includes(search);
+    });
+  };
+
+  // Apply search filters
+  const filteredChatListData = filterChatsBySearch(chatListData, search);
+  const filteredAvailableUsers = filterAvailableUsersBySearch(getAvailableUsers(), search);
 
   //format Time
   const formatTime = (timeString) => {
@@ -119,7 +148,7 @@ function Chats({ selectUser, setSelectUser }) {
         <div className="mx-3 mb-10 relative">
           <input
             type="text"
-            placeholder="Search messages or users"
+            placeholder="Search Users..."
             className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-blue-100 text-gray-700 placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -127,75 +156,105 @@ function Chats({ selectUser, setSelectUser }) {
           <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-600" />
         </div>
 
-        {/* Online avatars */}
-        <div className="relative flex items-center justify-center w-full mb-4">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.1 }}
-            className="absolute left-2 z-10 bg-white shadow rounded-full p-2"
-            onClick={scrollLeft}
-          >
-            <FaChevronLeft />
-          </motion.button>
+        {/* Online avatars - Show when no search OR when searching */}
+        {(() => {
+          const onlineUsers = combinedChatUsers.filter((chatUser) => chatUser.online);
 
-          <motion.div
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide w-[60vw] px-10"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            {combinedChatUsers
-              .filter((chatUser) => chatUser.online)
-              .map((chatUser) => {
-                return (
-                  <motion.div
-                    key={chatUser._id}
-                    className="text-center w-16"
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => setSelectUser(chatUser)}
-                  >
-                    <div className="flex flex-col items-center w-20">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 text-blue-800 font-semibold flex items-center justify-center">
-                        {chatUser.profile_avatar ? (
-                          <img
-                            src={chatUser.profile_avatar}
-                            alt={chatUser.firstname}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span>
-                            {chatUser.firstname?.[0]?.toUpperCase()}
-                            {chatUser.lastname?.[0]?.toUpperCase()}
-                          </span>
-                        )}
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+          // If searching, filter online users by search term
+          const displayOnlineUsers = search.trim()
+            ? onlineUsers.filter((user) => {
+              const fullName = getFullName(user).toLowerCase();
+              const email = user.email?.toLowerCase() || "";
+              const searchLower = search.toLowerCase();
+              return fullName.includes(searchLower) || email.includes(searchLower);
+            })
+            : onlineUsers;
 
+          return displayOnlineUsers.length > 0 ? (
+            <div className="relative flex items-center justify-center w-full mb-4">
+              {/* Left Arrow Button - Only show if there are scrollable users */}
+              {displayOnlineUsers.length > 4 && (
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#3b82f6",
+                    color: "white"
+                  }}
+                  className="absolute left-2 z-10 bg-white hover:bg-blue-500 hover:text-white shadow-lg rounded-full p-3 border border-gray-200 transition-all duration-200 ease-in-out"
+                  onClick={scrollLeft}
+                  title="Previous users"
+                >
+                  <FaChevronLeft className="w-4 h-4" />
+                </motion.button>
+              )}
 
+              <motion.div
+                ref={scrollRef}
+                className="flex gap-6 overflow-x-auto scrollbar-hide w-[60vw] px-10"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                {displayOnlineUsers.map((chatUser) => {
+                  return (
+                    <motion.div
+                      key={chatUser._id}
+                      className="text-center w-16 cursor-pointer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectUser(chatUser)}
+                    >
+                      <div className="flex flex-col items-center w-20 relative">
+                        <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200 text-blue-800 font-semibold flex items-center justify-center hover:ring-2 hover:ring-blue-300 transition-all duration-200">
+                          {chatUser.profile_avatar ? (
+                            <img
+                              src={chatUser.profile_avatar}
+                              alt={chatUser.firstname}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-lg">
+                              {chatUser.firstname?.[0]?.toUpperCase()}
+                              {chatUser.lastname?.[0]?.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        {/* Green dot positioned at bottom-right of avatar */}
+                        <div className="absolute top-8 right-3 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-lg z-20"></div>
+                        <p className="font-semibold text-sm dark:text-[#caf0f8] mt-1 truncate">
+                          {chatUser.firstname}
+                        </p>
                       </div>
-                      <p className="font-semibold text-sm dark:text-[#caf0f8] mt-1 truncate">
-                        {chatUser.firstname}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-          </motion.div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
 
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.1 }}
-            className="absolute right-2 z-10 bg-white shadow rounded-full p-2"
-            onClick={scrollRight}
-          >
-            <FaChevronRight />
-          </motion.button>
-        </div>
+              {/* Right Arrow Button - Only show if there are scrollable users */}
+              {displayOnlineUsers.length > 4 && (
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#3b82f6",
+                    color: "white"
+                  }}
+                  className="absolute right-2 z-10 bg-white hover:bg-blue-500 hover:text-white shadow-lg rounded-full p-3 border border-gray-200 transition-all duration-200 ease-in-out"
+                  onClick={scrollRight}
+                  title="Next users"
+                >
+                  <FaChevronRight className="w-4 h-4" />
+                </motion.button>
+              )}
+            </div>
+          ) : null;
+        })()}
 
         {/* Recent chats */}
         <div className="w-full h-auto overflow-auto mt-3.5">
           <p className="text-lg font-semibold dark:text-[var(--text-color3)] mb-4">
-            Recent
+            {search.trim() ? `Search Results` : `Recent`}
           </p>
 
           {/* User chats data */}
@@ -205,7 +264,8 @@ function Chats({ selectUser, setSelectUser }) {
             <p className="text-center text-red-500">Error: {error}</p>
           ) : (
             <div>
-              {chatListData.map((chat) => {
+              {/* Show filtered recent chats */}
+              {filteredChatListData.map((chat) => {
                 //online user
                 const isOnline = onlineUserIdsSet.has(chat.userId);
                 //unread count
@@ -301,8 +361,8 @@ function Chats({ selectUser, setSelectUser }) {
                 );
               })}
 
-              {/* Available users */}
-              {getAvailableUsers().map((chatUser) => {
+              {/* Show filtered available users */}
+              {filteredAvailableUsers.map((chatUser) => {
                 const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
                 const isSelected = selectUser?._id === chatUser._id;
 
@@ -349,7 +409,6 @@ function Chats({ selectUser, setSelectUser }) {
                           >
                             {getFullName(chatUser)}
                           </p>
-
                         </div>
                         <p
                           className={`text-sm line-clamp-1 break-words 
@@ -380,8 +439,20 @@ function Chats({ selectUser, setSelectUser }) {
                 );
               })}
 
-              {/* No chats */}
-              {chatListData.length === 0 &&
+              {/* No results found */}
+              {search.trim() &&
+                filteredChatListData.length === 0 &&
+                filteredAvailableUsers.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No results found for "{search}"
+                    </p>
+                  </div>
+                )}
+
+              {/* No chats when not searching */}
+              {!search.trim() &&
+                chatListData.length === 0 &&
                 getAvailableUsers().length === 0 &&
                 !chatListLoading && (
                   <div className="text-center py-8">

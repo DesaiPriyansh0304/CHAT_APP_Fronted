@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Sedan+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Libertinus+Sans:ital,wght@0,400;0,700;1,400&display=swap');
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -36,6 +36,15 @@
 
 
 
+.exo {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 400;
+}
+
+.exo-bold {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 700;
+}
 
 /* * {
     font-family: "Sedan SC", serif;

@@ -165,7 +165,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
                       <div className="w-10 h-10 flex items-center justify-center rounded-full text-purple-700 font-semibold">
                         {group.groupName.charAt(0).toUpperCase()}
                       </div>
-                      <span className={`font-medium dark:text-[var(--text-color3)]  group-hover:text-white ${selectGroup?._id === group._id ? 'dark:text-gray-800' : ''} `}>
+                      <span className={`font-medium dark:text-[var(--text-color3)]  dark:group-hover:text-white ${selectGroup?._id === group._id ? 'dark:text-gray-800' : ''} `}>
                         #{group.groupName}
                       </span>
                     </div>

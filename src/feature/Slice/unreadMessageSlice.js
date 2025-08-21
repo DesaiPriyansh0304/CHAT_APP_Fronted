@@ -9,7 +9,7 @@ export const fetchUnreadMessages = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      console.log("✌️token --->", token);
+      // console.log("token --->fetchUnreadMessages", token);
 
       if (!token) {
         return rejectWithValue("Token not found");
@@ -72,7 +72,7 @@ const unreadMessageSlice = createSlice({
       state.data = [];
       state.error = null;
     },
-    // Local update when user selects a conversation
+
     removeUserUnreadMessages: (state, action) => {
       const senderId = action.payload;
       state.data = state.data.filter(

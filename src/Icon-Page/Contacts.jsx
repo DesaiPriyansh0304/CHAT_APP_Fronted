@@ -37,12 +37,19 @@ function Contacts() {
 
   // Refs for outside click detection
   const dotmenuRef = useRef();
-  const modalRef = useRef(); // Modal માટે ref
+  const modalRef = useRef(); // Modal ref
 
-  //dot menu function
+  //dot menu function - FIXED
   const toggleMenu = (id) => {
-    setIsMenuOpen((prev) => (prev && activeMenuId === id ? false : true));
-    setActiveMenuId(id);
+    if (isMenuOpen && activeMenuId === id) {
+      // If same menu is open, close it
+      setIsMenuOpen(false);
+      setActiveMenuId(null);
+    } else {
+      // Open the clicked menu
+      setIsMenuOpen(true);
+      setActiveMenuId(id);
+    }
   };
 
   // Dot menu outside click handler
@@ -75,7 +82,6 @@ function Contacts() {
       document.removeEventListener('mousedown', handleModalOutsideClick);
     };
   }, [showAddModal]);
-
 
   //dot menu icons
   const dotMenu = [
@@ -144,12 +150,25 @@ function Contacts() {
     };
   });
 
+  // console.log('confirmedUsers --->/contact.jsx', confirmedUsers);
   const groupedContacts = groupContactsByLetter(confirmedUsers);
 
-  // add contact Function
+  // add contact Function - FIXED to refresh data
   const handleModalClose = () => {
     setShowAddModal(false);
     dispatch(resetInvitedUsersState());
+  };
+
+  // FIXED - Function to handle successful contact addition
+  const handleContactAdded = () => {
+    // Reset the invited users state to force fresh data fetch
+    dispatch(resetInvitedUsersState());
+    // Close modal
+    setShowAddModal(false);
+    // Trigger fresh API call by dispatching fetchInvitedUsers
+    setTimeout(() => {
+      dispatch(fetchInvitedUsers(debouncedSearch));
+    }, 100);
   };
 
   return (
@@ -167,7 +186,7 @@ function Contacts() {
           {/*icon title*/}
           <div>
             <button
-              className="text-gray-600 hover:text-gray-800 dark:text-[var(--text-color1)] text-xl mr-4 cursor-pointer"
+              className="text-gray-600 hover:text-blue-800 dark:text-[var(--text-color1)] text-xl mr-4 cursor-pointer "
               onClick={() => setShowAddModal(true)}
             >
               <RiUserAddLine />
@@ -175,7 +194,7 @@ function Contacts() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search Bar */}
         <div className="relative mb-4">
           <div>
             <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
@@ -198,7 +217,7 @@ function Contacts() {
         </div>}
 
         {/* Grouped Contacts List */}
-        <div className="space-y-4 overflow-y-auto h-[calc(100vh-200px)] pr-1">
+        <div className="space-y-4 overflow-y-auto h-full pr-1 overflow-auto">
           {Object.keys(groupedContacts).length === 0 && !loading ? (
             <div className="text-center text-gray-500 mt-8">
               No contacts found. Invite someone to get started!
@@ -215,17 +234,21 @@ function Contacts() {
                   {groupedContacts[letter].map((inv, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-800"
                     >
                       {/*user name*/}
                       <div className="text-gray-800 dark:text-[var(--text-color3)] font-medium">
                         {inv.name || inv.email}
                       </div>
+
                       {/*dot menu section*/}
-                      <div className="relative text-gray-500 text-xl dark:text-[var(--text-color1)] cursor-pointer">
-                        {/*icon*/}
+                      <div className="relative text-gray-500 text-xl dark:text-[var(--text-color1)]">
+                        {/*dot icon*/}
                         <div>
-                          <button onClick={() => toggleMenu(inv.id)}>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() => toggleMenu(inv.id)}
+                          >
                             <EllipsisVerticalIcon size={16} />
                           </button>
                         </div>
@@ -234,16 +257,18 @@ function Contacts() {
                           {isMenuOpen && activeMenuId === inv.id && (
                             <div
                               ref={dotmenuRef}
-                              className="absolute right-0 mt-2 w-30 bg-white border border-blue-300 rounded-xs shadow-md z-10 dark:bg-gray-800 dark:border-gray-600"
+                              className="absolute right-0 mt-2 w-30 bg-white rounded-md shadow-xl  z-10 dark:bg-gray-800 dark:border-gray-600"
                             >
                               <ul>
                                 {dotMenu.map(({ title, id, icon }) => (
-                                  <li key={id} className="flex flex-col hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 justify-between">
-                                      <div className="text-gray-700 dark:text-gray-300 text-md">{title}</div>
-                                      <div className="text-blue-500">{icon}</div>
-                                    </div>
-                                  </li>
+                                  <div key={id} className='hover:bg-gray-100 dark:hover:bg-gray-700'>
+                                    <li className="flex flex-col mx-2 ">
+                                      <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 justify-between">
+                                        <div className="text-gray-700 dark:text-gray-300 text-md">{title}</div>
+                                        <div className="text-blue-500">{icon}</div>
+                                      </div>
+                                    </li>
+                                  </div>
                                 ))}
                               </ul>
                             </div>
@@ -257,11 +282,14 @@ function Contacts() {
           )}
         </div>
 
-        {/* Add Contact Modal */}
+        {/* Add Contact Modal - FIXED to handle success callback */}
         {showAddModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center justify-center z-50">
             <div ref={modalRef}>
-              <ContactAdd onClose={handleModalClose} />
+              <ContactAdd
+                onClose={handleModalClose}
+                onContactAdded={handleContactAdded}
+              />
             </div>
           </div>
         )}

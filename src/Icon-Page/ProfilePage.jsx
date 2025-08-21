@@ -184,8 +184,8 @@ function ProfilePage() {
               </div>
 
               {/*User name*/}
-              <div>
-                <h5 className=" mt-4 font-semibold text-lg dark:text-[var(--text-color3)] bg-gradient-to-r from-[#0061ff] via-[#696eff] to-[#bf0fff] bg-clip-text text-transparent">
+              <div className='mt-4'>
+                <h5 className="font-semibold text-lg dark:text-[var(--text-color3)] bg-gradient-to-r from-[#0061ff] via-[#696eff] to-[#bf0fff] bg-clip-text text-transparent">
                   {user?.firstname} {user?.lastname}
                 </h5>
               </div>
