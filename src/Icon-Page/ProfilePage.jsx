@@ -213,7 +213,7 @@ function ProfilePage() {
           <div className="overflow-auto h-[50vh] mx-2">
 
             {/*About section*/}
-            <div className="w-full mb-3 bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-[#495057]  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] rounded-md border border-blue-600 shadow-md shadow-indigo-500/50 dark:border-gray-400 dark:shadow-gray-500">
+            <div className="w-full mb-3 bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-[#495057]  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] rounded-md border border-blue-600 shadow-md  dark:border-gray-400 dark:shadow-gray-500">
               <div
                 className="flex items-center justify-between cursor-pointe  px-4 py-2.5 cursor-pointer "
                 onClick={() => handleToggleSection('about')}
@@ -298,7 +298,7 @@ function ProfilePage() {
             </div>
 
             {/*Attached Files Section*/}
-            <div className="w-full  bg-gradient-to-r from-sky-200 to-purple-200 border border-blue-600  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] mt-2 rounded cursor-pointer shadow-md shadow-indigo-500/50 dark:border-gray-400 dark:shadow-gray-500">
+            <div className="w-full  bg-gradient-to-r from-sky-200 to-purple-200 border border-blue-600  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] mt-2 rounded cursor-pointer shadow-md  dark:border-gray-400 dark:shadow-gray-500">
 
               <div
                 className="flex items-center justify-between cursor-pointer px-4 py-2.5"

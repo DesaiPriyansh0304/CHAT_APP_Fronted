@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { RiUserSearchLine } from "react-icons/ri";
+import { RxCross2 } from "react-icons/rx";
 import { useDebounce } from "use-debounce";
 import { fetchInvitedUsers } from "../feature/Slice/Invited-User/InvitedUsersSlice";
 import { selectOnlineUsers } from "../feature/Slice/Socket/OnlineuserSlice";
 import { fetchUnreadMessages } from "../feature/Slice/unreadMessageSlice";
+
 
 function Chats({ selectUser, setSelectUser }) {
 
@@ -15,60 +18,57 @@ function Chats({ selectUser, setSelectUser }) {
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
 
+
+
   // User messages
   const getUserMessage = useSelector((state) => state.getUserMessage || {});
-  console.log('getUserMessage --->chat.jsx', getUserMessage);
   const { status, error } = getUserMessage;
+  // console.log('getUserMessage --->chat.jsx', getUserMessage);
 
   // Chat list slice (show in user)
   const chatList = useSelector((state) => state.chatList || {});
-  console.log('chatList --->chat.jsx', chatList);
   const { chats: chatListData = [], loading: chatListLoading } = chatList;
+  // console.log('chatList --->chat.jsx', chatList);
 
-  // Invited users Slice
+  // Invited users Slice (full response)
   const invitedUserData = useSelector((state) => state.invitedUsers || {});
-  console.log('invitedUserData --->chat.jsx', invitedUserData);
   const { invitedUsers = [], invitedBy = [], isLoaded } = invitedUserData;
+  // console.log('invitedUserData --->chat.jsx', invitedUserData);
 
-  // Unread messages
-  useEffect(() => {
-    dispatch(fetchUnreadMessages());
-  }, [dispatch]);
-
-  const onlineUserIds = useSelector(selectOnlineUsers);
-  const onlineUserIdsSet = new Set(onlineUserIds);
-
-  //invited User Data
-  const confirmedInvitedUsers = invitedUsers
-    .filter((inv) => inv.invited_is_Confirmed && inv.user)
-    .map((inv) => ({ ...inv.user, invited_is_Confirmed: true }));
-
-  const combinedChatUsers = [...confirmedInvitedUsers, ...invitedBy].map(
-    (user) => ({
-      ...user,
-      online: onlineUserIdsSet.has(user._id),
-    })
-  );
-
-  // Fetch users 
+  {/*api call*/ }
+  // Fetch users api call invited user + invited by
   useEffect(() => {
     if (!isLoaded || debouncedSearch) {
       dispatch(fetchInvitedUsers(debouncedSearch));
     }
   }, [dispatch, debouncedSearch, isLoaded]);
 
-  // Scroll buttons
-  const scrollLeft = () =>
-    scrollRef.current && (scrollRef.current.scrollLeft -= 100);
-  const scrollRight = () =>
-    scrollRef.current && (scrollRef.current.scrollLeft += 100);
+  // Unread messages api call
+  useEffect(() => {
+    dispatch(fetchUnreadMessages());
+  }, [dispatch]);
 
-  const getFullName = (user) =>
-    `${user.firstname || ""} ${user.lastname || ""}`.trim();
 
-  const allUnreadCounts = useSelector(
-    (state) => state.unreadCount.chatWiseCount
+
+  const onlineUserIds = useSelector(selectOnlineUsers);          // all online user id 
+  // console.log('onlineUserIds --->chat.jsx', onlineUserIds);
+  const onlineUserIdsSet = new Set(onlineUserIds);
+
+  //invited User Data -- filter user(only invite user)
+  const confirmedInvitedUsers = invitedUsers
+    .filter((inv) => inv.invited_is_Confirmed && inv.user)
+    .map((inv) => ({ ...inv.user, invited_is_Confirmed: true }));
+  // console.log('confirmedInvitedUsers --->/chat.jsx', confirmedInvitedUsers);
+
+  //conbmin user invited user and invited by
+  const combinedChatUsers = [...confirmedInvitedUsers, ...invitedBy].map(
+    (user) => ({
+      ...user,
+      online: onlineUserIdsSet.has(user._id),
+    })
   );
+  // console.log('combinedChatUsers --->chat.jsx', combinedChatUsers);
+
 
   // Available users not in chat list
   const getAvailableUsers = () => {
@@ -76,7 +76,7 @@ function Chats({ selectUser, setSelectUser }) {
     return combinedChatUsers.filter((user) => !chatListUserIds.has(user._id));
   };
 
-  // Filter functions for search
+  // Filter functions for search in last message in set user data
   const filterChatsBySearch = (chats, searchTerm) => {
     if (!searchTerm.trim()) return chats;
 
@@ -89,6 +89,8 @@ function Chats({ selectUser, setSelectUser }) {
     });
   };
 
+
+  //user detail info in serch user
   const filterAvailableUsersBySearch = (users, searchTerm) => {
     if (!searchTerm.trim()) return users;
 
@@ -102,11 +104,14 @@ function Chats({ selectUser, setSelectUser }) {
     });
   };
 
-  // Apply search filters
-  const filteredChatListData = filterChatsBySearch(chatListData, search);
-  const filteredAvailableUsers = filterAvailableUsersBySearch(getAvailableUsers(), search);
 
-  //format Time
+  //Apply search filters
+  const filteredChatListData = filterChatsBySearch(chatListData, search);
+  // console.log('filteredChatListData --->chat.jsx', filteredChatListData);
+  const filteredAvailableUsers = filterAvailableUsersBySearch(getAvailableUsers(), search);
+  // console.log('filteredAvailableUsers --->chat.jsx', filteredAvailableUsers);
+
+  //format Time to message 
   const formatTime = (timeString) => {
     if (!timeString) return "";
     try {
@@ -136,6 +141,20 @@ function Chats({ selectUser, setSelectUser }) {
     }
   };
 
+  // Scroll buttons in online user
+  const scrollLeft = () =>
+    scrollRef.current && (scrollRef.current.scrollLeft -= 100);
+  const scrollRight = () =>
+    scrollRef.current && (scrollRef.current.scrollLeft += 100);
+
+  //user full name
+  const getFullName = (user) => `${user.firstname || ""} ${user.lastname || ""}`.trim();
+
+  //sender user id + message counte number(id+2)
+  const allUnreadCounts = useSelector((state) => state.unreadCount.chatWiseCount);
+  // console.log('allUnreadCounts --->/chat.jsx', allUnreadCounts);
+
+
   return (
     <>
       <div className="p-2 h-screen md:w-full">
@@ -149,11 +168,23 @@ function Chats({ selectUser, setSelectUser }) {
           <input
             type="text"
             placeholder="Search Users..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-blue-100 text-gray-700 placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
+            className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-blue-100 text-black placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-600" />
+          {/* Left side search icon */}
+          <RiUserSearchLine className="absolute text-lg top-1/2 left-3 transform -translate-y-1/2 text-gray-700" />
+
+          {/* clear icon - only when search has text */}
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
+            >
+              <RxCross2 />
+            </button>
+          )}
         </div>
 
         {/* Online avatars - Show when no search OR when searching */}
@@ -253,9 +284,12 @@ function Chats({ selectUser, setSelectUser }) {
 
         {/* Recent chats */}
         <div className="w-full h-auto overflow-auto mt-3.5">
-          <p className="text-lg font-semibold dark:text-[var(--text-color3)] mb-4">
-            {search.trim() ? `Search Results` : `Recent`}
-          </p>
+
+          <div>
+            <p className="text-xl font-semibold  mb-6">
+              {search.trim() ? `Search Results` : `Recent`}
+            </p>
+          </div>
 
           {/* User chats data */}
           {status === "loading" ? (
@@ -269,10 +303,10 @@ function Chats({ selectUser, setSelectUser }) {
                 //online user
                 const isOnline = onlineUserIdsSet.has(chat.userId);
                 //unread count
-                const unreadCount =
-                  allUnreadCounts?.[chat.userId] || chat.unreadCount || 0;
+                const unreadCount = allUnreadCounts?.[chat.userId] || chat.unreadCount || 0;
                 //selected
                 const isSelected = selectUser?._id === chat.userId;
+
 
                 return (
                   <div key={`chat-${chat.conversationId}`}>
@@ -281,20 +315,18 @@ function Chats({ selectUser, setSelectUser }) {
                         setSelectUser({
                           _id: chat.userId,
                           firstname: chat.name.split(" ")[0] || "",
-                          lastname:
-                            chat.name.split(" ").slice(1).join(" ") || "",
+                          lastname: chat.name.split(" ").slice(1).join(" ") || "",
                           email: chat.email,
                           profile_avatar: chat.avatar,
                           online: isOnline,
                           conversationId: chat.conversationId,
                         })
                       }
-
-                      className={`group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200 
-                      hover:bg-[#e3ecff] dark:hover:bg-gray-400
-                      ${isSelected ? "bg-gray-200 border-l-4 border-blue-500" : ""}`}
+                      className={`group flex items-center px-5 py-3 rounded cursor-pointer transition-colors duration-200                       hover:bg-[#e3ecff] dark:hover:bg-gray-400
+                                  ${isSelected ? "bg-gray-200 border-l-4 border-blue-500" : ""}
+                      `}
                     >
-                      {/* Avatar */}
+                      {/* Avatar img */}
                       <div className="relative mr-3">
                         {chat.avatar ? (
                           <div className="w-10 h-10 rounded-full overflow-hidden">
@@ -318,28 +350,30 @@ function Chats({ selectUser, setSelectUser }) {
 
                       {/* User info */}
                       <div className="flex-1">
+                        {/*user name*/}
                         <div className="flex items-center gap-2">
                           <p
-                            className={`text-sm font-semibold truncate ${isSelected
-                              ? "text-black hover:text-black"
-                              : "dark:text-white group-hover:text-black"
-                              }`}
+                            className={`text-sm font-semibold truncate
+                                        ${isSelected ? "text-black hover:text-black" : "dark:text-white group-hover:text-black"}
+                                       `}
                           >
                             {chat.name}
                           </p>
                         </div>
-                        <p
-                          className={`text-sm line-clamp-1 break-words ${isSelected
-                            ? "text-gray-500 hover:text-black"
-                            : "dark:text-white group-hover:text-black"
-                            }`}
-                        >
-                          {chat.lastMessage
-                            ? chat.lastMessage.senderName === "You"
-                              ? `You: ${chat.lastMessage.text}`
-                              : chat.lastMessage.text
-                            : "No message yet"}
-                        </p>
+                        {/*sender last message*/}
+                        <div>
+                          <p
+                            className={`text-sm line-clamp-1 break-words
+                                        ${isSelected ? "text-gray-500 hover:text-black" : "dark:text-white group-hover:text-black"}
+                                      `}
+                          >
+                            {chat.lastMessage
+                              ? chat.lastMessage.senderName === "You"
+                                ? `You: ${chat.lastMessage.text}`
+                                : chat.lastMessage.text
+                              : "No message yet"}
+                          </p>
+                        </div>
                       </div>
 
                       {/* Time & unread */}
@@ -349,6 +383,7 @@ function Chats({ selectUser, setSelectUser }) {
                             chat.lastMessage?.time || chat.updatedAt
                           )}
                         </p>
+                        {/* unread count show */}
                         {unreadCount > 0 && !isSelected && (
                           <div className="mt-1.5 bg-red-100 text-red-500 w-7 h-5 rounded-full text-xs font-bold flex items-center justify-center mx-auto">
                             {unreadCount.toString().padStart(2, "0")}
@@ -363,6 +398,7 @@ function Chats({ selectUser, setSelectUser }) {
 
               {/* Show filtered available users */}
               {filteredAvailableUsers.map((chatUser) => {
+
                 const unreadCount = allUnreadCounts?.[chatUser._id] || 0;
                 const isSelected = selectUser?._id === chatUser._id;
 
@@ -398,25 +434,22 @@ function Chats({ selectUser, setSelectUser }) {
                         )}
                       </div>
 
-                      {/* Info */}
+                      {/* user info */}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p
-                            className={`text-sm font-semibold truncate ${isSelected
-                              ? "text-black hover:text-black"
-                              : "dark:text-white group-hover:text-black"
-                              }`}
+                            className={`text-sm font-semibold truncate
+                                        ${isSelected ? "text-black hover:text-black" : "dark:text-white group-hover:text-black"}
+                                     `}
                           >
                             {getFullName(chatUser)}
                           </p>
                         </div>
                         <p
                           className={`text-sm line-clamp-1 break-words 
-                          ${chatUser.isTyping ? "text-blue-600 italic" : ""} 
-                          ${isSelected
-                              ? "text-gray-500 hover:text-black"
-                              : "dark:text-white group-hover:text-black"
-                            }`}
+                                      ${chatUser.isTyping ? "text-blue-600 italic" : ""} 
+                                      ${isSelected ? "text-gray-500 hover:text-black" : "dark:text-white group-hover:text-black"}
+                                    `}
                         >
                           {chatUser.bio || "Start a conversation"}
                         </p>
@@ -439,7 +472,7 @@ function Chats({ selectUser, setSelectUser }) {
                 );
               })}
 
-              {/* No results found */}
+              {/* No results found  */}
               {search.trim() &&
                 filteredChatListData.length === 0 &&
                 filteredAvailableUsers.length === 0 && (
