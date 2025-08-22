@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { addToken } from '../../feature/Slice/Auth/AuthSlice';
+import { addToken } from '../../feature/Auth/AuthSlice';
 import * as Yup from 'yup';
 import { FiMail } from 'react-icons/fi';
 // import { FaEye, FaEyeSlash } from 'react-icons/fa';

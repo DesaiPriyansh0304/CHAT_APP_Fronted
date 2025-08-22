@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../feature/Slice/Auth/AuthSlice';
+import { logout } from '../feature/Auth/AuthSlice';
 import { toggleTheme } from '../feature/Slice/Theme/ThemeSlice';
 import { topItems, bottomItems, avatarItems, languages } from '../Sidebar/icon';
 import { HiOutlineDotsVertical } from "react-icons/hi";
@@ -22,9 +22,9 @@ function Sidebar({ isMobile }) {
   //theme Slice 
   const theme = useSelector((state) => state.theme.mode);
   //Login User Data Slice
-  const loginUserState = useSelector((state) => state.loginUser || {});
-  const { loading, error } = loginUserState;
-  const user = loginUserState?.userData;
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  const { loading, error } = AuthUserState;
+  const user = AuthUserState?.userData;
   // console.log('user --->sidebar', user);
 
   //theme change
@@ -94,7 +94,7 @@ function Sidebar({ isMobile }) {
     };
   }, [showAvatarMenu, showLangMenu]);
 
-  //Tooltip Component - Fixed to show only when conditions are met
+  //Tooltip 
   const Tooltip = ({ children, text, position = "right", show = false, itemId }) => {
 
     const shouldShowTooltip = show &&

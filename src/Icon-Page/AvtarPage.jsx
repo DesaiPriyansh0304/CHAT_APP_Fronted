@@ -5,10 +5,10 @@ import moment from 'moment';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { setUserData } from '../feature/Slice/Auth/LoginUserSlice';
+import { setUserData } from '../feature/Auth/LoginUserSlice';
 
 function AvtarPage() {
-  const user = useSelector((state) => state.loginUser.userData);
+  const user = useSelector((state) => state.AuthUser.userData);
   const dispatch = useDispatch();
 
   const [avatrFrom, setAvtarFrom] = useState({

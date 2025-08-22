@@ -87,7 +87,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   const dispatch = useDispatch();
 
   // Redux selectors
-  const { userData: user } = useSelector((state) => state.loginUser);
+  const { userData: user } = useSelector((state) => state.AuthUser);
   const {
     messages,
     loadingHistory,

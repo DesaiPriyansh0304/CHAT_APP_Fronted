@@ -1,26 +1,35 @@
-Profile Image with Animated Border .profile-card {
-    position: relative;
+.outer-ring {
     width: 100px;
     height: 100px;
     border-radius: 50%;
+    background: conic-gradient(from 0deg, #0061ff, #60efff, #595cff);
+    animation: spin 3s linear infinite;
+    padding: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: conic-gradient(from 0deg, skyblue, red, yellow, purple, #ffeaa7, #dda0dd);
-    animation: rotate 3s linear infinite;
-    padding: 4px;
 }
 
-.profile-image {
+.inner-ring {
     width: 92px;
     height: 92px;
     border-radius: 50%;
-    object-fit: cover;
-    position: relative;
-    z-index: 10;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@keyframes rotate {
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: rotate(0deg);
+    animation: counter-spin 3s linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
     0% {
         transform: rotate(0deg);
     }
@@ -30,57 +39,12 @@ Profile Image with Animated Border .profile-card {
     }
 }
 
-/* Alternative method with pseudo elements if the above doesn't work */
-.profile-card-alt {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-card-alt::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 50%;
-    padding: 4px;
-    background: linear-gradient(45deg, skyblue, red, yellow, purple, #ffeaa7, #dda0dd);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: subtract;
-    animation: rotate 3s linear infinite;
-}
-
-/* Simple border animation fallback */
-.profile-border {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, skyblue, red, yellow, purple, #ffeaa7, #dda0dd);
-    background-size: 300% 300%;
-    animation: gradient-animation 3s ease infinite;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-@keyframes gradient-animation {
+@keyframes counter-spin {
     0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
+        transform: rotate(0deg);
     }
 
     100% {
-        background-position: 0% 50%;
+        transform: rotate(-360deg);
     }
 }

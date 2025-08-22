@@ -1,8 +1,8 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
 // Auth-reducers
-import authReducer from "./Auth/AuthSlice";
-import loginuserReducer from "./Auth/LoginUserSlice";
+import authReducer from "../Auth/AuthSlice";
+import loginuserReducer from "../Auth/LoginUserSlice";
 
 // User-related reducers
 import userReducer from "./FetchUserdata";
@@ -33,8 +33,9 @@ import unreadMessagesReducer from "../Slice/unreadMessageSlice";
 import chatListReducer from "../Slice/Socket/chatListSlice";
 
 const rootReducer = combineReducers({
+  //Auth-reducers
   auth: authReducer,
-  loginUser: loginuserReducer,
+  AuthUser: loginuserReducer,
 
   users: userReducer,
   searchUser: searchUserReducer,

@@ -10,10 +10,10 @@ export const fetchLoginUser = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       const token = localStorage.getItem("Authtoken");
-      // console.log("ℹ️token --->/LoginUserDataSlice", token);
+      // console.log("token --->/LoginUserDataSlice", token);
       if (!token) {
         dispatch(logout());
-        return rejectWithValue("Token not found-LoginuserSlice");
+        return rejectWithValue("Token not found-Login userSlice");
       }
 
       const response = await axios.get(`${URL}/api/auth/userdata/check`, {
@@ -24,22 +24,23 @@ export const fetchLoginUser = createAsyncThunk(
 
       // console.log("response --->/LoginUserDataSlice", response);
       // console.log(
-      //   "response.data.user --->/LoginUserDataSlice",
-      //   response.data.user
+      //   "response.data.userData --->/LoginUserDataSlice",
+      //   response.data.userData
       // );
 
-      if (response.data && response.data.user) {
-        const user = {
-          ...response.data.user,
-          _id: response.data.user._id,
+      if (response.data && response.data.userData) {
+        const userData = {
+          ...response.data.userData,
+          _id: response.data.userData._id,
         };
 
         // console.log(
-        //   "response.data.user._id --->/LoginUserDataSlice",
-        //   response.data.user._id
+        //   "response.data.userData._id --->/LoginUserDataSlice",
+        //   response.data.userData._id
         // );
+
         dispatch(setAuthenticated(true)); // login success
-        return { user };
+        return { userData };
       } else {
         dispatch(logout());
         return rejectWithValue("Invalid response from server");
@@ -55,7 +56,7 @@ export const fetchLoginUser = createAsyncThunk(
 );
 
 const loginUserSlice = createSlice({
-  name: "loginUser",
+  name: "AuthUser",
   initialState: {
     userData: null,
     loading: false,
@@ -73,9 +74,9 @@ const loginUserSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLoginUser.fulfilled, (state, action) => {
-        // console.log("fulfilled reducer called", action.payload);
+        // console.log("fulfilled reducer called", action.payload.userData);
         state.loading = false;
-        state.userData = action.payload.user;
+        state.userData = action.payload.userData;
       })
       .addCase(fetchLoginUser.rejected, (state, action) => {
         state.loading = false;

@@ -16,8 +16,9 @@ function ProfilePage() {
   const navigate = useNavigate();
 
   //loginUser Slice
-  const loginUserState = useSelector((state) => state.loginUser || {});
-  const { userData: user } = loginUserState;
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  // console.log('AuthUserState --->/Profile Page', AuthUserState);
+  const { userData: user } = AuthUserState;
 
   //dot section
   const dotmenuRef = useRef();
@@ -37,7 +38,7 @@ function ProfilePage() {
     { id: 3, name: 'Another action' },
   ];
 
-  //click event - Complete fix for outside clicks
+  //click event 
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Check if click is outside both menu and button
@@ -82,18 +83,6 @@ function ProfilePage() {
       <div className="h-screen w-full">
         {/*Header*/}
         <div className="p-2 relative">
-          {/* Add inline styles for animation */}
-          <style jsx>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-            @keyframes counter-spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(-360deg); }
-            }
-          `}</style>
-
           {/*my profile and dot icon*/}
           <div className="flex justify-between">
 
@@ -134,6 +123,7 @@ function ProfilePage() {
                       </button>
                     </div>
                   ))}
+
                 </div>
               )}
             </div>
@@ -144,40 +134,12 @@ function ProfilePage() {
             <div className="flex flex-col items-center">
               {/*Profile Image*/}
               <div className='relative flex items-center justify-center'>
-                <div
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '50%',
-                    background: 'conic-gradient(from 0deg, #0061ff, #60efff,#595cff)',
-                    animation: 'spin 3s linear infinite',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                    // className='bg-orange-400'
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '92px',
-                      height: '92px',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
+                <div className='outer-ring'>
+                  <div className='inner-ring'>
                     <img
                       src={user?.profile_avatar || 'https://via.placeholder.com/100'}
                       alt="Avatar"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transform: 'rotate(0deg)',
-                        animation: 'counter-spin 3s linear infinite'
-                      }}
+                      className='w-full h-full object-cover rotate-0 animate-[counter-spin_3s_linear_infinite]'
                     />
                   </div>
                 </div>

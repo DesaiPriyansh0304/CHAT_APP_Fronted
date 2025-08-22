@@ -10,16 +10,19 @@ import { BsThreeDots } from 'react-icons/bs';
 import { IoIosPersonAdd } from 'react-icons/io';
 import { MdBlockFlipped } from 'react-icons/md';
 import { DeleteGroupButton } from '../Chat-contatainer/Contacts/DeleteGroup';
+import { RxCross2 } from 'react-icons/rx';
 
 const GroupList = ({ selectGroup, setSelectGroup }) => {
   const dispatch = useDispatch();
   const { groups, loading, error, hasFetched } = useSelector((state) => state.userGroups);
-  const { userData } = useSelector((state) => state.loginUser);
-  const loginUserId = userData?._id;
+  const { userData } = useSelector((state) => state.AuthUser);
+  const AuthUserId = userData?._id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);                  //model menu(create group)
+  // console.log('isModalOpen --->Group.jsx', isModalOpen);
   const [searchTerm, setSearchTerm] = useState('');                       //serch group name
   const [isdotMenu, setIsdotMenu] = useState(false);                      //dot menu
+  console.log('isdotMenu --->Group.jsx', isdotMenu);
   const [activegroupMenuId, setActivegroupMenuId] = useState(null);       // 
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);          //Add member   
   const [targetGroupId, setTargetGroupId] = useState(null);               //Grop ID
@@ -120,9 +123,10 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-gray-800 dark:text-[var(--text-color3)] font-semibold">Groups</h2>
           <RiGroupLine
-            className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-black dark:hover:text-gray-100 cursor-pointer mr-3.5"
+            className="text-xl text-gray-600 dark:text-[var(--text-color)] hover:text-blue-600 dark:hover:text-gray-100 cursor-pointer mr-3.5"
             onClick={() => setIsModalOpen(true)}
           />
+
         </div>
 
         {/* Search bar */}
@@ -132,9 +136,18 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
             placeholder="Search groups..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 text-gray-400  border-2 border-blue-500 placeholder-gray-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 text-gray-800  border-2 border-blue-500 placeholder-gray-500 focus:outline-none"
           />
-          <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500 " />
+          <FaSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-700 " />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
+            >
+              <RxCross2 />
+            </button>
+          )}
         </div>
 
         {/* Group List */}
@@ -150,7 +163,7 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
             <p className="text-gray-500">No groups found</p>
           ) : (
             filteredGroups.map((group) => {
-              const userRole = getUserRoleInGroup(group, loginUserId);
+              const userRole = getUserRoleInGroup(group, AuthUserId);
               const dotMenu = getDotMenuByRole(userRole);
 
               return (

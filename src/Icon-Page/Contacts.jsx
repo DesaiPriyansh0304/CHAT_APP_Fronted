@@ -10,6 +10,7 @@ import { IoShareSocialOutline } from 'react-icons/io5';
 import { MdBlockFlipped } from 'react-icons/md';
 import { fetchInvitedUsers, resetInvitedUsersState } from '../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
+import { RxCross2 } from 'react-icons/rx';
 
 // Group users alphabetically
 const groupContactsByLetter = (contacts) => {
@@ -96,12 +97,12 @@ function Contacts() {
   const invitedUsersArray = invitedUserState.invitedUsers || [];
   const invitedByArray = invitedUserState.invitedBy || [];
 
-  // API Call InvitedUsers Slice
+  // API Call InvitedUsers Slice - FIXED
   useEffect(() => {
-    if (!token && !isLoaded) {
+    if (!token) {
       dispatch(fetchInvitedUsers(debouncedSearch));
     }
-  }, [dispatch, debouncedSearch, token, isLoaded]);
+  }, [dispatch, debouncedSearch, token]);
 
   {/*If token from URL → verify invite*/ }
   useEffect(() => {
@@ -150,8 +151,19 @@ function Contacts() {
     };
   });
 
-  // console.log('confirmedUsers --->/contact.jsx', confirmedUsers);
-  const groupedContacts = groupContactsByLetter(confirmedUsers);
+  // FIXED - Apply search filter to contacts
+  const filteredContacts = confirmedUsers.filter((contact) => {
+    if (!debouncedSearch.trim()) return true;
+
+    const searchTerm = debouncedSearch.toLowerCase();
+    const name = contact.name?.toLowerCase() || '';
+    const email = contact.email?.toLowerCase() || '';
+
+    return name.includes(searchTerm) || email.includes(searchTerm);
+  });
+
+  // Group filtered contacts
+  const groupedContacts = groupContactsByLetter(filteredContacts);
 
   // add contact Function - FIXED to refresh data
   const handleModalClose = () => {
@@ -197,7 +209,7 @@ function Contacts() {
         {/* Search Bar */}
         <div className="relative mb-4">
           <div>
-            <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+            <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-700" />
           </div>
           <div>
             <input
@@ -205,22 +217,31 @@ function Contacts() {
               placeholder="Search users.."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 border-2 border-blue-500 text-gray-700 placeholder-gray-500 focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 border-2 border-blue-500 text-gray-800 placeholder-gray-500 focus:outline-none"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
+              >
+                <RxCross2 />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Loader */}
-        {loading && <div className="flex justify-center items-center py-8">
+        {/* {loading && <div className="flex justify-center items-center py-8">
           <div className="w-5 h-5 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
           <span className="ml-2 text-blue-400">Loading contact...</span>
-        </div>}
+        </div>} */}
 
         {/* Grouped Contacts List */}
         <div className="space-y-4 overflow-y-auto h-full pr-1 overflow-auto">
           {Object.keys(groupedContacts).length === 0 && !loading ? (
             <div className="text-center text-gray-500 mt-8">
-              No contacts found. Invite someone to get started!
+              {debouncedSearch.trim() ? `No contacts found for "${debouncedSearch}"` : "No contacts found. Invite someone to get started!"}
             </div>
           ) : (
             Object.keys(groupedContacts)

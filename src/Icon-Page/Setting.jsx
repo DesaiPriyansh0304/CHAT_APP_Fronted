@@ -19,7 +19,7 @@ function Setting() {
 
 
   //Login user data Slice
-  const { userData: user } = useSelector((state) => state.loginUser);
+  const { userData: user } = useSelector((state) => state.AuthUser);
 
   {/*menu open */ }
   const menuRef = useRef(null);

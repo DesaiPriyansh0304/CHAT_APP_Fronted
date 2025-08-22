@@ -24,7 +24,7 @@ export const SenderMessage = ({
   setPreviewMedia,
   setIsImagePreview,
 }) => {
-  const { userData: user } = useSelector((state) => state.loginUser);
+  const { userData: user } = useSelector((state) => state.AuthUser);
   const onlineUsers = useSelector(selectOnlineUsers);
 
   const receiverId = msg.receiverId?._id || msg.receiverId;

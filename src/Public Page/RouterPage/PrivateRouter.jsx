@@ -2,27 +2,28 @@ import React, { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 //LoginUser SLice
-import { fetchLoginUser } from '../../feature/Slice/Auth/LoginUserSlice';
+import { fetchLoginUser } from '../../feature/Auth/LoginUserSlice';
 
 function PrivateRoute() {
 
   const dispatch = useDispatch();
-
-  const authState = useSelector((state) => state.auth || {});                     //AuthSlice 
-  const loginUserState = useSelector((state) => state.loginUser || {});           //LoginuserSlice
-
-  const { isAuthenticated } = authState;
-  const { loading, error } = loginUserState;
-
-  // console.log('isAuthenticated ->/auth/PrivetRouter', isAuthenticated);
-  // console.log('loading ->/LoginUser/PrivetRouter', loading);
-  // console.log('error ->/LoginUser/PrivetRouter', error);
 
   //LoginUser Api Call 
   useEffect(() => {
     dispatch(fetchLoginUser());
   }, [dispatch]);
 
+  //Auth Slice
+  const authState = useSelector((state) => state.auth || {});
+  const { isAuthenticated } = authState;
+
+  //LoginuserSlice
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  const { loading, error } = AuthUserState;
+
+  // console.log('isAuthenticated ->/auth/PrivetRouter', isAuthenticated);
+  // console.log('loading ->/LoginUser/PrivetRouter', loading);
+  // console.log('error ->/LoginUser/PrivetRouter', error);
 
   if (loading) {
     return (
@@ -35,7 +36,6 @@ function PrivateRoute() {
       </div>
     );
   }
-
 
   if (!isAuthenticated || error) {
     return <Navigate to="/login" replace />;
