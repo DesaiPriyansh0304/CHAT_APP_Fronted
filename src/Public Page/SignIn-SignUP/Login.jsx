@@ -34,7 +34,7 @@ function Login() {
   const [searchParams] = useSearchParams();
 
 
-  //recaptcha
+  //Google recaptcha
   const getRecaptchavalue = (value) => {
     setRecaptcha(value);
     // console.log('reCAPTCHA value:', value);
@@ -116,8 +116,8 @@ function Login() {
   const handleGithubCallback = async (code) => {
     try {
       setIsGithubLoading(true);
-      console.log('GitHub Auth Code:', code);
-      console.log('Redirect URI used:', REDIRECT_URI);
+      // console.log('GitHub Auth Code:', code);
+      // console.log('Redirect URI used:', REDIRECT_URI);
 
       // Clear any existing errors
       setError({});
@@ -136,7 +136,7 @@ function Login() {
         }
       );
 
-      console.log('GitHub login response:', response.data);
+      // console.log('GitHub login response:', response.data);
 
       const { token, userData } = response.data;
 
@@ -220,9 +220,9 @@ function Login() {
 
     try {
       await LoginSchema.validate(userLogin, { abortEarly: false });
-    } catch (err) {
+    } catch (error) {
       const validationErrors = {};
-      err.inner.forEach((validationError) => {
+      error.inner.forEach((validationError) => {
         validationErrors[validationError.path] = validationError.message;
       });
       setError(validationErrors);
@@ -330,9 +330,9 @@ function Login() {
     // Clear any existing errors
     setError({});
 
-    console.log('GitHub OAuth URL:', GITHUB_OAUTH_URL);
-    console.log('Redirect URI:', REDIRECT_URI);
-    console.log('GitHub Client ID:', GITHUB_CLIENT_ID);
+    // console.log('GitHub OAuth URL:', GITHUB_OAUTH_URL);
+    // console.log('Redirect URI:', REDIRECT_URI);
+    // console.log('GitHub Client ID:', GITHUB_CLIENT_ID);
 
     try {
       setIsGithubLoading(true);
