@@ -15,6 +15,7 @@ function Sidebar({ isMobile }) {
 
   const [showLangMenu, setShowLangMenu] = useState(false);                     //Language Menu
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);                 //Avatar Menu 
+  // console.log('showAvatarMenu --->sidebar/state', showAvatarMenu);
   const [hoveredItem, setHoveredItem] = useState(null);                        //Hover Effect 
   const [showBottomIconsMobile, setShowBottomIconsMobile] = useState(false);   // Bottom icons toggle for mobile 
 
@@ -57,9 +58,16 @@ function Sidebar({ isMobile }) {
   // click Event - AvtarMenu & Language
   const menuRef = useRef(null);
   const langMenuRef = useRef(null);
+  const avatarButtonRef = useRef(null);
+  const isClickingAvatarButton = useRef(false);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // Skip if we're in the middle of handling avatar button click
+      if (isClickingAvatarButton.current) {
+        return;
+      }
+
       // Check if click is outside language menu
       if (showLangMenu && langMenuRef.current && !langMenuRef.current.contains(e.target)) {
         // Also check if the click is not on the language button
@@ -152,13 +160,25 @@ function Sidebar({ isMobile }) {
     }
   };
 
-  // avatar button click handler
-  const handleAvatarButtonClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowAvatarMenu(prev => !prev);
-    setShowLangMenu(false);
-    setHoveredItem(null);
+  // Fixed avatar button click handler
+  const handleAvatarButtonClick = () => {
+    // Set flag to prevent outside click handler from firing
+    isClickingAvatarButton.current = true;
+
+    // Use setTimeout to allow the flag to be processed
+    setTimeout(() => {
+      setShowAvatarMenu(prev => {
+        console.log('showAvatarMenu --->Sidebar', prev);
+        return !prev;
+      });
+      setShowLangMenu(false);
+      setHoveredItem(null);
+
+      // Reset flag after state update
+      setTimeout(() => {
+        isClickingAvatarButton.current = false;
+      }, 50);
+    }, 0);
   };
 
   //mobile language menu 
@@ -324,6 +344,8 @@ function Sidebar({ isMobile }) {
                 <div className="relative mt-3 mb-1.5">
 
                   <button
+                    ref={avatarButtonRef}
+                    data-avatar-button="true"
                     onClick={handleAvatarButtonClick}
                     className="w-13 h-13 rounded-full border-[3px] border-purple-200 dark:border-[#d9d9d9] shadow-md hover:scale-115 transition-transform cursor-pointer"
                     onMouseEnter={() => !showAvatarMenu && setHoveredItem('avatar')}
@@ -457,7 +479,7 @@ function Sidebar({ isMobile }) {
             {showLangMenu && (
               <div
                 ref={langMenuRef}
-                className="fixed top-90 left-1/2 -translate-x-1/2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
+                className="fixed top-89 left-45 -translate-x-1/2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
                 onClick={(e) => e.stopPropagation()}
                 onTouchStart={(e) => e.stopPropagation()}
               >
@@ -489,7 +511,7 @@ function Sidebar({ isMobile }) {
             {showAvatarMenu && (
               <div
                 ref={menuRef}
-                className="fixed top-116 right-4 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
+                className="fixed top-114 right-4 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] dark:bg-gray-800 dark:border-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="p-2">
