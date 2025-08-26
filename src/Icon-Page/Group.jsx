@@ -59,14 +59,14 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isdotMenu && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+      if (dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
         setIsdotMenu(false);
         setActivegroupMenuId(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isdotMenu]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   //fined in user role - FIXED with proper null checks
   const getUserRoleInGroup = (group, userId) => {
@@ -141,8 +141,8 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
     <div className="h-screen w-full">
       <div className="p-4 overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 mt-6">
-          <h2 className="text-[26px] text-gray-800 dark:text-[var(--text-color3)] font-semibold">Groups</h2>
+        <div className="flex justify-between items-center mx-3.5 mb-6 mt-2">
+          <h2 className="libertinus-sans-regular text-[26px] text-gray-800 dark:text-[var(--text-color3)] font-semibold">Groups</h2>
           <RiGroupLine
             className="text-xl text-purple-600 dark:text-[var(--text-color)] 
                  hover:text-blue-600 dark:hover:text-gray-100 

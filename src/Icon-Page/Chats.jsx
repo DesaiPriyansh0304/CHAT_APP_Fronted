@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+//serchbar Icon
 import { RiUserSearchLine } from "react-icons/ri";
 import { RxCross2 } from "react-icons/rx";
 import { useDebounce } from "use-debounce";
+//inveted user
 import { fetchInvitedUsers } from "../feature/Slice/Invited-User/InvitedUsersSlice";
+//online user
 import { selectOnlineUsers } from "../feature/Slice/Socket/OnlineuserSlice";
+//unred message
 import { fetchUnreadMessages } from "../feature/Slice/unreadMessageSlice";
 
 
@@ -17,7 +21,6 @@ function Chats({ selectUser, setSelectUser }) {
 
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
-
 
 
   // User messages
@@ -159,8 +162,8 @@ function Chats({ selectUser, setSelectUser }) {
     <>
       <div className="p-2 h-screen md:w-full">
         {/* Header */}
-        <div className="p-5 flex items-center justify-between">
-          <div className="text-2xl font-semibold dark:text-[#f8f9fa]">Chats</div>
+        <div className="p-5 mt-2 flex items-center justify-between">
+          <div className="libertinus-sans-regular text-2xl font-semibold dark:text-[#f8f9fa] text-[26px]">Chats</div>
         </div>
 
         {/* Search-bar */}
@@ -168,12 +171,12 @@ function Chats({ selectUser, setSelectUser }) {
           <input
             type="text"
             placeholder="Search Users..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg bg-blue-100 text-black placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-200 text-black placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {/* Left side search icon */}
-          <RiUserSearchLine className="absolute text-lg top-1/2 left-3 transform -translate-y-1/2 text-gray-700" />
+          <RiUserSearchLine className="absolute text-lg top-1/2 left-3 transform -translate-y-1/2 text-blue-700" />
 
           {/* clear icon - only when search has text */}
           {search && (

@@ -31,6 +31,7 @@ import unreadCountReducer from "./Socket/unreadCountSlice";
 
 import unreadMessagesReducer from "../Slice/unreadMessageSlice";
 import chatListReducer from "../Slice/Socket/chatListSlice";
+import settingsReducer from "../Slice/Setting/settingsSlice";
 
 const rootReducer = combineReducers({
   //Auth-reducers
@@ -56,6 +57,8 @@ const rootReducer = combineReducers({
   unreadMessages: unreadMessagesReducer,
 
   chatList: chatListReducer,
+
+  settings: settingsReducer,
 });
 
 export default rootReducer;

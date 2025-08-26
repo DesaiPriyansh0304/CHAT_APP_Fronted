@@ -197,10 +197,10 @@ function Contacts() {
       <div className="h-screen w-full p-4 relative">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 mt-6">
+        <div className="flex items-center justify-between mx-3.5 mb-6 mt-6">
           {/*Contacts title*/}
           <div>
-            <h4 className="text-[26px] font-semibold text-gray-800 dark:text-[var(--text-color3)]">
+            <h4 className="libertinus-sans-regular text-[26px] font-semibold text-gray-800 dark:text-[var(--text-color3)]">
               Contacts
             </h4>
           </div>
@@ -218,7 +218,7 @@ function Contacts() {
         {/* Search Bar */}
         <div className="relative mb-4">
           <div>
-            <TbListSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-700" size={18} />
+            <TbListSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-cyan-900" size={18} />
           </div>
           <div>
             <input

@@ -7,16 +7,21 @@ import { MdOutlinePrivacyTip, MdSecurity, MdOutlinePolicy } from 'react-icons/md
 import { TbHelpSquareRounded } from 'react-icons/tb';
 import { FaQuestion } from 'react-icons/fa6';
 import { IoIosContact } from 'react-icons/io';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toggleLastSeen, toggleReadReceipts, togglesecurityReceipts, setPrivacySetting, setUserStatus } from "../feature/Slice/Setting/settingsSlice";
 
 function Setting() {
+
+  const dispatch = useDispatch();
 
   const [showAvailble, setShowAvailble] = useState(false);
   const [activeSection, setActiveSection] = useState('personalinfo');    //section
   const [openMenuId, setOpenMenuId] = useState(null);                    // NEW
   const navigate = useNavigate(); // For navigation
 
+
+  const { lastSeen, readReceipts, security, profilephoto, status, groups, userStatus } = useSelector((state) => state.settings);
 
   //Login user data Slice
   const { userData: user } = useSelector((state) => state.AuthUser);
@@ -35,6 +40,28 @@ function Setting() {
     { id: 2, name: 'Selected' },
     { id: 3, name: 'Nobody' },
   ];
+
+  // Handle user status selection
+  const handleStatusSelection = (selectedStatus) => {
+    dispatch(setUserStatus(selectedStatus));
+    setShowAvailble(false);
+  };
+
+  // Handle privacy setting selection
+  const handlePrivacySelection = (key, value) => {
+    dispatch(setPrivacySetting({ key, value }));
+    setOpenMenuId(null);
+  };
+
+  // Get current value for dropdown
+  const getCurrentValue = (key) => {
+    switch (key) {
+      case 'profilephoto': return profilephoto;
+      case 'status': return status;
+      case 'groups': return groups;
+      default: return 'Everyone';
+    }
+  };
 
   //clike event
   useEffect(() => {
@@ -63,7 +90,7 @@ function Setting() {
       <div className="p-2">
         {/* Title */}
         <div className="flex justify-between">
-          <div className="p-5 text-2xl font-bold dark:text-[var(--text-color3)]">Settings</div>
+          <div className="libertinus-sans-regular p-5 text-2xl font-bold dark:text-[var(--text-color3)]">Settings</div>
         </div>
 
         {/* Avatar */}
@@ -97,7 +124,7 @@ function Setting() {
               <div className="flex gap-2 items-center cursor-pointer " onClick={toggleAvailbleMenu}>
                 {/*menu Title*/}
                 <div>
-                  <p className="text-base text-gray-600 dark:text-[#90e0ef]">Available</p>
+                  <p className="text-base text-gray-600 dark:text-[#90e0ef]">{userStatus}</p>
                 </div>
                 {/*menu open*/}
                 <div>
@@ -115,13 +142,13 @@ function Setting() {
                 <div className="absolute top-full mt-2 left-0 w-32 bg-white rounded shadow-xl z-50">
                   <div
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-t-xl"
-                    onClick={() => setShowAvailble(false)}
+                    onClick={() => handleStatusSelection('Available')}
                   >
                     Available
                   </div>
                   <div
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-b-xl"
-                    onClick={() => setShowAvailble(false)}
+                    onClick={() => handleStatusSelection('Busy')}
                   >
                     Busy
                   </div>
@@ -137,7 +164,7 @@ function Setting() {
         <div className="overflow-auto h-[60vh] mx-2">
 
           {/* Personal Info */}
-          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
+          <div className="w-full bg-gradient-to-r from-sky-200 to-purple-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('personalinfo')}
@@ -163,7 +190,7 @@ function Setting() {
             {/* Personal Info open*/}
             <div>
               {activeSection === 'personalinfo' && (
-                <div className="bg-white dark:bg-[#f8f9fa]">
+                <div className="bg-blue-50 dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     <div className="flex justify-between items-start">
                       {/*user name */}
@@ -177,7 +204,7 @@ function Setting() {
                       <div>
                         <button
                           onClick={() => navigate('/avtarpage')}
-                          className="flex items-center gap-2 bg-gray-100 hover:bg-gray-300 px-2 py-1 rounded text-sm text-black cursor-pointer">
+                          className="flex items-center gap-2 bg-blue-100 hover:bg-gray-300 px-2 py-1 rounded text-sm text-black cursor-pointer">
                           <CiEdit className="text-lg" />
                           <span>Edit</span>
                         </button>
@@ -226,7 +253,7 @@ function Setting() {
           </div>
 
           {/* Privacy section */}
-          <div className="w-full bg-gray-200  dark:bg-[#495057] rounded">
+          <div className="w-full bg-gradient-to-r from-sky-200 to-purple-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3"
               onClick={() => handleToggleSection('privacy')}
@@ -252,24 +279,24 @@ function Setting() {
             {/* Privacy sction open*/}
             <div>
               {activeSection === 'privacy' && (
-                <div className="bg-white dark:bg-[#f8f9fa]">
+                <div className="bg-blue-50 dark:bg-[#f8f9fa]">
                   <div className="my-4 mt-2 space-y-3 text-sm text-gray-800 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     {/* Reusable dropdown */}
                     {['profilephoto', 'status', 'groups'].map((key) => (
                       <div key={key} className="flex justify-between items-center relative">
-                        <p className="text-base capitalize">
+                        <p className="text-base capitalize ">
                           {key
                             .replace('profilephoto', 'Profile photo')
                             .replace('status', 'Status')
                             .replace('groups', 'Groups')}
                         </p>
-                        {/*everyone button*/}
+                        {/*dropdown button*/}
                         <div>
                           <button
                             onClick={() => toggleMenu(key)}
-                            className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300  px-2 py-1 rounded text-sm text-black"
+                            className="flex items-center  gap-2 bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm text-black"
                           >
-                            <span>Everyone</span>
+                            <span>{getCurrentValue(key)}</span>
                             <ChevronDown className="w-4 h-4" />
                           </button>
                         </div>
@@ -282,7 +309,7 @@ function Setting() {
                             {everyonemenu.map(({ name, id }) => (
                               <button
                                 key={id}
-                                onClick={() => setOpenMenuId(null)}
+                                onClick={() => handlePrivacySelection(key, name)}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-100"
                               >
                                 {name}
@@ -304,7 +331,7 @@ function Setting() {
                       {/* Last Seen toggel button */}
                       <div>
                         <label className="relative inline-flex items-center w-8 h-4 cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
+                          <input type="checkbox" className="sr-only peer" checked={lastSeen} onChange={() => dispatch(toggleLastSeen())} />
                           <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-blue-600   transition-colors duration-300"></div>
                           <span className="absolute left-0.5 w-3 h-3 bg-gray-500 rounded-full transition-all duration-300 peer-checked:left-4 peer-checked:bg-white top-1/2 -translate-y-1/2"></span>
                         </label>
@@ -321,7 +348,7 @@ function Setting() {
                       {/* Read receipts toggel button */}
                       <div>
                         <label className="relative inline-flex items-center w-8 h-4 cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
+                          <input type="checkbox" className="sr-only peer" checked={readReceipts} onChange={() => dispatch(toggleReadReceipts())} />
                           <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-colors duration-300"></div>
                           <span className="absolute left-0.5 w-3 h-3 bg-gray-500 rounded-full transition-all duration-300 peer-checked:left-4 peer-checked:bg-white top-1/2 -translate-y-1/2"></span>
                         </label>
@@ -334,7 +361,7 @@ function Setting() {
           </div>
 
           {/* Security Section */}
-          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
+          <div className="w-full bg-gradient-to-r from-sky-200 to-purple-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('security')}
@@ -359,7 +386,7 @@ function Setting() {
             {/* Security section open */}
             <div>
               {activeSection === 'security' && (
-                <div className="bg-white dark:bg-[#f8f9fa]">
+                <div className="bg-blue-50 dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 mb-4 px-4 py-2.5 max-h-[37vh] overflow-auto">
                     <div className="flex justify-between items-center">
                       {/*Show security*/}
@@ -369,7 +396,7 @@ function Setting() {
                       {/*Show toggle button*/}
                       <div>
                         <label className="relative inline-flex items-center w-8 h-4 cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
+                          <input type="checkbox" className="sr-only peer" checked={security} onChange={() => dispatch(togglesecurityReceipts())} />
                           <div className="w-full h-full bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-colors duration-300"></div>
                           <span className="absolute left-0.5 w-3 h-3 bg-gray-500 rounded-full transition-all duration-300 peer-checked:left-4 peer-checked:bg-white top-1/2 -translate-y-1/2"></span>
                         </label>
@@ -382,7 +409,7 @@ function Setting() {
           </div>
 
           {/* Help Section */}
-          <div className="w-full bg-gray-200 dark:bg-[#495057] rounded">
+          <div className="w-full bg-gradient-to-r from-sky-200 to-purple-200 dark:bg-[#495057] rounded">
             <div
               className="flex items-center justify-between cursor-pointer px-4 py-2.5 mt-3.5"
               onClick={() => handleToggleSection('help')}
@@ -406,7 +433,7 @@ function Setting() {
             {/* Help section open*/}
             <div>
               {activeSection === 'help' && (
-                <div className="bg-white dark:bg-[#f8f9fa]">
+                <div className="bg-blue-50 dark:bg-[#f8f9fa]">
                   <div className="mt-2 space-y-3 text-sm text-gray-800 mb-4 px-4 py-2.5">
                     {/* FAQs */}
                     <div className="flex gap-1 items-center">

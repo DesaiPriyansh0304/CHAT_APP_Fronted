@@ -84,10 +84,10 @@ function ProfilePage() {
         {/*Header*/}
         <div className="p-2 relative">
           {/*my profile and dot icon*/}
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-2">
 
             {/*My Profile*/}
-            <div className="p-5 text-2xl font-semibold dark:text-[var(--Chatcontainer-text)]">
+            <div className="libertinus-sans-regular p-5 text-[26px] font-semibold dark:text-[var(--Chatcontainer-text)]">
               My Profile
             </div>
 
@@ -112,6 +112,7 @@ function ProfilePage() {
                       )}
                       <button
                         onClick={() => {
+                          // console.log(`Dotmenu Profile -${name}`)
                           setIsMenuOpen(false);
                           if (name === 'Edit') {
                             navigate('/avtarpage');
@@ -175,7 +176,7 @@ function ProfilePage() {
           <div className="overflow-auto h-[50vh] mx-2">
 
             {/*About section*/}
-            <div className="w-full mb-3 bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-[#495057]  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] rounded-md border border-blue-600 shadow-md  dark:border-gray-400 dark:shadow-gray-500">
+            <div className="w-full mb-3 bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-[#495057]  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] rounded-md  shadow-md  dark:border-gray-400 dark:shadow-gray-500">
               <div
                 className="flex items-center justify-between cursor-pointe  px-4 py-2.5 cursor-pointer "
                 onClick={() => handleToggleSection('about')}
@@ -260,7 +261,7 @@ function ProfilePage() {
             </div>
 
             {/*Attached Files Section*/}
-            <div className="w-full  bg-gradient-to-r from-sky-200 to-purple-200 border border-blue-600  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] mt-2 rounded cursor-pointer shadow-md  dark:border-gray-400 dark:shadow-gray-500">
+            <div className="w-full  bg-gradient-to-r from-sky-200 to-purple-200  dark:bg-gradient-to-r dark:from-[#343a40] dark:to-[#495057] mt-2 rounded cursor-pointer shadow-md  dark:border-gray-400 dark:shadow-gray-500">
 
               <div
                 className="flex items-center justify-between cursor-pointer px-4 py-2.5"
