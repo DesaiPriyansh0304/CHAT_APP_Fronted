@@ -59,14 +59,14 @@ const GroupList = ({ selectGroup, setSelectGroup }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+      if (isdotMenu && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
         setIsdotMenu(false);
         setActivegroupMenuId(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isdotMenu]);
 
   //fined in user role - FIXED with proper null checks
   const getUserRoleInGroup = (group, userId) => {

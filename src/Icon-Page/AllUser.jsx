@@ -3,14 +3,19 @@ import { motion } from 'framer-motion';
 import InvitedData from '../Chat-contatainer/All-User/InvitedData';
 import OtherUser from '../Chat-contatainer/All-User/OtherUser';
 import LiveChatUser from '../Chat-contatainer/All-User/LivechatUser';
+import { useSelector } from 'react-redux';
 
 function AllUser() {
-
-  const [activeTab, setActiveTab] = useState('invited');  //active Tab/button
+  const [activeTab, setActiveTab] = useState('invited'); // Active Tab
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); //set user data tab
+  const [selectedUser, setSelectedUser] = useState(null); // Selected user data
 
-  //function
+  // Login User Data Slice
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  const user = AuthUserState?.userData;
+  // console.log('user --->All User', user);
+
+  // Function
   const handleChat = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -19,59 +24,85 @@ function AllUser() {
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-indigo-100 via-yellow-50 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
 
-      {/*title*/}
+      {/* Title */}
       <div className="border-2 border-amber-900 rounded-2xl h-20 w-full mb-6 shadow-md flex items-center justify-center text-xl font-semibold text-amber-900 dark:text-amber-200 dark:border-amber-400">
         All Users Panel
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-3 gap-5 mb-6">
+      <div className={`grid ${user?.isAdmin ? 'grid-cols-3' : 'grid-cols-2'} gap-5 mb-6`}>
+        {/* If user isAdmin = true => Show all 3 tabs */}
+        {user?.isAdmin ? (
+          <>
+            {/* Invited Data */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('invited')}
+              className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
+                ${activeTab === 'invited'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+                }`}
+            >
+              Invited Data
+            </motion.button>
 
-        {/*Invited Data Tabs */}
+            {/* Other Users */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('other')}
+              className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
+                ${activeTab === 'other'
+                  ? 'bg-green-500 text-white'
+                  : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
+                }`}
+            >
+              Other Users
+            </motion.button>
 
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setActiveTab('invited')}
-          className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
-                        ${activeTab === 'invited'
-              ? 'bg-blue-500 text-white'
-              : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-            }`}
-        >
-          Invited Data
-        </motion.button>
+            {/* Live Chat */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('livechat')}
+              className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
+                ${activeTab === 'livechat'
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200'
+                }`}
+            >
+              Live Chat
+            </motion.button>
+          </>
+        ) : (
+          // If not Admin => Show only Invited Data & Live Chat
+          <>
+            {/* Invited Data */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('invited')}
+              className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
+                ${activeTab === 'invited'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+                }`}
+            >
+              Invited Data
+            </motion.button>
 
-
-        {/*Other Users Tabs */}
-
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setActiveTab('other')}
-          className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
-                        ${activeTab === 'other'
-              ? 'bg-green-500 text-white'
-              : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
-            }`}
-        >
-          Other Users
-        </motion.button>
-
-
-        {/*Live Chat Tabs */}
-
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setActiveTab('livechat')}
-          className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
-                        ${activeTab === 'livechat'
-              ? 'bg-purple-500 text-white'
-              : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200'
-            }`}
-        >
-          Live Chat
-        </motion.button>
-
-
+            {/* Live Chat */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('livechat')}
+              className={`py-2 rounded-xl font-medium text-lg shadow-sm transition-all duration-300
+                ${activeTab === 'livechat'
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200'
+                }`}
+            >
+              Live Chat
+            </motion.button>
+          </>
+        )}
       </div>
 
       {/* Content Area */}
@@ -84,10 +115,9 @@ function AllUser() {
         className="bg-white dark:bg-gray-800 dark:text-white rounded-2xl p-6 shadow-md min-h-[300px]"
       >
         {activeTab === 'invited' && <InvitedData handleChat={handleChat} />}
-        {activeTab === 'other' && <OtherUser onChat={handleChat} />}
+        {activeTab === 'other' && user?.isAdmin && <OtherUser onChat={handleChat} />}
         {activeTab === 'livechat' && <LiveChatUser onChat={handleChat} />}
       </motion.div>
-
 
       {/* Chat Invite Modal */}
       {isModalOpen && (
@@ -137,7 +167,6 @@ function AllUser() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

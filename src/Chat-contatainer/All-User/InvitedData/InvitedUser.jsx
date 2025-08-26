@@ -222,7 +222,7 @@ const InvitedUser = ({ onChat }) => {
                                 <th className="py-3 px-4 text-left font-semibold">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y h-20 overflow-y-auto divide-gray-200">
                             {!loading && filteredUsers.length > 0 ? (
                                 filteredUsers.map((invite, i) => {
                                     const status = getStatusLabel(invite);

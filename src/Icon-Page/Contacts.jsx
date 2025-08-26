@@ -34,7 +34,7 @@ function Contacts() {
   const [search, setSearch] = useState('');                  //searchbar
   const [debouncedSearch] = useDebounce(search, 400);
   const [isMenuOpen, setIsMenuOpen] = useState(false);       //dot menu
-  console.log('✌️isMenuOpen --->', isMenuOpen);
+  // console.log('isMenuOpen --->Contacts.jsx', isMenuOpen);
   const [activeMenuId, setActiveMenuId] = useState(null);    //Active Menu ID
 
   // Refs for outside click detection

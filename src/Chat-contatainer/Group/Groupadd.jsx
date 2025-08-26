@@ -157,8 +157,12 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
     const totalMembers = selectedMembers.length + 1; // +1 for current user
 
     return (
-        <div className="fixed inset-0 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm sm:max-w-md lg:max-w-lg shadow-2xl transform transition-all duration-300 max-h-[95vh] sm:max-h-[90vh] overflow-hidden mx-2">
+        <div className="fixed inset-0 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4"
+            onClick={onClose}
+        >
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm sm:max-w-md lg:max-w-lg shadow-2xl transform transition-all duration-300 max-h-[95vh] sm:max-h-[90vh] overflow-hidden mx-2"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <div className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-700 dark:to-blue-700 text-white p-4 sm:p-6 relative">
                     <button
