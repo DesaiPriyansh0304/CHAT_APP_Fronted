@@ -12,7 +12,7 @@ export const DeleteGroupButton = ({ groupId, onClose }) => {
             text: "You won't be able to revert this!",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",  // Blue
+            confirmButtonColor: "#3062d6",  // Blue
             cancelButtonColor: "#d33",      // Red
             confirmButtonText: "Yes, delete it!",
             cancelButtonText: "Cancel",

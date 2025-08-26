@@ -168,7 +168,7 @@ function Chats({ selectUser, setSelectUser }) {
           <input
             type="text"
             placeholder="Search Users..."
-            className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-blue-100 text-black placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-lg bg-blue-100 text-black placeholder-gray-500 border-2 border-blue-500 focus:outline-none"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -180,7 +180,7 @@ function Chats({ selectUser, setSelectUser }) {
             <button
               type="button"
               onClick={() => setSearch("")}
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
+              className="absolute top-1/2 right-3 text-lg transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
             >
               <RxCross2 />
             </button>

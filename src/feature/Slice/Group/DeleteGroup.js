@@ -3,7 +3,7 @@ import axios from "axios";
 
 const URL = import.meta.env.VITE_REACT_APP;
 
-// 🔸 DELETE GROUP
+//DELETE GROUP Api call Function
 export const deleteGroup = createAsyncThunk(
   "group/deleteGroup",
   async (groupId, { rejectWithValue }) => {
@@ -19,13 +19,15 @@ export const deleteGroup = createAsyncThunk(
         }
       );
       return res.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || { message: err.message });
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );
 
-// 🔸 LEAVE GROUP
+//LEAVE GROUP Api call Function
 export const leaveGroup = createAsyncThunk(
   "group/leaveGroup",
   async (groupId, { rejectWithValue }) => {
@@ -41,8 +43,10 @@ export const leaveGroup = createAsyncThunk(
         }
       );
       return res.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || { message: err.message });
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
     }
   }
 );

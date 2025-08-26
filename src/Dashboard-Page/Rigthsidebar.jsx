@@ -1,36 +1,31 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-// Redux Actions
+// Redux Actions(SocketSlice)
 import {
   connectSocket,
   disconnectSocket,
   markMessagesAsRead,
 } from '../feature/Slice/Socket/SocketSlice';
-
+//chat-history Slice
 import {
   addOwnMessage,
   setMessages,
   fetchChatHistory,
   setSearchQuery,
 } from '../feature/Slice/Chat/ChatHistory';
-
+//unread message Slice
 import {
   incrementUnreadCount,
   resetChatUnreadCount,
 } from '../feature/Slice/Socket/unreadCountSlice';
-
-// UI Components
+// UI Components(Header + Chatbody + Inputside)
 import Header from '../components/Rigthsidebar/Header';
 import Chatbody from '../components/Rigthsidebar/Chatbody';
 import Inputside from '../components/Rigthsidebar/Inputside';
+//RigthSidebar - Contect User data
 import RightProfilePanel from '../components/Rigthsidebar/chatprofiledata';
 
-/**
- * Build payload for private messages
- * @param {Object} params - Message parameters
- * @returns {Object} Formatted message payload
- */
+//payload for private messages
 const buildPrivateMessagePayload = ({
   user,
   selectUser,
@@ -54,11 +49,7 @@ const buildPrivateMessagePayload = ({
   };
 };
 
-/**
- * Build payload for group messages
- * @param {Object} params - Message parameters
- * @returns {Object} Formatted message payload
- */
+//payload for group messages
 const buildGroupMessagePayload = ({
   user,
   selectGroup,
@@ -84,22 +75,9 @@ const buildGroupMessagePayload = ({
 };
 
 const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
+
   const dispatch = useDispatch();
 
-  // Redux selectors
-  const { userData: user } = useSelector((state) => state.AuthUser);
-  const {
-    messages,
-    loadingHistory,
-    currentPage,
-    totalPages,
-    sender,
-    receiver,
-    groupUsers
-  } = useSelector((state) => state.chatHistory);
-  const { socket, isConnected } = useSelector((state) => state.socket);
-
-  // Local state
   const [message, setMessage] = useState('');
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -110,6 +88,16 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   const [fileName, setFileName] = useState([]);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const [sentMessageIds, setSentMessageIds] = useState(new Set());
+
+  // Login User Slice
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  const { userData: user } = AuthUserState;
+  //chatHistory Slice
+  const chatHistoryState = useSelector((state) => state.chatHistory || {});
+  const { messages, loadingHistory, currentPage, totalPages, sender, receiver, groupUsers } = chatHistoryState;
+  //Socket Slice
+  const socketState = useSelector((state) => state.socket || {});
+  const { socket, isConnected } = socketState;
 
   // Refs
   const scrollEnd = useRef(null);
@@ -131,9 +119,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     [selectGroup]
   );
 
-  /**
-   * Initialize chat when user or chat selection changes
-   */
+  //Initialize chat when user or chat selection changes
   useEffect(() => {
     if (!user || (!selectUser && !selectGroup)) return;
 
@@ -145,7 +131,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     setMessage('');
     setShowEmojiPicker(false);
 
-    // Emit open chat event
+    // ✅ સુધારેલું openChatWith event
     const chatData = selectGroup
       ? {
         userId: currentUserId,
@@ -160,7 +146,14 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
         groupId: null,
       };
 
+    console.log('📡 Emitting openChatWith:', chatData);
     socket?.emit('openChatWith', chatData);
+
+    // ✅ Group માટે joinGroup event પણ emit કરો
+    if (selectGroup) {
+      console.log('👥 Joining group:', selectGroup._id);
+      socket?.emit('joinGroup', { groupId: selectGroup._id });
+    }
 
     // Fetch chat history
     const historyPayload = selectGroup
@@ -234,44 +227,50 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   }, [user, dispatch]);
 
   /**
-   * Handle typing indicator
+   * Handle typing indicator - ✅ Group typing માટે પણ support add કર્યું
    */
   useEffect(() => {
     if (!socket) return;
 
     const handleTyping = ({ senderId, isTyping: typing }) => {
-      if (senderId === selectUser?._id) {
+      if (selectUser && senderId === selectUser._id) {
         setIsTyping(typing);
       }
     };
 
+    const handleGroupTyping = ({ senderId, isTyping: typing }) => {
+      if (selectGroup && senderId !== currentUserId) {
+        setIsTyping(typing);
+        // ✅ Group માં multiple users typing show કરવા માટે અહીં extend કરી શકાય
+      }
+    };
+
     socket.on('typing', handleTyping);
+    socket.on('groupTyping', handleGroupTyping); // ✅ Group typing event add કર્યું
 
     return () => {
       socket.off('typing', handleTyping);
+      socket.off('groupTyping', handleGroupTyping);
     };
-  }, [socket, selectUser]);
+  }, [socket, selectUser, selectGroup, currentUserId]);
 
   /**
-   * Join group if group chat is selected
+   * ✅ Deprecated: Join group logic moved to initialization
    */
-  useEffect(() => {
-    if (socket && selectGroup?._id) {
-      console.log('👥 Joining group:', selectGroup._id);
-      socket.emit('joinGroup', { groupId: selectGroup._id });
-    }
-  }, [socket, selectGroup]);
 
   /**
-   * Handle incoming messages
+   * Handle incoming messages - ✅ મુખ્ય fix અહીં છે
    */
   useEffect(() => {
     if (!socket || !user) return;
 
     const handleGroupMessage = (data) => {
       console.log('📨 Received group message:', data);
+      console.log('📨 Current selectGroup:', selectGroup?._id);
+      console.log('📨 Message groupId:', data.groupId);
 
       const senderId = String(data.senderId?._id || data.senderId);
+      const messageGroupId = String(data.groupId?._id || data.groupId);
       const messageId = data._id || data.messageId || `msg_${Date.now()}_${Math.random()}`;
 
       // Skip own messages
@@ -286,20 +285,26 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
         return;
       }
 
-      // Handle messages for different groups
-      if (selectGroup && data.groupId !== selectGroup._id) {
-        console.log('📝 Message for different group, updating unread count');
-        dispatch(incrementUnreadCount({ chatId: data.groupId }));
-        return;
-      }
+      // ✅ Group ID matching સુधારી
+      const currentGroupId = String(selectGroup?._id || '');
 
-      // Process message for current group
-      if (selectGroup && data.groupId === selectGroup._id) {
+      if (selectGroup && messageGroupId === currentGroupId) {
         const messageObj = createMessageObject(data, messageId);
         console.log('✅ Adding group message to UI:', messageObj);
 
         dispatch(addOwnMessage(messageObj));
         setSentMessageIds(prev => new Set([...prev, messageId]));
+
+        // ✅ Group message received તો typing indicator બંધ કરો
+        if (senderId !== currentUserId) {
+          setIsTyping(false);
+        }
+      } else if (selectGroup && messageGroupId !== currentGroupId) {
+        console.log('📝 Message for different group, updating unread count');
+        dispatch(incrementUnreadCount({ chatId: messageGroupId }));
+      } else {
+        console.log('📝 Group message received but no group selected');
+        dispatch(incrementUnreadCount({ chatId: messageGroupId }));
       }
     };
 
@@ -328,6 +333,9 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
 
         dispatch(addOwnMessage(messageObj));
         setSentMessageIds(prev => new Set([...prev, messageId]));
+
+        // Private message received તો typing indicator બંધ કરો
+        setIsTyping(false);
       } else {
         console.log('📝 Message for different chat, updating unread count');
         dispatch(incrementUnreadCount({ chatId: senderId }));
@@ -351,7 +359,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   }, [messages]);
 
   /**
-   * Create standardized message object
+   * Create standardized message object - ✅ Group support સુધારી
    */
   const createMessageObject = useCallback((data, messageId) => {
     const contentArray = Array.isArray(data.content)
@@ -367,11 +375,14 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
       image: data.type === 'image' ? contentArray[0] : data.image || '',
       file: data.type === 'file' ? contentArray[0] : data.file || '',
       createdAt: data.createdAt || new Date().toISOString(),
+      // ✅ Group message flag properly set કરો
+      isGroupMessage: data.isGroupMessage || Boolean(data.groupId),
+      groupId: data.groupId, // ✅ Group ID preserve કરો
     };
   }, []);
 
   /**
-   * Handle typing with debounce
+   * Handle typing with debounce - ✅ Group typing support add કર્યું
    */
   const handleTyping = useCallback((e) => {
     const value = e.target.value;
@@ -421,7 +432,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   }, [loadingHistory, currentPage, totalPages, selectGroup, currentUserId, selectUser, dispatch]);
 
   /**
-   * Send message handler
+   * Send message handler - ✅ Group message debugging improve કર્યું
    */
   const handleSendMessage = useCallback((e) => {
     e.preventDefault();
@@ -442,11 +453,15 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     }
 
     console.log('📤 Sending message...');
+    console.log('📤 Chat type:', isGroupChat ? 'GROUP' : 'PRIVATE');
+    console.log('📤 Target:', isGroupChat ? selectGroup?.name : selectUser?.name);
 
     // Build payload based on chat type
     const payload = isGroupChat
       ? buildGroupMessagePayload({ user, selectGroup, message, image, file, fileName })
       : buildPrivateMessagePayload({ user, selectUser, message, image, file, fileName });
+
+    console.log('📤 Message payload:', payload);
 
     // Create temporary message for UI
     const tempMessageId = `temp_${Date.now()}_${Math.random()}`;
@@ -462,6 +477,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
       type: payload.type,
       createdAt: new Date().toISOString(),
       senderId: currentUserId,
+      isGroupMessage: isGroupChat, // ✅ Group flag set કરો
       ...(isGroupChat
         ? { groupId: selectGroup._id }
         : { receiverId: selectUser._id }
@@ -492,6 +508,11 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
       clearTimeout(typingTimeoutRef.current);
     }
     setTyping(false);
+    socket.emit('typing', {
+      receiverId: selectUser?._id,
+      groupId: selectGroup?._id,
+      isTyping: false,
+    });
   }, [
     message,
     image,
@@ -518,11 +539,11 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   // Render empty state when no chat is selected
   if (!selectUser && !selectGroup) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-blue-700 px-4 text-center bg-gray-50">
+      <div className="flex flex-col items-center justify-center h-full text-blue-700 px-4 text-center bg-gray-50 dark:bg-[#36404A]">
         <div className="">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+          <div className="w-24 h-24 bg-gray-100 dark:bg-sky-200 rounded-full flex items-center justify-center mb-4 mx-auto">
             <svg
-              className="w-12 h-12 text-gray-400"
+              className="w-12 h-12 text-gray-400 dark:text-sky-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -535,8 +556,8 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-gray-800">No chat selected</h2>
-          <p className="text-sm text-gray-600 max-w-xs">
+          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-sky-400">No chat selected</h2>
+          <p className="text-sm text-gray-600 dark:text-white max-w-xs ">
             Please select a conversation from the sidebar to start chatting.
           </p>
         </div>

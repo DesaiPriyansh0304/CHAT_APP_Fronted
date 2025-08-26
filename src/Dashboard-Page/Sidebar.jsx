@@ -320,7 +320,7 @@ function Sidebar({ isMobile }) {
                 {showLangMenu && (
                   <div
                     ref={langMenuRef}
-                    className="absolute bottom-36 left-16 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
+                    className="absolute bottom-35 left-14 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700"
                   >
                     <ul className="p-2">
                       {languages.map((lang) => (

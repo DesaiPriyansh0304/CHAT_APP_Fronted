@@ -10,6 +10,7 @@ import {
   IoChevronBackOutline
 } from 'react-icons/io5';
 import { BsThreeDots } from 'react-icons/bs';
+//componet Use in Header
 import { AudioCallModal, VideoCallModal, SearchBox } from './CallPopup';
 
 function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, onMobileBack }) {
@@ -53,9 +54,8 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
     );
   };
 
-  const dotmenuRef = useRef();
 
-  // Mark messages as read when user is selected
+  // Mark messages as read when user is selected(userid Privet Chate)
   useEffect(() => {
     if (selectUser && selectUser._id) {
       console.log("🔔 Marking messages as read for user:", selectUser._id);
@@ -63,7 +63,10 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
     }
   }, [selectUser, dispatch]);
 
-  //click event
+  //Clike event
+  const dotmenuRef = useRef();
+
+  //click event 
   useEffect(() => {
     const handleClickAnywhere = (event) => {
       if (showMoreOptions && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
@@ -79,7 +82,6 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
 
   const isUserSelected = selectUser && Object.keys(selectUser).length > 0;
   const isGroupSelected = selectGroup && Object.keys(selectGroup).length > 0;
-
 
   const renderMoreMenu = () => (
     <div
@@ -123,14 +125,14 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
             <div className="flex-shrink-0">
               <img
                 className="w-12 h-12 rounded-full object-cover"
-                alt={`${selectUser.firstname} ${selectUser.lastname}`}
+                alt={`${selectUser.firstname || ''} ${selectUser.lastname || ''}`}
                 src={selectUser.img || selectUser.profile_avatar || 'https://via.placeholder.com/40'}
               />
             </div>
             {/*User name*/}
             <div className='text-gray-900 dark:text-white min-w-0'>
               <div className="flex items-center gap-2 font-semibold">
-                <span className="truncate">{`${selectUser.firstname} ${selectUser.lastname}`}</span>
+                <span className="truncate">{`${selectUser.firstname || ''} ${selectUser.lastname || ''}`}</span>
                 {selectUser.online && (
                   <span className="w-2 h-2 bg-green-500 rounded-full inline-block flex-shrink-0"></span>
                 )}
@@ -247,16 +249,22 @@ function Header({ selectUser, isTyping, selectGroup, onProfileClick, isMobile, o
           <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileClick}>
             <img
               className="w-12 h-12 rounded-full object-cover"
-              alt={selectGroup.groupName}
+              alt={selectGroup?.groupName || 'Group'}
               src={'https://via.placeholder.com/40?text=G'}
             />
             <div className='text-gray-900 dark:text-white'>
-              <div className="flex items-center gap-2 font-semibold">
-                <span>{selectGroup.groupName}</span>
+              <div className="flex items-center gap-2 font-semibold text-xl">
+                <span>{selectGroup?.groupName || 'Unknown Group'}</span>
               </div>
-              <span className='text-sm text-gray-500 dark:text-gray-400'>
-                Created by: {selectGroup.createdBy.firstname} {selectGroup.createdBy.lastname}
-              </span>
+              {/* FIXED: Added null checks for createdBy */}
+              {/* <span className='text-sm text-gray-500 dark:text-gray-400'>
+                {selectGroup?.createdBy && selectGroup.createdBy.firstname && selectGroup.createdBy.lastname
+                  ? `Created by: ${selectGroup.createdBy.firstname} ${selectGroup.createdBy.lastname}`
+                  : selectGroup?.createdBy?.firstname
+                    ? `Created by: ${selectGroup.createdBy.firstname}`
+                    : 'Group'
+                }
+              </span> */}
             </div>
           </div>
         </div>

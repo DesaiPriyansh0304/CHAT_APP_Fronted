@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RiUserAddLine, RiDeleteBin6Line } from 'react-icons/ri';
-import { FaSearch } from 'react-icons/fa';
+import { TbListSearch } from "react-icons/tb";
 import ContactAdd from '../Chat-contatainer/Contacts/ContactAdd';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ import { MdBlockFlipped } from 'react-icons/md';
 import { fetchInvitedUsers, resetInvitedUsersState } from '../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
 import { RxCross2 } from 'react-icons/rx';
+import "../Chat-contatainer/Contacts/css/contect.css"
 
 // Group users alphabetically
 const groupContactsByLetter = (contacts) => {
@@ -26,46 +27,52 @@ const groupContactsByLetter = (contacts) => {
 };
 
 function Contacts() {
-  const [showAddModal, setShowAddModal] = useState(false);   //add contact modal
-  const { token } = useParams();
   const dispatch = useDispatch();
+  const { token } = useParams();
 
+  const [showAddModal, setShowAddModal] = useState(false);   //add contact modal
   const [search, setSearch] = useState('');                  //searchbar
   const [debouncedSearch] = useDebounce(search, 400);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);       //dot menu
-  const [activeMenuId, setActiveMenuId] = useState(null);
+  console.log('✌️isMenuOpen --->', isMenuOpen);
+  const [activeMenuId, setActiveMenuId] = useState(null);    //Active Menu ID
 
   // Refs for outside click detection
   const dotmenuRef = useRef();
   const modalRef = useRef(); // Modal ref
 
-  //dot menu function - FIXED
+  //dot menu function 
   const toggleMenu = (id) => {
     if (isMenuOpen && activeMenuId === id) {
-      // If same menu is open, close it
-      setIsMenuOpen(false);
-      setActiveMenuId(null);
+      // setIsMenuOpen(false);
+      // setActiveMenuId(null);
+      setIsMenuOpen(!isMenuOpen);
     } else {
-      // Open the clicked menu
       setIsMenuOpen(true);
       setActiveMenuId(id);
     }
   };
 
   // Dot menu outside click handler
+  // Dot menu outside click handler
   useEffect(() => {
     const handleClickAnywhere = (event) => {
-      if (isMenuOpen && dotmenuRef.current && !dotmenuRef.current.contains(event.target)) {
+      if (
+        isMenuOpen &&
+        dotmenuRef.current &&
+        !dotmenuRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
         setActiveMenuId(null);
       }
     };
-    document.addEventListener('mousedown', handleClickAnywhere);
+
+    document.addEventListener("click", handleClickAnywhere);
     return () => {
-      document.removeEventListener('mousedown', handleClickAnywhere);
+      document.removeEventListener("click", handleClickAnywhere);
     };
   }, [isMenuOpen]);
+
 
   // Modal outside click handler
   useEffect(() => {
@@ -92,19 +99,26 @@ function Contacts() {
   ];
 
   {/*invited user Slice*/ }
-  const invitedUserState = useSelector((state) => state.invitedUsers);
-  const { isLoaded, loading } = invitedUserState;
-  const invitedUsersArray = invitedUserState.invitedUsers || [];
-  const invitedByArray = invitedUserState.invitedBy || [];
+  //all user (Invited User & invited by)
+  const invitedUserState = useSelector((state) => state.invitedUsers || {});
+  // console.log('invitedUserState --->Contact.jsx', invitedUserState);
+  const { loading } = invitedUserState;
 
-  // API Call InvitedUsers Slice - FIXED
+  //invited User
+  const invitedUsersArray = invitedUserState.invitedUsers || [];
+  // console.log('invitedUsersArray --->Contact.jsx', invitedUsersArray);
+  //Invited By User
+  const invitedByArray = invitedUserState.invitedBy || [];
+  // console.log('invitedByArray --->Contact.jsx', invitedByArray);
+
+  // API Call InvitedUsers Slice 
   useEffect(() => {
     if (!token) {
       dispatch(fetchInvitedUsers(debouncedSearch));
     }
   }, [dispatch, debouncedSearch, token]);
 
-  {/*If token from URL → verify invite*/ }
+  {/*If token from URL → verify invite User*/ }
   useEffect(() => {
     if (token) {
       const verifyToken = async () => {
@@ -120,13 +134,11 @@ function Contacts() {
           const data = await response.json();
           if (response.ok) {
             toast.success('🎉 Invitation confirmed! You can now register.');
-            // Redirect to registration page if needed
-            // window.location.href = '/register';
           } else {
             toast.error('❌ ' + data.message);
           }
-        } catch (err) {
-          console.error('Token verify error:', err);
+        } catch (error) {
+          console.log('Token verify error:', error);
           toast.error('❌ Token verification failed.');
         }
       };
@@ -171,13 +183,10 @@ function Contacts() {
     dispatch(resetInvitedUsersState());
   };
 
-  // FIXED - Function to handle successful contact addition
+  // Function to handle contact addition
   const handleContactAdded = () => {
-    // Reset the invited users state to force fresh data fetch
     dispatch(resetInvitedUsersState());
-    // Close modal
     setShowAddModal(false);
-    // Trigger fresh API call by dispatching fetchInvitedUsers
     setTimeout(() => {
       dispatch(fetchInvitedUsers(debouncedSearch));
     }, 100);
@@ -188,17 +197,17 @@ function Contacts() {
       <div className="h-screen w-full p-4 relative">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6 mt-6">
           {/*Contacts title*/}
           <div>
-            <h4 className="text-xl font-semibold text-gray-800 dark:text-[var(--text-color3)]">
+            <h4 className="text-[26px] font-semibold text-gray-800 dark:text-[var(--text-color3)]">
               Contacts
             </h4>
           </div>
           {/*icon title*/}
           <div>
             <button
-              className="text-gray-600 hover:text-blue-800 dark:text-[var(--text-color1)] text-xl mr-4 cursor-pointer "
+              className="text-cyan-400 hover:text-blue-500 dark:text-[var(--text-color1)] text-xl mr-4 cursor-pointer tilt-animation"
               onClick={() => setShowAddModal(true)}
             >
               <RiUserAddLine />
@@ -209,21 +218,21 @@ function Contacts() {
         {/* Search Bar */}
         <div className="relative mb-4">
           <div>
-            <FaSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-700" />
+            <TbListSearch className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-700" size={18} />
           </div>
           <div>
             <input
               type="text"
-              placeholder="Search users.."
+              placeholder="Search Users.."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-2xl bg-blue-100 border-2 border-blue-500 text-gray-800 placeholder-gray-500 focus:outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-gradient-to-r from-cyan-200 to-blue-100 border-2 border-cyan-500 text-gray-800 placeholder-gray-500 focus:outline-none"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
+                className="absolute top-1/2 right-3 text-lg transform -translate-y-1/2 text-gray-600 hover:text-red-600 cursor-pointer"
               >
                 <RxCross2 />
               </button>
@@ -232,10 +241,10 @@ function Contacts() {
         </div>
 
         {/* Loader */}
-        {/* {loading && <div className="flex justify-center items-center py-8">
-          <div className="w-5 h-5 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-          <span className="ml-2 text-blue-400">Loading contact...</span>
-        </div>} */}
+        {loading && <div className="flex justify-center items-center py-8">
+          <div className="w-5 h-5 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-2 text-cyan-400">Loading contact...</span>
+        </div>}
 
         {/* Grouped Contacts List */}
         <div className="space-y-4 overflow-y-auto h-full pr-1 overflow-auto">
@@ -249,13 +258,13 @@ function Contacts() {
               .map((letter) => (
                 <div key={letter}>
                   {/*letter*/}
-                  <div className="text-purple-600 dark:text-[var(--text-color)] font-semibold text-sm mt-8">
+                  <div className="text-cyan-600 dark:text-[var(--text-color)] font-semibold text-sm mt-8">
                     {letter}
                   </div>
                   {groupedContacts[letter].map((inv, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-800"
+                      className="flex justify-between items-center px-4 py-2 rounded cursor-pointer hover:bg-cyan-100 dark:hover:bg-gray-800"
                     >
                       {/*user name*/}
                       <div className="text-gray-800 dark:text-[var(--text-color3)] font-medium">
@@ -268,7 +277,10 @@ function Contacts() {
                         <div>
                           <button
                             className="cursor-pointer"
-                            onClick={() => toggleMenu(inv.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleMenu(inv.id);
+                            }}
                           >
                             <EllipsisVerticalIcon size={16} />
                           </button>
@@ -278,15 +290,20 @@ function Contacts() {
                           {isMenuOpen && activeMenuId === inv.id && (
                             <div
                               ref={dotmenuRef}
-                              className="absolute right-0 mt-2 w-30 bg-white rounded-md shadow-xl  z-10 dark:bg-gray-800 dark:border-gray-600"
+                              className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-xl  z-10 dark:bg-gray-800 dark:border-gray-600"
                             >
                               <ul>
                                 {dotMenu.map(({ title, id, icon }) => (
-                                  <div key={id} className='hover:bg-gray-100 dark:hover:bg-gray-700'>
+                                  <div key={id} className='hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    onClick={() => {
+                                      // console.log(`👉 ${title} clicked`); 
+                                      setIsMenuOpen(false);
+                                      setActiveMenuId(null);
+                                    }}>
                                     <li className="flex flex-col mx-2 ">
                                       <div className="flex items-center p-0.5 gap-4 my-0.5 mx-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 justify-between">
                                         <div className="text-gray-700 dark:text-gray-300 text-md">{title}</div>
-                                        <div className="text-blue-500">{icon}</div>
+                                        <div className="text-cyan-500">{icon}</div>
                                       </div>
                                     </li>
                                   </div>
@@ -303,7 +320,7 @@ function Contacts() {
           )}
         </div>
 
-        {/* Add Contact Modal - FIXED to handle success callback */}
+        {/* Add Contact Modal - handle callback */}
         {showAddModal && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div ref={modalRef}>

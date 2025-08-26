@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
+import { MdOutlineMarkEmailRead } from "react-icons/md";
+import { BiMessageDetail } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import axios from 'axios';
 
@@ -40,7 +42,7 @@ function ContactAdd({ onClose, onContactAdded }) {
                 return;
             }
 
-            //api call - FIXED: Using axios properly
+            //api call
             const response = await axios.post(`${URL}/api/auth/invite/invitedUsers`,
                 { email, message },
                 {
@@ -52,12 +54,12 @@ function ContactAdd({ onClose, onContactAdded }) {
             );
 
             // FIXED: axios response structure
-            if (response.status === 200 || response.status === 201) {
+            if (response.status === 200) {
                 toast.success('Invitation sent successfully!');
                 // Reset form
                 setEmail('');
                 setMessage('');
-                // FIXED: Call the success callback to refresh contacts
+                //Call the success callback to refresh contacts
                 if (onContactAdded) {
                     onContactAdded();
                 } else {
@@ -112,7 +114,7 @@ function ContactAdd({ onClose, onContactAdded }) {
                     </h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-blue-500 text-xl font-semibold cursor-pointer touch-manipulation"
+                        className="text-gray-400 hover:text-cyan-600 text-xl font-semibold cursor-pointer touch-manipulation"
                     >
                         <RxCross2 />
                     </button>
@@ -120,16 +122,26 @@ function ContactAdd({ onClose, onContactAdded }) {
 
                 {/* Email */}
                 <div className="mb-4">
-                    <label className="exo-bold block text-sm font-xl font-semibold text-gray-700 mb-2">Email</label>
-                    <input
-                        type="email"
-                        placeholder="Enter email"
-                        className={`exo w-full px-3 sm:px-4 py-3 border border-sky-300 ${errors.email ? 'border-red-500' : 'border-gray-300'
-                            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-base`}
-                        value={email}
-                        onChange={handleEmailChange}
-                    />
-                    {errors.email && <p className="text-sm text-red-500 mt-0.5">{errors.email}</p>}
+                    <label className="exo-bold block text-sm font-xl font-semibold text-gray-700 mb-2">
+                        Email
+                    </label>
+                    <div className="relative">
+                        {/* Icon inside input */}
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-xl">
+                            <MdOutlineMarkEmailRead />
+                        </span>
+                        <input
+                            type="email"
+                            placeholder="Enter email"
+                            className={`exo w-full pl-10 pr-3 py-3 border ${errors.email ? "border-red-500" : "border-cyan-300"
+                                } rounded-md  text-base`}
+                            value={email}
+                            onChange={handleEmailChange}
+                        />
+                    </div>
+                    {errors.email && (
+                        <p className="text-sm text-red-500 mt-0.5">{errors.email}</p>
+                    )}
                 </div>
 
                 {/* Message */}
@@ -137,20 +149,26 @@ function ContactAdd({ onClose, onContactAdded }) {
                     <label className="exo-bold block text-sm font-xl font-semibold text-gray-700 mb-2">
                         Invitation Message
                     </label>
-                    <textarea
-                        placeholder="Enter a message"
-                        rows={4}
-                        className={`exo w-full px-3 sm:px-4 py-3 border border-sky-300 ${errors.message ? 'border-red-500' : 'border-gray-300'
-                            } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-base`}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        // onKeyDown={handleKeyDown} //  Enter vs Shift+Enter
-                        style={{ resize: 'vertical', minHeight: '50px' }}
-                    />
-                    {errors.message && <p className="text-sm text-red-500 mt-0.5">{errors.message}</p>}
+                    <div className="relative">
+                        <span className="absolute  left-3 top-3 text-cyan-400 text-xl mt-[5px]">
+                            <BiMessageDetail />
+                        </span>
+                        <textarea
+                            placeholder="Enter a Message..."
+                            rows={4}
+                            className={`exo w-full pl-10 pr-3 py-3 border ${errors.message ? "border-red-500" : "border-cyan-300"
+                                } rounded-md text-base`}
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            style={{ resize: "vertical", minHeight: "50px" }}
+                        />
+                    </div>
+                    {errors.message && (
+                        <p className="text-sm text-red-500 mt-0.5">{errors.message}</p>
+                    )}
                 </div>
 
-                {/* Actions */}
+                {/* Actions close & Invited Contact */}
                 <div className="flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
                     <button
                         onClick={onClose}
@@ -162,7 +180,7 @@ function ContactAdd({ onClose, onContactAdded }) {
                     <button
                         onClick={handleInvite}
                         disabled={loading}
-                        className="w-full sm:w-auto bg-blue-200 text-blue-700 font-medium px-4 py-1 rounded-md outline-2 outline-blue-500 hover:bg-blue-300 hover:text-blue-800  disabled:bg-blue-300 disabled:text-gray-400 transition-colors cursor-pointer touch-manipulation"
+                        className="w-full sm:w-auto bg-cyan-100 text-cyan-600 font-medium px-4 py-1 rounded-md outline-2 outline-cyan-500 hover:bg-cyan-700 hover:text-white  disabled:bg-cyan-300 disabled:text-gray-400 transition-colors cursor-pointer touch-manipulation"
                     >
                         {loading ? 'Sending...' : 'Invite Contact'}
                     </button>

@@ -1,9 +1,9 @@
-// SocketSlice.js - Updated with Chat List Events
 import { createSlice } from "@reduxjs/toolkit";
 import { io } from "socket.io-client";
 import { setOnlineUsers } from "../Socket/OnlineuserSlice";
 import { newMessageReceived } from "../ChatSlice";
 import { setUnreadCount } from "../Socket/unreadCountSlice";
+
 import {
   setChatListLoading,
   setChatList,
@@ -11,10 +11,10 @@ import {
   setChatListError,
   updateChatUnreadCount,
   updateLastMessage,
-} from "../Socket/chatListSlice"; // 🆕 Chat list actions import કરો
+} from "../Socket/chatListSlice";
 
 const URL = import.meta.env.VITE_REACT_APP;
-console.log("✌️URL --->", URL);
+// console.log("URL --->Socket Slice", URL);
 let socketInstance = null;
 
 const socketSlice = createSlice({
@@ -41,21 +41,19 @@ export const { setSocket, setConnectionStatus, clearSocket } =
   socketSlice.actions;
 
 export const connectSocket = (user) => (dispatch) => {
-  console.log("👉 User received in connectSocket:", user);
+  //Login user sata(user)
+  console.log("User received in connectSocket:", user);
 
   if (!user || socketInstance?.connected) {
-    console.log("⚠️ Socket already connected or user missing/SocketSlice", {
+    console.log("Socket already connected or user missing/SocketSlice", {
       hasUser: !!user,
       socketConnected: socketInstance?.connected,
     });
     return;
   }
 
-  console.log("🌐 Connecting socket to:/SocketSlice", URL);
-  console.log(
-    "👤 Connecting with userId:/SocketSlice",
-    user._id || user.userId
-  );
+  // console.log("Connecting socket to:/SocketSlice", URL); //localhost path backend
+  // console.log("👤 Connecting with userId:/SocketSlice", user._id); login userdata user_id
 
   socketInstance = io(URL, {
     query: {
@@ -64,12 +62,13 @@ export const connectSocket = (user) => (dispatch) => {
     transports: ["websocket"],
   });
 
+  //connect to socket
   socketInstance.on("connect", () => {
     console.log("🟢Socket connected:/SocketSlice", socketInstance.id);
     dispatch(setSocket(socketInstance));
     dispatch(setConnectionStatus(true));
 
-    // 🆕 Connection થતાં જ chat list fetch કરો
+    // 🆕 Connection true - chat list fetch
     console.log("📋 Requesting chat list after connection...");
     socketInstance.emit("getChatList");
   });
@@ -79,21 +78,22 @@ export const connectSocket = (user) => (dispatch) => {
     chatWithUserId: null,
   });
 
+  //connection Error
   socketInstance.on("connect_error", (err) => {
-    console.error("⚫Socket connection error:/SocketSlice", err.message);
+    console.log("⚫Socket connection error:/SocketSlice", err.message);
     dispatch(setConnectionStatus(false));
   });
-
+  //Socket Disconnection
   socketInstance.on("disconnect", () => {
     console.log("🔴Socket disconnected/SocketSlice");
     dispatch(setConnectionStatus(false));
   });
-
+  //Online User Id
   socketInstance.on("getOnlineUsers", (userIds) => {
-    console.log(
-      "🔵 Online users received/SocketSlice/ (count):",
-      userIds.length
-    );
+    // console.log(
+    //   "🔵 Online users received/SocketSlice/ (count):",
+    //   userIds.length
+    // );
     console.log(" Online users received:", userIds);
     dispatch(setOnlineUsers(userIds));
   });
@@ -121,7 +121,7 @@ export const connectSocket = (user) => (dispatch) => {
       );
     } else {
       dispatch(setChatListError(data.error || "Failed to fetch chat list"));
-      console.error("❌ Chat list fetch error:", data.error);
+      console.log("Chat list fetch error:", data.error);
     }
   });
 
@@ -143,7 +143,7 @@ export const connectSocket = (user) => (dispatch) => {
     }
   });
 
-  // Unread count updates માટે
+  // Unread count updates
   socketInstance.on("unreadCountUpdated", (data) => {
     console.log("📊 Unread count updated:/SocketSlice", data);
 
@@ -158,7 +158,7 @@ export const connectSocket = (user) => (dispatch) => {
   socketInstance.on("groupMessage", (message) => {
     console.log("👥 Group message received:/SocketSlice", message);
 
-    // Message dispatch કરો
+    // Message dispatch
     dispatch(
       newMessageReceived({
         ...message,
@@ -169,7 +169,7 @@ export const connectSocket = (user) => (dispatch) => {
       })
     );
 
-    // 🆕 Chat list માં last message update કરો
+    // Chat list last message update
     if (message.groupId) {
       dispatch(
         updateLastMessage({
@@ -185,6 +185,7 @@ export const connectSocket = (user) => (dispatch) => {
     }
   });
 
+  //private Message
   socketInstance.on("privateMessage", (message) => {
     console.log("📩 Private message received:/SocketSlice", message);
 
@@ -194,7 +195,7 @@ export const connectSocket = (user) => (dispatch) => {
       : message.content;
 
     if (message.receiverId === currentUserId) {
-      // Message dispatch કરો
+      // Message dispatch
       dispatch(
         newMessageReceived({
           ...message,
@@ -206,7 +207,7 @@ export const connectSocket = (user) => (dispatch) => {
         })
       );
 
-      // 🆕 Chat list માં last message update કરો
+      // Chat list last message update
       dispatch(
         updateLastMessage({
           conversationId: message.conversationId,
@@ -225,35 +226,36 @@ export const connectSocket = (user) => (dispatch) => {
   socketInstance.io.on("reconnect", () => {
     console.log("🔁 Reconnected to socket server!/SocketSlice");
 
-    // 🆕 Reconnect પછી chat list refresh કરો
+    // Reconnect - chat list refresh
     console.log("📋 Refreshing chat list after reconnection...");
     socketInstance.emit("getChatList");
   });
 };
 
-// 🆕 Chat list fetch કરવા માટે action
+// Chat list fetch action
 export const fetchChatList = () => (dispatch) => {
   if (socketInstance && socketInstance.connected) {
     console.log("📋 Requesting chat list...");
     dispatch(setChatListLoading(true));
     socketInstance.emit("getChatList");
   } else {
-    console.error("❌ Socket not connected, cannot fetch chat list");
+    console.log(" Socket not connected, cannot fetch chat list");
     dispatch(setChatListError("Socket not connected"));
   }
 };
 
-// 🆕 Chat refresh કરવા માટે
+// Chat refresh
 export const refreshChatList = () => (dispatch) => {
-  console.log("🔄 Manually refreshing chat list...");
+  console.log("Manually refreshing chat list...");
   dispatch(fetchChatList());
 };
 
+//mark message
 export const markMessagesAsRead =
   ({ senderId, receiverId }) =>
   () => {
     if (socketInstance && socketInstance.connected) {
-      console.log("✅ Emitting markMessagesAsRead to backend", {
+      console.log("Emitting markMessagesAsRead to backend", {
         senderId,
         receiverId,
       });
@@ -261,7 +263,7 @@ export const markMessagesAsRead =
     }
   };
 
-console.log("✌️ Socket instance: ", socketInstance?.connected);
+console.log("Socket instance: ", socketInstance?.connected);
 
 export const disconnectSocket = () => (dispatch) => {
   if (socketInstance) {

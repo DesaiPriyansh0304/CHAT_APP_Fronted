@@ -1,15 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaFileAlt } from 'react-icons/fa';
 // import { format } from "timeago.js";
+// import { format } from "timeago.js";
 import { IoTimeOutline } from 'react-icons/io5';
 import { useSelector } from 'react-redux';
 import { RxDotsVertical } from 'react-icons/rx';
 //dot menu
 import { RiDeleteBin6Line, RiSaveLine, RiShareForwardBoxFill } from 'react-icons/ri';
-import { BsCopy } from 'react-icons/bs';
+import { BsCopy, BsCheck, BsCheckAll } from 'react-icons/bs';
 import toast from 'react-hot-toast';
-import { BsCheck, BsCheckAll } from 'react-icons/bs';
 import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
+// import { FaFileAlt } from "react-icons/fa";
+import { LuDownload } from "react-icons/lu";
+import { HiDotsHorizontal } from 'react-icons/hi';
+
 
 export const SenderMessage = ({
   msg,
@@ -24,15 +28,22 @@ export const SenderMessage = ({
   setPreviewMedia,
   setIsImagePreview,
 }) => {
-  const { userData: user } = useSelector((state) => state.AuthUser);
+  // Login User Slice
+  const AuthUserState = useSelector((state) => state.AuthUser || {});
+  const { userData: user } = AuthUserState;
+
   const onlineUsers = useSelector(selectOnlineUsers);
 
   const receiverId = msg.receiverId?._id || msg.receiverId;
   const seenBy = msg.seenBy || [];
   const isSeen = seenBy.includes(receiverId);
   const isReceiverOnline = onlineUsers.includes(receiverId);
+  // console.log('receiverId --->Messageui/SenderMessage', receiverId);
+  // console.log('seenBy --->Messageui/SenderMessage', seenBy);
+  // console.log('isSeen --->Messageui/SenderMessage', isSeen);
+  // console.log('isReceiverOnline --->Messageui/SenderMessage', isReceiverOnline);
 
-  // ✅ Tick logic
+  // ✅Tick logic
   let tickIcon = <BsCheck className="text-gray-500" />; // Sent
   if (isSeen) {
     tickIcon = <BsCheckAll className="text-blue-500" />; // Seen
@@ -73,17 +84,40 @@ export const SenderMessage = ({
                 {(isImage || isImageBase64) &&
                   Array.isArray(msg.content) &&
                   msg.content.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt={`sent-img-${i}`}
-                      className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                      onClick={() => {
-                        setPreviewMedia(url);
-                        setIsImagePreview(true);
-                      }}
-                    />
+                    <div key={i} className="relative inline-block mt-2">
+                      <img
+                        src={url}
+                        alt={`sent-img-${i}`}
+                        className="max-h-48 rounded-lg border cursor-pointer"
+                        onClick={() => {
+                          setPreviewMedia(url);
+                          setIsImagePreview(true);
+                        }}
+                      />
+
+                      {/* Icon Container */}
+                      <div className="absolute bottom-2 right-2 flex gap-2">
+                        {/* Download Icon */}
+                        <a
+                          href={url}
+                          download={`image-${i + 1}`}
+                          className="bg-white p-1 rounded-full shadow-md cursor-pointer"
+                          onClick={(e) => e.stopPropagation()} // prevent preview
+                        >
+                          <LuDownload className="text-black text-lg" />
+                        </a>
+
+                        {/* Horizontal Dots Icon */}
+                        <button
+                          className="bg-white p-1 rounded-full shadow-md cursor-pointer"
+                          onClick={(e) => e.stopPropagation()} // prevent preview
+                        >
+                          <HiDotsHorizontal className="text-black text-lg" />
+                        </button>
+                      </div>
+                    </div>
                   ))}
+
 
                 {/* Files */}
                 {(isFile || isFileBase64) &&
@@ -173,7 +207,6 @@ export const ReceiverMessage = ({
   let senderName = '';
   const senderId = typeof msg.senderId === 'object' ? msg.senderId._id : msg.senderId;
 
-  // ✅ Group users માંથી sender શોધવાનું સુધારેલું logic
   if (groupUsers?.length) {
     const foundUser = groupUsers.find((u) => {
       const uid = u?.user?._id || u?.user?.userId;
@@ -185,12 +218,10 @@ export const ReceiverMessage = ({
     }
   }
 
-  // Fallback to receiver if not found in group users
   if (!senderName && receiver) {
     senderName = `${receiver.firstname || ''} ${receiver.lastname || ''}`.trim();
   }
 
-  // Final fallback
   if (!senderName) {
     senderName = 'Unknown User';
   }
@@ -202,7 +233,6 @@ export const ReceiverMessage = ({
   const isSeen = seenBy.includes(receiverId);
   const isReceiverOnline = onlineUsers.includes(receiverId);
 
-  // ✅ Tick logic
   let tickIcon = <BsCheck className="text-gray-500" />;
   if (isSeen) {
     tickIcon = <BsCheckAll className="text-blue-500" />;
@@ -265,16 +295,28 @@ export const ReceiverMessage = ({
                   (isImage || isImageBase64) &&
                   Array.isArray(msg.content) &&
                   msg.content.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt={`received-img-${i}`}
-                      className="mt-2 max-h-48 rounded-lg border cursor-pointer"
-                      onClick={() => {
-                        setPreviewMedia(url);
-                        setIsImagePreview(true);
-                      }}
-                    />
+                    <div key={i} className="relative inline-block mt-2">
+                      <img
+                        src={url}
+                        alt={`received-img-${i}`}
+                        className="max-h-48 rounded-lg border cursor-pointer"
+                        onClick={() => {
+                          setPreviewMedia(url);
+                          setIsImagePreview(true);
+                        }}
+                      />
+
+
+                      {/* Download Icon */}
+                      <a
+                        href={url}
+                        download={`image-${i + 1}`}
+                        className="absolute bottom-2 right-2 bg-white p-1 rounded-full shadow-md cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <LuDownload className="text-black text-lg" />
+                      </a>
+                    </div>
                   ))}
 
                 {/* File Preview */}
@@ -342,6 +384,7 @@ export const ReceiverMessage = ({
     </div>
   );
 };
+
 
 
 //dot menu
