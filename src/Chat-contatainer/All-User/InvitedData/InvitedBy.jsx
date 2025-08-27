@@ -13,12 +13,10 @@ const InvitedByUser = () => {
     //invited user data slice
     const { invitedBy, loading, isLoaded } = useSelector((state) => state.invitedUsers);
 
-    {/*slice call in invited User data*/ }
+    // Fix: Remove isLoaded check and always call API when debouncedSearch changes
     useEffect(() => {
-        if (!isLoaded) {
-            dispatch(fetchInvitedUsers(debouncedSearch));
-        }
-    }, [dispatch, debouncedSearch, isLoaded]);
+        dispatch(fetchInvitedUsers(debouncedSearch));
+    }, [dispatch, debouncedSearch]);
 
     // Mobile Card Skeleton Component
     const MobileCardSkeleton = () => (
@@ -108,44 +106,44 @@ const InvitedByUser = () => {
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="80%"
-                    height={16}
+                    width={80}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="90%"
-                    height={16}
+                    width={120}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="50%"
-                    height={16}
+                    width={50}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="70%"
-                    height={16}
+                    width={70}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="75%"
-                    height={16}
+                    width={75}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="85%"
-                    height={16}
+                    width={70}
+                    height={30}
                 />
             </td>
             <td className="py-2 px-4">
                 <SkeletonLoader
-                    width="55%"
-                    height={16}
+                    width={80}
+                    height={30}
                 />
             </td>
         </tr>

@@ -19,7 +19,7 @@ const onlineUsersSlice = createSlice({
 });
 
 export const { setOnlineUsers, clearOnlineUsers } = onlineUsersSlice.actions;
-console.log("✌️setOnlineUsers --->", setOnlineUsers);
+console.log("setOnlineUsers --->", setOnlineUsers);
 
 export const selectOnlineUsers = (state) => state.onlineUsers.users;
 

@@ -24,7 +24,8 @@ const InvitedUser = ({ onChat }) => {
 
     // slice api call and store data
     useEffect(() => {
-        if (!fetchedFilters[tab]) {
+        // Always fetch when search query changes or filter hasn't been fetched
+        if (!fetchedFilters[tab] || debouncedSearchQuery) {
             console.log('📤 Dispatching fetch for:', tab, 'with search:', debouncedSearchQuery);
             dispatch(fetchFilteredInvitedUsers({ filter: tab, searchQuery: debouncedSearchQuery }));
         }
@@ -33,7 +34,7 @@ const InvitedUser = ({ onChat }) => {
     // Clear search when tab changes
     useEffect(() => {
         dispatch(setSearchQuery(''));
-    }, [tab]);
+    }, [tab, dispatch]);
 
     const getStatusLabel = (invite) => {
         if (invite.user === null && invite.invited_is_Confirmed === true) return 'Verified';
@@ -97,7 +98,7 @@ const InvitedUser = ({ onChat }) => {
     const TableSkeletonRow = () => (
         <tr className="hover:bg-gray-50">
             <td className="py-3 px-4">
-                <SkeletonLoader width="70%" height={16} />
+                <SkeletonLoader width={80} height={30} />
             </td>
             <td className="py-3 px-4">
                 <div className="space-y-1">
@@ -180,9 +181,8 @@ const InvitedUser = ({ onChat }) => {
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => {
                                     dispatch(setFilter(type));
-                                    if (!fetchedFilters[type]) {
-                                        dispatch(fetchFilteredInvitedUsers({ filter: type, searchQuery: debouncedSearchQuery }));
-                                    }
+                                    // Reset fetched filter to ensure fresh data on tab change
+                                    dispatch(resetFetchedFilter(type));
                                 }}
                                 className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors duration-300 text-sm sm:text-base flex-1 sm:flex-none min-w-fit ${tab === type ? activeGradient[type] : inactive[type]
                                     }`}
@@ -198,7 +198,7 @@ const InvitedUser = ({ onChat }) => {
             <div className="block sm:hidden flex-1 overflow-y-auto">
                 <div className="space-y-3 pb-4">
                     {loading ? (
-                        // Mobile Skeleton Loading
+                        // Mobile Skeleton Loading - Fixed condition
                         Array.from({ length: 5 }, (_, index) => (
                             <MobileCardSkeleton key={`mobile-skeleton-${index}`} />
                         ))
@@ -263,7 +263,7 @@ const InvitedUser = ({ onChat }) => {
                     ) : (
                         <div className="text-center py-8 text-gray-500">
                             <div className="text-4xl mb-3">📭</div>
-                            <p>No {tab} invited users found.</p>
+                            <p>No {tab} invited users found{searchQuery && ` for "${searchQuery}"`}.</p>
                         </div>
                     )}
                 </div>
@@ -293,7 +293,7 @@ const InvitedUser = ({ onChat }) => {
                         </thead>
                         <tbody className="divide-y h-20 overflow-y-auto divide-gray-200">
                             {loading ? (
-                                // Desktop Table Skeleton Loading
+                                // Desktop Table Skeleton Loading - Fixed condition
                                 Array.from({ length: 5 }, (_, index) => (
                                     <TableSkeletonRow key={`table-skeleton-${index}`} />
                                 ))
@@ -361,7 +361,7 @@ const InvitedUser = ({ onChat }) => {
                                 <tr>
                                     <td className="p-8 text-center text-gray-500" colSpan={7}>
                                         <div className="text-4xl mb-3">📭</div>
-                                        <p>No {tab} invited users found.</p>
+                                        <p>No {tab} invited users found{searchQuery && ` for "${searchQuery}"`}.</p>
                                     </td>
                                 </tr>
                             )}
