@@ -8,6 +8,7 @@ import {
     setSearchQuery,
     resetFetchedFilter,
 } from '../../../feature/Slice/Invited-User/FilteredInvitedUsers';
+import SkeletonLoader from "../../../Public Page/SkeletonLoader";
 
 const InvitedUser = ({ onChat }) => {
     const dispatch = useDispatch();
@@ -58,6 +59,73 @@ const InvitedUser = ({ onChat }) => {
             default: return 'bg-gray-100 text-gray-800';
         }
     };
+
+    // Mobile Card Skeleton Component
+    const MobileCardSkeleton = () => (
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm space-y-3">
+            <div className="flex justify-between items-start">
+                <div className="flex-1 min-w-0 space-y-2">
+                    <SkeletonLoader width="80%" height={16} />
+                    <SkeletonLoader width="40%" height={14} />
+                </div>
+                <SkeletonLoader width={80} height={28} borderRadius="6px" />
+            </div>
+            <div className="space-y-2">
+                <SkeletonLoader width="30%" height={12} />
+                <SkeletonLoader count={2} height={14} />
+            </div>
+            {tab === 'pending' && (
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                        <SkeletonLoader width="50%" height={12} />
+                        <SkeletonLoader width="70%" height={14} />
+                    </div>
+                    <div className="space-y-1">
+                        <SkeletonLoader width="60%" height={12} />
+                        <SkeletonLoader width="50%" height={14} />
+                    </div>
+                    <div className="col-span-2 space-y-1">
+                        <SkeletonLoader width="40%" height={12} />
+                        <SkeletonLoader width="80%" height={14} />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
+    // Desktop Table Skeleton Row Component
+    const TableSkeletonRow = () => (
+        <tr className="hover:bg-gray-50">
+            <td className="py-3 px-4">
+                <SkeletonLoader width="70%" height={16} />
+            </td>
+            <td className="py-3 px-4">
+                <div className="space-y-1">
+                    <SkeletonLoader width="90%" height={14} />
+                    <SkeletonLoader width="60%" height={14} />
+                </div>
+            </td>
+            {tab === 'pending' && (
+                <>
+                    <td className="py-3 px-4">
+                        <SkeletonLoader width="80%" height={16} />
+                    </td>
+                    <td className="py-3 px-4">
+                        <SkeletonLoader width="50%" height={16} />
+                    </td>
+                    <td className="py-3 px-4">
+                        <SkeletonLoader width="70%" height={16} />
+                    </td>
+                </>
+            )}
+            <td className="py-3 px-4">
+                <SkeletonLoader width={80} height={24} borderRadius="12px" />
+            </td>
+            <td className="py-3 px-4">
+                <SkeletonLoader width={100} height={32} borderRadius="8px" />
+            </td>
+        </tr>
+    );
 
     return (
         <div className="h-screen flex flex-col p-2 sm:p-4">
@@ -129,7 +197,12 @@ const InvitedUser = ({ onChat }) => {
             {/* Mobile Card View */}
             <div className="block sm:hidden flex-1 overflow-y-auto">
                 <div className="space-y-3 pb-4">
-                    {!loading && filteredUsers.length > 0 ? (
+                    {loading ? (
+                        // Mobile Skeleton Loading
+                        Array.from({ length: 5 }, (_, index) => (
+                            <MobileCardSkeleton key={`mobile-skeleton-${index}`} />
+                        ))
+                    ) : filteredUsers.length > 0 ? (
                         filteredUsers.map((invite, i) => {
                             const status = getStatusLabel(invite);
                             const statusColor = getStatusColor(status);
@@ -187,14 +260,10 @@ const InvitedUser = ({ onChat }) => {
                                 </motion.div>
                             );
                         })
-                    ) : loading ? (
-                        <div className="text-center py-8">
-                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                            <p className="mt-2 text-gray-500">Loading...</p>
-                        </div>
                     ) : (
                         <div className="text-center py-8 text-gray-500">
-                            No {tab} invited users found.
+                            <div className="text-4xl mb-3">📭</div>
+                            <p>No {tab} invited users found.</p>
                         </div>
                     )}
                 </div>
@@ -223,7 +292,12 @@ const InvitedUser = ({ onChat }) => {
                             </tr>
                         </thead>
                         <tbody className="divide-y h-20 overflow-y-auto divide-gray-200">
-                            {!loading && filteredUsers.length > 0 ? (
+                            {loading ? (
+                                // Desktop Table Skeleton Loading
+                                Array.from({ length: 5 }, (_, index) => (
+                                    <TableSkeletonRow key={`table-skeleton-${index}`} />
+                                ))
+                            ) : filteredUsers.length > 0 ? (
                                 filteredUsers.map((invite, i) => {
                                     const status = getStatusLabel(invite);
                                     const statusBadge = getStatusBadgeColor(status);
@@ -283,15 +357,6 @@ const InvitedUser = ({ onChat }) => {
                                         </motion.tr>
                                     );
                                 })
-                            ) : loading ? (
-                                <tr>
-                                    <td className="p-8 text-center" colSpan={7}>
-                                        <div className="flex justify-center items-center">
-                                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mr-3"></div>
-                                            Loading...
-                                        </div>
-                                    </td>
-                                </tr>
                             ) : (
                                 <tr>
                                     <td className="p-8 text-center text-gray-500" colSpan={7}>

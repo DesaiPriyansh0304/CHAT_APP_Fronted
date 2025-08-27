@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchInvitedUsers } from '../../../feature/Slice/Invited-User/InvitedUsersSlice';
 import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
+import SkeletonLoader from "../../../Public Page/SkeletonLoader";
 
 const InvitedByUser = () => {
     const dispatch = useDispatch();
@@ -18,6 +19,137 @@ const InvitedByUser = () => {
             dispatch(fetchInvitedUsers(debouncedSearch));
         }
     }, [dispatch, debouncedSearch, isLoaded]);
+
+    // Mobile Card Skeleton Component
+    const MobileCardSkeleton = () => (
+        <div className="bg-white border border-blue-200 rounded-lg p-4 shadow-sm">
+            {/* Profile Header Skeleton */}
+            <div className="flex items-center space-x-3 mb-3">
+                <div className="flex-shrink-0">
+                    <SkeletonLoader
+                        width={48}
+                        height={48}
+                        circle={true}
+                    />
+                </div>
+                <div className="flex-1 min-w-0 space-y-2">
+                    <SkeletonLoader
+                        width="70%"
+                        height={18}
+                    />
+                    <SkeletonLoader
+                        width="85%"
+                        height={14}
+                    />
+                    <SkeletonLoader
+                        width={60}
+                        height={20}
+                        borderRadius="12px"
+                    />
+                </div>
+            </div>
+
+            {/* User Details Grid Skeleton */}
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                    <SkeletonLoader
+                        width="50%"
+                        height={12}
+                    />
+                    <SkeletonLoader
+                        width="40%"
+                        height={16}
+                    />
+                </div>
+                <div className="space-y-1">
+                    <SkeletonLoader
+                        width="45%"
+                        height={12}
+                    />
+                    <SkeletonLoader
+                        width="75%"
+                        height={16}
+                    />
+                </div>
+                <div className="col-span-2 space-y-1">
+                    <SkeletonLoader
+                        width="60%"
+                        height={12}
+                    />
+                    <SkeletonLoader
+                        width="50%"
+                        height={16}
+                    />
+                </div>
+                <div className="col-span-2 space-y-1">
+                    <SkeletonLoader
+                        width="30%"
+                        height={12}
+                    />
+                    <SkeletonLoader
+                        count={2}
+                        height={14}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+
+    // Desktop Table Skeleton Row Component
+    const TableSkeletonRow = () => (
+        <tr className="border-t hover:bg-blue-50">
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width={40}
+                    height={40}
+                    circle={true}
+
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="80%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="90%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="50%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="70%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="75%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="85%"
+                    height={16}
+                />
+            </td>
+            <td className="py-2 px-4">
+                <SkeletonLoader
+                    width="55%"
+                    height={16}
+                />
+            </td>
+        </tr>
+    );
 
     return (
         <div className="p-2 sm:p-4">
@@ -52,10 +184,10 @@ const InvitedByUser = () => {
             {/* Mobile Card View (visible on small screens) */}
             <div className="block sm:hidden space-y-4">
                 {loading ? (
-                    <div className="text-center py-8">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                        <p className="mt-2 text-blue-500">Loading...</p>
-                    </div>
+                    // Mobile Skeleton Loading
+                    Array.from({ length: 4 }, (_, index) => (
+                        <MobileCardSkeleton key={`mobile-skeleton-${index}`} />
+                    ))
                 ) : invitedBy.length > 0 ? (
                     invitedBy.map((user, i) => (
                         <motion.div
@@ -155,14 +287,10 @@ const InvitedByUser = () => {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr>
-                                <td colSpan="8" className="text-center py-8">
-                                    <div className="flex justify-center items-center">
-                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-2"></div>
-                                        <span className="text-blue-500">Loading...</span>
-                                    </div>
-                                </td>
-                            </tr>
+                            // Desktop Table Skeleton Loading
+                            Array.from({ length: 5 }, (_, index) => (
+                                <TableSkeletonRow key={`table-skeleton-${index}`} />
+                            ))
                         ) : invitedBy.length > 0 ? (
                             invitedBy.map((user, i) => (
                                 <motion.tr
