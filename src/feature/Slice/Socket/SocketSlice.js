@@ -68,7 +68,7 @@ export const connectSocket = (user) => (dispatch) => {
     dispatch(setSocket(socketInstance));
     dispatch(setConnectionStatus(true));
 
-    // 🆕 Connection true - chat list fetch
+    // Connection true - chat list fetch
     console.log("📋 Requesting chat list after connection...");
     socketInstance.emit("getChatList");
   });
@@ -88,6 +88,7 @@ export const connectSocket = (user) => (dispatch) => {
     console.log("🔴Socket disconnected/SocketSlice");
     dispatch(setConnectionStatus(false));
   });
+
   //Online User Id
   socketInstance.on("getOnlineUsers", (userIds) => {
     // console.log(
@@ -103,7 +104,7 @@ export const connectSocket = (user) => (dispatch) => {
     dispatch(setUnreadCount(data));
   });
 
-  // 🆕 Chat List Events
+  //Chat List Events
   socketInstance.on("chatListResponse", (data) => {
     console.log("📋 Chat list response received:/SocketSlice", data);
 
@@ -114,11 +115,7 @@ export const connectSocket = (user) => (dispatch) => {
           totalChats: data.totalChats,
         })
       );
-      console.log(
-        "✅ Chat list loaded successfully:",
-        data.totalChats,
-        "chats"
-      );
+      console.log("Chat list loaded successfully:", data.totalChats, "chats");
     } else {
       dispatch(setChatListError(data.error || "Failed to fetch chat list"));
       console.log("Chat list fetch error:", data.error);

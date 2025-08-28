@@ -27,7 +27,7 @@ export const fetchInvitedUsers = createAsyncThunk(
         invitedBy: data.data.invitedBy || [],
       };
     } catch (err) {
-      console.error(err);
+      console.log(err);
       return rejectWithValue("Network error");
     }
   }

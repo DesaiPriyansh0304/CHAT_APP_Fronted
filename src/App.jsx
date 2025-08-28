@@ -7,6 +7,7 @@ import { initializeTheme } from './feature/Slice/Theme/ThemeSlice';
 import AppRouter from './Router/AppRouter';
 //GoogleAuthProvider
 import GoogleAuthProvider from './providers/GoogleAuthProvider';
+// import { useTranslation } from 'react-i18next';
 
 function App() {
 
@@ -25,10 +26,14 @@ function App() {
     }
   }, [theme]);
 
+  // const { t } = useTranslation()
+
+
   return (
     <>
       <GoogleAuthProvider>
         <Router>
+          {/* <h1 className="text-xl">{t("greeting")}</h1> */}
           <AppRouter />
         </Router>
       </GoogleAuthProvider>

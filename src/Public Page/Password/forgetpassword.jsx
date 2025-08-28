@@ -73,7 +73,7 @@ function ForgetPassword() {
       toast.success(res.data.message || 'OTP sent successfully!');
       navigate('/reset-password', { state: { email } }); // pass email to next page
     } catch (error) {
-      console.error('Forget Password Error:', error);
+      console.log('Forget Password Error:', error);
 
       // Handle different types of errors
       let errorMessage = 'Something went wrong. Please try again.';

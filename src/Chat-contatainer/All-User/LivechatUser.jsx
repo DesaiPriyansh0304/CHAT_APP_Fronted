@@ -4,6 +4,7 @@ import { fetchInvitedUsers } from '../../feature/Slice/Invited-User/InvitedUsers
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import SkeletonLoader from "../../Public Page/SkeletonLoader";
+import { TbMessageSearch } from 'react-icons/tb';
 
 const LiveChatUser = () => {
     const dispatch = useDispatch();
@@ -201,12 +202,15 @@ const LiveChatUser = () => {
 
             <div className="mb-6">
                 <div className="relative w-full sm:max-w-md">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg sm:text-xl">
+                        <TbMessageSearch />
+                    </span>
                     <input
                         type="text"
                         placeholder="Search by name or email..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="px-4 py-2 border border-purple-300 rounded-md w-full outline-none focus:ring-2 focus:ring-purple-400 pr-10"
+                        className="pl-10 sm:pl-14 px-4 py-2 border border-purple-300 rounded-md w-full outline-none focus:ring-2 focus:ring-purple-400 pr-10"
                     />
                     {search && (
                         <button

@@ -114,7 +114,7 @@ const unreadMessageSlice = createSlice({
       .addCase(markMessagesAsRead.rejected, (state, action) => {
         state.markingRead = false;
         state.error = action.payload || "Failed to mark messages as read";
-        console.error("❌ Error marking messages as read:", action.payload);
+        console.log("❌ Error marking messages as read:", action.payload);
       });
   },
 });

@@ -33,7 +33,7 @@ export const fetchChatHistory = createAsyncThunk(
         currentGroupId: groupId || null,
       };
     } catch (error) {
-      console.error("Fetch chat history error:", error);
+      console.log("Fetch chat history error:", error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -240,7 +240,7 @@ const chatHistorySlice = createSlice({
       .addCase(fetchChatHistory.rejected, (state, action) => {
         state.error = action.payload;
         state.loadingHistory = false;
-        console.error("❌ Failed to load messages:", action.payload);
+        console.log("❌ Failed to load messages:", action.payload);
       });
   },
 });

@@ -66,7 +66,7 @@ const AddMemberModal = ({ groupId, onClose, onMembersAdded, existingMemberIds })
                 onClose();
             }
         } catch (error) {
-            console.error('Error adding members:', error);
+            console.log('Error adding members:', error);
         } finally {
             setLoading(false);
         }

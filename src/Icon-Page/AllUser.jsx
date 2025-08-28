@@ -112,7 +112,7 @@ function AllUser() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.4 }}
-        className="bg-white dark:bg-gray-800 dark:text-white rounded-2xl p-6 shadow-md min-h-[300px]"
+        className="bg-white dark:bg-gray-800 dark:text-white rounded-2xl p-6 shadow-md min-h-[70vh]"
       >
         {activeTab === 'invited' && <InvitedData handleChat={handleChat} />}
         {activeTab === 'other' && user?.isAdmin && <OtherUser onChat={handleChat} />}

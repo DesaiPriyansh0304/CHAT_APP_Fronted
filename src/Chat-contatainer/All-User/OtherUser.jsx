@@ -5,6 +5,7 @@ import { useDebounce } from 'use-debounce';
 import { useSelector } from 'react-redux';
 import { selectOnlineUsers } from '../../feature/Slice/Socket/OnlineuserSlice';
 import SkeletonLoader from "../../Public Page/SkeletonLoader";
+import { TbWorldSearch } from "react-icons/tb";
 
 const OtherUser = ({ onChat }) => {
     const [users, setUsers] = useState([]);
@@ -110,7 +111,7 @@ const OtherUser = ({ onChat }) => {
 
     // Mobile Card Skeleton Component
     const MobileCardSkeleton = () => (
-        <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+        <div className="bg-white  border border-gray-300 rounded-lg p-4 shadow-sm">
             {/* Profile Header Skeleton */}
             <div className="flex items-center space-x-3 mb-3">
                 <div className="flex-shrink-0">
@@ -240,12 +241,15 @@ const OtherUser = ({ onChat }) => {
                 </h2>
 
                 <div className="relative w-full sm:max-w-xs">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg sm:text-xl">
+                        <TbWorldSearch />
+                    </span>
                     <input
                         type="text"
                         placeholder="Search by name or email..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded w-full shadow-sm pr-10"
+                        className="pl-10 sm:pl-14 px-4 py-2 border border-green-300 rounded w-full shadow-sm pr-10"
                     />
                     {search && (
                         <button
@@ -354,7 +358,7 @@ const OtherUser = ({ onChat }) => {
             </div>
 
             {/* Desktop Table View (hidden on small screens) */}
-            <div className="hidden sm:block overflow-x-auto rounded-lg shadow">
+            <div className="hidden sm:block h-[60vh] overflow-auto rounded-lg shadow cursor-pointer">
                 <table className="min-w-full border border-gray-300 overflow-hidden rounded-lg">
                     <thead className="bg-gradient-to-r from-green-400 to-blue-400 text-white">
                         <tr>

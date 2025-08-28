@@ -27,7 +27,7 @@ export const fetchUnreadMessages = createAsyncThunk(
 
       return { chatWiseCount, totalCount };
     } catch (error) {
-      console.error("❌ Error fetching unread messages:", error);
+      console.log("❌ Error fetching unread messages:", error);
       return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
@@ -54,11 +54,11 @@ export const markMessagesAsRead = createAsyncThunk(
 
         return { receiverId };
       } else {
-        console.error("❌ Socket not connected");
+        console.log("❌ Socket not connected");
         return rejectWithValue("Socket not connected");
       }
     } catch (error) {
-      console.error("❌ Error marking messages as read:", error);
+      console.log("❌ Error marking messages as read:", error);
       return rejectWithValue(error.message);
     }
   }
@@ -167,7 +167,7 @@ const unreadCountSlice = createSlice({
       .addCase(fetchUnreadMessages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch unread messages";
-        console.error("❌ Failed to fetch unread messages:", action.payload);
+        console.log("❌ Failed to fetch unread messages:", action.payload);
       })
       // markMessagesAsRead cases
       .addCase(markMessagesAsRead.pending, (state) => {
@@ -190,7 +190,7 @@ const unreadCountSlice = createSlice({
       })
       .addCase(markMessagesAsRead.rejected, (state, action) => {
         state.error = action.payload || "Failed to mark messages as read";
-        console.error("❌ Failed to mark messages as read:", action.payload);
+        console.log("❌ Failed to mark messages as read:", action.payload);
       });
   },
 });

@@ -92,9 +92,11 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   // Login User Slice
   const AuthUserState = useSelector((state) => state.AuthUser || {});
   const { userData: user } = AuthUserState;
+
   //chatHistory Slice
   const chatHistoryState = useSelector((state) => state.chatHistory || {});
   const { messages, loadingHistory, currentPage, totalPages, sender, receiver, groupUsers } = chatHistoryState;
+
   //Socket Slice
   const socketState = useSelector((state) => state.socket || {});
   const { socket, isConnected } = socketState;
@@ -119,6 +121,11 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     [selectGroup]
   );
 
+  // Profile panel click handler
+  const handleProfileClick = useCallback(() => {
+    setShowProfilePanel(prev => !prev);
+  }, []);
+
   //Initialize chat when user or chat selection changes
   useEffect(() => {
     if (!user || (!selectUser && !selectGroup)) return;
@@ -131,7 +138,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     setMessage('');
     setShowEmojiPicker(false);
 
-    // ✅ સુધારેલું openChatWith event
+    // openChatWith event
     const chatData = selectGroup
       ? {
         userId: currentUserId,
@@ -149,7 +156,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     console.log('📡 Emitting openChatWith:', chatData);
     socket?.emit('openChatWith', chatData);
 
-    // ✅ Group માટે joinGroup event પણ emit કરો
+    //Group joinGroup event  emit 
     if (selectGroup) {
       console.log('👥 Joining group:', selectGroup._id);
       socket?.emit('joinGroup', { groupId: selectGroup._id });
@@ -167,9 +174,8 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
 
   }, [selectUser, selectGroup, user, dispatch, socket, currentUserId]);
 
-  /**
-   * Mark messages as read and reset unread count
-   */
+
+  // Mark messages as read and reset unread count
   useEffect(() => {
     if (!currentChatId || !socket || !user) return;
 
@@ -198,19 +204,17 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
 
   }, [currentChatId, socket, selectUser, selectGroup, currentUserId, dispatch]);
 
-  /**
-   * Handle emoji selection
-   */
+
+  // Handle emoji selection
   useEffect(() => {
     if (emoji) {
       setMessage((prev) => prev + emoji);
-      setEmoji(''); // Reset emoji after adding
+      setEmoji('');
     }
   }, [emoji]);
 
-  /**
-   * Connect to socket when user is available
-   */
+
+  // Connect to socket when user is available
   useEffect(() => {
     if (!user?._id) return;
 
@@ -226,9 +230,8 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     };
   }, [user, dispatch]);
 
-  /**
-   * Handle typing indicator - ✅ Group typing માટે પણ support add કર્યું
-   */
+
+  // Group Handle typing indicator 
   useEffect(() => {
     if (!socket) return;
 
@@ -241,12 +244,12 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     const handleGroupTyping = ({ senderId, isTyping: typing }) => {
       if (selectGroup && senderId !== currentUserId) {
         setIsTyping(typing);
-        // ✅ Group માં multiple users typing show કરવા માટે અહીં extend કરી શકાય
+        //Group multiple users typing show extend 
       }
     };
 
     socket.on('typing', handleTyping);
-    socket.on('groupTyping', handleGroupTyping); // ✅ Group typing event add કર્યું
+    socket.on('groupTyping', handleGroupTyping); //  Group typing event add 
 
     return () => {
       socket.off('typing', handleTyping);
@@ -254,13 +257,10 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     };
   }, [socket, selectUser, selectGroup, currentUserId]);
 
-  /**
-   * ✅ Deprecated: Join group logic moved to initialization
-   */
 
-  /**
-   * Handle incoming messages - ✅ મુખ્ય fix અહીં છે
-   */
+
+
+  // Handle incoming messages 
   useEffect(() => {
     if (!socket || !user) return;
 
@@ -285,17 +285,16 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
         return;
       }
 
-      // ✅ Group ID matching સુधારી
+      // Group ID matching
       const currentGroupId = String(selectGroup?._id || '');
 
       if (selectGroup && messageGroupId === currentGroupId) {
         const messageObj = createMessageObject(data, messageId);
-        console.log('✅ Adding group message to UI:', messageObj);
+        console.log('Adding group message to UI:', messageObj);
 
         dispatch(addOwnMessage(messageObj));
         setSentMessageIds(prev => new Set([...prev, messageId]));
 
-        // ✅ Group message received તો typing indicator બંધ કરો
         if (senderId !== currentUserId) {
           setIsTyping(false);
         }
@@ -334,7 +333,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
         dispatch(addOwnMessage(messageObj));
         setSentMessageIds(prev => new Set([...prev, messageId]));
 
-        // Private message received તો typing indicator બંધ કરો
+        // Private message received typing indicator stop
         setIsTyping(false);
       } else {
         console.log('📝 Message for different chat, updating unread count');
@@ -351,16 +350,14 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     };
   }, [socket, dispatch, currentUserId, selectUser, selectGroup, sentMessageIds]);
 
-  /**
-   * Auto scroll to bottom when new messages arrive
-   */
+
+  // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     scrollEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /**
-   * Create standardized message object - ✅ Group support સુધારી
-   */
+
+  // Create standardized message object 
   const createMessageObject = useCallback((data, messageId) => {
     const contentArray = Array.isArray(data.content)
       ? data.content
@@ -375,15 +372,13 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
       image: data.type === 'image' ? contentArray[0] : data.image || '',
       file: data.type === 'file' ? contentArray[0] : data.file || '',
       createdAt: data.createdAt || new Date().toISOString(),
-      // ✅ Group message flag properly set કરો
       isGroupMessage: data.isGroupMessage || Boolean(data.groupId),
-      groupId: data.groupId, // ✅ Group ID preserve કરો
+      groupId: data.groupId,
     };
   }, []);
 
-  /**
-   * Handle typing with debounce - ✅ Group typing support add કર્યું
-   */
+
+  // Handle typing with debounce - Group typing 
   const handleTyping = useCallback((e) => {
     const value = e.target.value;
     setMessage(value);
@@ -416,9 +411,8 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     }, 2000);
   }, [socket, typing, selectUser, selectGroup]);
 
-  /**
-   * Fetch older messages for pagination
-   */
+
+  // Fetch older messages for pagination(History)
   const handleFetchOlderMessages = useCallback(async () => {
     if (loadingHistory || currentPage >= totalPages) return;
 
@@ -431,9 +425,8 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     await dispatch(fetchChatHistory(payload));
   }, [loadingHistory, currentPage, totalPages, selectGroup, currentUserId, selectUser, dispatch]);
 
-  /**
-   * Send message handler - ✅ Group message debugging improve કર્યું
-   */
+
+  // Send message handler -  Group message 
   const handleSendMessage = useCallback((e) => {
     e.preventDefault();
 
@@ -448,7 +441,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
     }
 
     if (!socket) {
-      console.error('🚫 Socket not connected');
+      console.log('🚫 Socket not connected');
       return;
     }
 
@@ -477,7 +470,7 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
       type: payload.type,
       createdAt: new Date().toISOString(),
       senderId: currentUserId,
-      isGroupMessage: isGroupChat, // ✅ Group flag set કરો
+      isGroupMessage: isGroupChat,
       ...(isGroupChat
         ? { groupId: selectGroup._id }
         : { receiverId: selectUser._id }
@@ -539,111 +532,114 @@ const RightSidebar = ({ selectUser, selectGroup, isMobile, onMobileBack }) => {
   // Render empty state when no chat is selected
   if (!selectUser && !selectGroup) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-blue-700 px-4 text-center bg-gray-50 dark:bg-[#36404A]">
-        <div className="">
-          <div className="w-24 h-24 bg-gray-100 dark:bg-sky-200 rounded-full flex items-center justify-center mb-4 mx-auto">
-            <svg
-              className="w-12 h-12 text-gray-400 dark:text-sky-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
+      <>
+        <div className="flex flex-col items-center justify-center h-full text-blue-700 px-4 text-center bg-gray-50 dark:bg-[#36404A]">
+          <div className="">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-sky-200 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <svg
+                className="w-12 h-12 text-gray-400 dark:text-sky-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-sky-400">No chat selected</h2>
+            <p className="text-sm text-gray-600 dark:text-white max-w-xs ">
+              Please select a conversation from the sidebar to start chatting.
+            </p>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-sky-400">No chat selected</h2>
-          <p className="text-sm text-gray-600 dark:text-white max-w-xs ">
-            Please select a conversation from the sidebar to start chatting.
-          </p>
         </div>
-      </div>
+      </>
     );
   }
 
-  // Main chat interface
+  // Main chat interface in body(Header + ChatBody + Inputsidebar)
   return (
-    <div className="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden">
-      <div className={`flex flex-col h-full transition-all duration-300 ${showProfilePanel ? 'w-[60%]' : 'w-full'
-        }`}>
-        {/* Chat Header */}
-        <Header
-          selectUser={selectUser}
-          selectGroup={selectGroup}
-          user={user}
-          setShowProfilePanel={setShowProfilePanel}
-          showProfilePanel={showProfilePanel}
-          isTyping={isTyping}
-          isMobile={isMobile}
-          onMobileBack={onMobileBack}
-          isConnected={isConnected}
-        />
+    <>
+      <div className="flex flex-col h-full bg-white border-l border-gray-200 overflow-hidden">
+        <div className={`flex flex-col h-full transition-all duration-300 ${showProfilePanel ? 'w-[60%]' : 'w-full'
+          }`}>
+          {/* Chat Header */}
+          <Header
+            selectUser={selectUser}
+            selectGroup={selectGroup}
+            user={user}
+            onProfileClick={handleProfileClick}
+            showProfilePanel={showProfilePanel}
+            isTyping={isTyping}
+            isMobile={isMobile}
+            onMobileBack={onMobileBack}
+            isConnected={isConnected}
+          />
 
-        {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto bg-gray-50">
-          {loadingHistory && (
-            <div className="text-center py-4">
-              <div className="inline-flex items-center space-x-2 text-sm text-gray-500">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
-                <span>Loading more messages...</span>
+          {/* Chat Messages Area */}
+          <div className="flex-1 overflow-y-auto bg-gray-50">
+            {loadingHistory && (
+              <div className="text-center py-4">
+                <div className="inline-flex items-center space-x-2 text-sm text-gray-500">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                  <span>Loading more messages...</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <Chatbody
+            <Chatbody
+              selectUser={selectUser}
+              selectGroup={selectGroup}
+              user={user}
+              scrollEnd={scrollEnd}
+              loadingHistory={loadingHistory}
+              fetchOlderMessages={handleFetchOlderMessages}
+              sender={sender}
+              receiver={receiver}
+              groupUsers={groupUsers}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              messages={messages}
+            />
+          </div>
+
+          {/* Message Input Area */}
+          <Inputside
+            message={message}
+            setMessage={setMessage}
+            handleTyping={handleTyping}
+            handleSendMessage={handleSendMessage}
+            showEmojiPicker={showEmojiPicker}
+            setShowEmojiPicker={setShowEmojiPicker}
+            file={file}
+            setFile={setFile}
+            image={image}
+            setImage={setImage}
+            emoji={emoji}
+            setEmoji={setEmoji}
+            fileName={fileName}
+            setFileName={setFileName}
             selectUser={selectUser}
             selectGroup={selectGroup}
-            user={user}
-            scrollEnd={scrollEnd}
-            loadingHistory={loadingHistory}
-            fetchOlderMessages={handleFetchOlderMessages}
-            sender={sender}
-            receiver={receiver}
-            groupUsers={groupUsers}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            messages={messages}
+            disabled={!isConnected}
           />
         </div>
 
-        {/* Message Input Area */}
-        <Inputside
-          message={message}
-          setMessage={setMessage}
-          handleTyping={handleTyping}
-          handleSendMessage={handleSendMessage}
-          showEmojiPicker={showEmojiPicker}
-          setShowEmojiPicker={setShowEmojiPicker}
-          file={file}
-          setFile={setFile}
-          image={image}
-          setImage={setImage}
-          emoji={emoji}
-          setEmoji={setEmoji}
-          fileName={fileName}
-          setFileName={setFileName}
-          selectUser={selectUser}
-          selectGroup={selectGroup}
-          disabled={!isConnected}
-        />
+        {/* Profile Panel */}
+        {showProfilePanel && (
+          <div className="w-[40%] border-l border-gray-200 bg-white">
+            <RightProfilePanel
+              userData={selectUser || selectGroup}
+              isGroup={Boolean(selectGroup)}
+              onClose={() => setShowProfilePanel(false)}
+            />
+          </div>
+        )}
       </div>
-
-      {/* Profile Panel */}
-      {showProfilePanel && (
-        <div className="w-[40%] border-l border-gray-200 bg-white">
-          <RightProfilePanel
-            selectUser={selectUser}
-            selectGroup={selectGroup}
-            user={user}
-            setShowProfilePanel={setShowProfilePanel}
-          />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 

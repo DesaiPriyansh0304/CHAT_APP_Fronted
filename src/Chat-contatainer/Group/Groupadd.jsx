@@ -147,9 +147,9 @@ const CreateGroupModal = ({ onClose, onGroupCreated }) => {
             setSearchTerm('');
 
             onClose();
-        } catch (err) {
-            console.error('Create Group Error:', err);
-            toast.error(typeof err === 'string' ? err : err?.message || 'Failed to create group');
+        } catch (error) {
+            console.log('Create Group Error:', error);
+            toast.error(typeof err === 'string' ? error : error?.message || 'Failed to create group');
         }
     };
 

@@ -6,6 +6,7 @@ import { toggleTheme } from '../feature/Slice/Theme/ThemeSlice';
 import { topItems, bottomItems, avatarItems, languages } from '../Sidebar/icon';
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { RxCross2 } from "react-icons/rx";
+import i18n from "i18next";
 
 function Sidebar({ isMobile }) {
 
@@ -327,6 +328,8 @@ function Sidebar({ isMobile }) {
                         <li
                           key={lang.code}
                           onClick={() => {
+                            i18n.changeLanguage(lang.code);   // 👈 change language globally
+                            localStorage.setItem("i18nextLng", lang.code); // 👈 persist
                             setShowLangMenu(false);
                             setHoveredItem(null);
                           }}

@@ -133,7 +133,7 @@ const DraggableChatbot = () => {
                 }]);
             }
         } catch (error) {
-            console.error('❌ Error sending message:', error);
+            console.log('❌ Error sending message:', error);
 
             // Handle different types of errors
             let errorMessage = 'Sorry, I could not connect to the server. Please check your internet connection.';

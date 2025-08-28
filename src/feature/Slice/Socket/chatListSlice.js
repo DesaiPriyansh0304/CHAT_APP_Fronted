@@ -32,7 +32,7 @@ const chatListSlice = createSlice({
     setChatListError: (state, action) => {
       state.error = action.payload;
       state.loading = false;
-      console.error("❌ Chat list error:", action.payload);
+      console.log("❌ Chat list error:", action.payload);
     },
     clearChatList: (state) => {
       state.chats = [];

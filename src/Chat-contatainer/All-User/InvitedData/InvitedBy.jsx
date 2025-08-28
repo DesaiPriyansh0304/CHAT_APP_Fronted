@@ -4,6 +4,8 @@ import { fetchInvitedUsers } from '../../../feature/Slice/Invited-User/InvitedUs
 import { useDebounce } from 'use-debounce';
 import { motion } from 'framer-motion';
 import SkeletonLoader from "../../../Public Page/SkeletonLoader";
+import { LuUserRoundSearch } from "react-icons/lu";
+
 
 const InvitedByUser = () => {
     const dispatch = useDispatch();
@@ -161,12 +163,15 @@ const InvitedByUser = () => {
             {/*search input*/}
             <div className="mb-4 sm:mb-6">
                 <div className="relative w-full sm:max-w-md">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg sm:text-xl">
+                        <LuUserRoundSearch />
+                    </span>
                     <input
                         type="text"
                         placeholder="Search by name or email..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="px-3 sm:px-4 py-2 border border-blue-300 rounded-md w-full outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base pr-10"
+                        className="pl-10 sm:pl-14 sm:px-4 py-2 border border-blue-300 rounded-md w-full outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base pr-10"
                     />
                     {search && (
                         <button

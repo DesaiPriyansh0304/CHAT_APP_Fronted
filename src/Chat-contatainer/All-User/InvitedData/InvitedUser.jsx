@@ -9,6 +9,8 @@ import {
     resetFetchedFilter,
 } from '../../../feature/Slice/Invited-User/FilteredInvitedUsers';
 import SkeletonLoader from "../../../Public Page/SkeletonLoader";
+import { LuUserSearch } from "react-icons/lu";
+
 
 const InvitedUser = ({ onChat }) => {
     const dispatch = useDispatch();
@@ -141,22 +143,31 @@ const InvitedUser = ({ onChat }) => {
             <div className="space-y-3 sm:space-y-4 mb-3 sm:mb-6 flex-shrink-0">
                 {/* Search bar */}
                 <div className="relative w-full sm:w-1/2">
+                    {/* Search Icon */}
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg sm:text-xl">
+                        <LuUserSearch />
+                    </span>
+
+                    {/* Input Field */}
                     <input
                         type="text"
                         placeholder="Search by email or name..."
                         value={searchQuery}
                         onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-                        className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg w-full shadow-sm pr-10 text-sm sm:text-base"
+                        className="pl-12 sm:pl-14 pr-10 py-2 border border-orange-300 rounded-lg w-full shadow-sm text-sm sm:text-base"
                     />
+
+                    {/* Clear Button */}
                     {searchQuery && (
                         <button
                             onClick={() => dispatch(setSearchQuery(''))}
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-3 hover:text-red-500 text-xl sm:text-2xl font-bold focus:outline-none"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-500 text-xl sm:text-2xl font-bold focus:outline-none"
                         >
                             ×
                         </button>
                     )}
                 </div>
+
 
                 {/* Filter buttons */}
                 <div className="flex flex-wrap gap-2">
@@ -211,7 +222,7 @@ const InvitedUser = ({ onChat }) => {
                             return (
                                 <motion.div
                                     key={invite._id}
-                                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                                    className="bg-white h-[10vh] min-h-auto border border-gray-200 rounded-lg p-4 shadow-sm"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.05 }}
@@ -262,7 +273,7 @@ const InvitedUser = ({ onChat }) => {
                         })
                     ) : (
                         <div className="text-center py-8 text-gray-500">
-                            <div className="text-4xl mb-3">📭</div>
+                            <div className="text-4xl mb-1">📭</div>
                             <p>No {tab} invited users found{searchQuery && ` for "${searchQuery}"`}.</p>
                         </div>
                     )}

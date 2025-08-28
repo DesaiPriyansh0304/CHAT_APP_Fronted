@@ -175,7 +175,7 @@ const Chatbody = ({
   return (
     <div
       ref={containerRef}
-      className="h-full w-full overflow-y-auto px-4 py-2 space-y-2 bg-gray-50 dark:bg-[#222831] transition-colors duration-300"
+      className="h-full w-full overflow-y-auto px-4 py-2 space-y-2 bg-white dark:bg-[#222831] transition-colors duration-300"
     >
       {/* {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 p-2 bg-yellow-100 rounded">
@@ -251,6 +251,7 @@ const Chatbody = ({
                   setIsImagePreview={setIsImagePreview}
                   receiver={receiver}
                   groupUsers={groupUsers}
+                  selectUser={selectUser}
                   hasValidContent={msg.hasValidContent}
                 />
               )}
